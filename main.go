@@ -59,14 +59,28 @@ func main() {
 
 		heightAPI.GET("/block/txs", controller.GetBlockTxsByBlockHeight)
 
-		heightAPI.GET("/tx/:txid", controller.GetTxById)
-		heightAPI.GET("/tx/:txid/ins", controller.GetTxInputsByTxId)
-		heightAPI.GET("/tx/:txid/outs", controller.GetTxOutputsByTxId)
+		heightAPI.GET("/tx/:txid", controller.GetTxByIdInsideHeight)
+		heightAPI.GET("/tx/:txid/ins", controller.GetTxInputsByTxIdInsideHeight)
+		heightAPI.GET("/tx/:txid/outs", controller.GetTxOutputsByTxIdInsideHeight)
 
-		heightAPI.GET("/tx/:txid/in/:index", controller.GetTxInputByTxIdAndIdx)
-		heightAPI.GET("/tx/:txid/out/:index", controller.GetTxOutputByTxIdAndIdx)
+		heightAPI.GET("/tx/:txid/in/:index", controller.GetTxInputByTxIdAndIdxInsideHeight)
+		heightAPI.GET("/tx/:txid/out/:index", controller.GetTxOutputByTxIdAndIdxInsideHeight)
 
 		heightAPI.GET("/tx/:txid/out/:index/spent", controller.GetTxOutputSpentStatusByTxIdAndIdx)
+	}
+
+	beforeHeightAPI := router.Group("/before/:height")
+	{
+		beforeHeightAPI.GET("/tx/:txid", controller.GetTxByIdBeforeHeight)
+		beforeHeightAPI.GET("/tx/:txid/ins", controller.GetTxInputsByTxIdBeforeHeight)
+		beforeHeightAPI.GET("/tx/:txid/outs", controller.GetTxOutputsByTxIdBeforeHeight)
+	}
+
+	afterHeightAPI := router.Group("/after/:height")
+	{
+		afterHeightAPI.GET("/tx/:txid", controller.GetTxByIdAfterHeight)
+		// afterHeightAPI.GET("/tx/:txid/ins", controller.GetTxInputsByTxIdAfterHeight)
+		// afterHeightAPI.GET("/tx/:txid/outs", controller.GetTxOutputsByTxIdAfterHeight)
 	}
 
 	log.Printf("LISTEN: %s", listen_address)

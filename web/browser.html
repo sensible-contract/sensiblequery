@@ -10,7 +10,7 @@
     </style>
   </head>
   <body>
-    <div class="container" id="app">
+    <div class="container-fluent" id="app">
       <!-- nav -->
       <nav class="navbar navbar-expand navbar-light bg-light">
         <a class="navbar-brand">BSV browser</a>
@@ -48,169 +48,175 @@
         </form>
       </nav>
 
-      <!-- blocks -->
-      <div v-if="showBlock">
+      <div class="col">
+        <!-- blocks -->
+        <div v-if="showBlock">
 
-        <h3> Blocks: </h3>
-        <form class="form-inline">
-          <div class="form-group mb-2">
-            <label for="blockStartHeight" class="sr-only">Start</label>
-            <input type="text" class="form-control" v-model="blockStartHeight" id="blockStartHeight"
-                   placeholder="input start blk height">
-          </div>
-          <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
-            <div class="btn-group mr-2" role="group" aria-label="First group">
-              <a class="btn btn-secondary mb-2" v-on:click="viewBlockRange(-pageSize)" title="prev page">-</a>
-              <a class="btn btn-secondary mb-2" v-on:click="viewBlockRange(pageSize)" title="next page">+</a>
+          <h3> Blocks: </h3>
+          <form class="form-inline">
+            <div class="form-group mb-2">
+              <label for="blockStartHeight" class="sr-only">Start</label>
+              <input type="text" class="form-control" v-model="blockStartHeight" id="blockStartHeight"
+                     placeholder="input start blk height">
             </div>
-            <div class="btn-group" role="group" aria-label="Third group">
-              <a class="btn btn-primary mb-2" v-on:click="viewBlockRange(0)" title="View Blocks">Go</a>
+            <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+              <div class="btn-group mr-2" role="group" aria-label="First group">
+                <a class="btn btn-secondary mb-2" v-on:click="viewBlockRange(-pageSize)" title="prev page">-</a>
+                <a class="btn btn-secondary mb-2" v-on:click="viewBlockRange(pageSize)" title="next page">+</a>
+              </div>
+              <div class="btn-group" role="group" aria-label="Third group">
+                <a class="btn btn-primary mb-2" v-on:click="viewBlockRange(0)" title="View Blocks">Go</a>
+              </div>
             </div>
-          </div>
-        </form>
+          </form>
 
-        <table class="table table-sm">
-          <thead>
-            <tr>
-              <th class="text-right">#</th>
-              <th class="text-center">block id</th>
-              <th class="text-right">tx count</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="blk in Blocks">
-              <td class="text-right"><small><samp>{{ blk.height }}</samp></small></td>
-              <td class="text-center">
-                <a type="button"
-                   v-on:click="viewBlockHeightTxs(blk.height, blk.id);showBlock=false; showTxs=true"
-                   title="View Txs"
-                   class="btn-link"><small><samp>{{ blk.id }}</samp></small></a></td>
-              <td class="text-right">{{ blk.ntx }}</td>
-            </tr>
-          </tbody>
-        </table>
-
-      </div>
-
-      <!-- txs -->
-      <div v-if="showTxs">
-
-        <h3> Tx <small>list in block <samp>{{currBlockId}}</samp></small></h3>
-
-        <table class="table table-sm">
-          <thead>
-            <tr>
-              <th class="text-right">#</th>
-              <th class="text-center">tx id</th>
-              <th class="text-right">txin count</th>
-              <th class="text-right">txout count</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="tx in currBlockTxs">
-              <td class="text-right"><small><samp>{{ tx.idx }}</samp></small></td>
-              <td class="text-center">
-                <a type="button"
-                   v-on:click="viewTxIns(tx.height, tx.txid); viewTxOuts(tx.height, tx.txid); showTxs=false; showTx=true"
-                   title="View tx detail"
-                   class="btn-link"><small><samp>{{ tx.txid }}</samp></small></a></td>
-              <td class="text-right">{{ tx.nIn }}</td>
-              <td class="text-right">{{ tx.nOut }}</td>
-            </tr>
-          </tbody>
-        </table>
-
-      </div>
-
-      <!-- tx -->
-      <div v-if="showTx">
-
-        <h3> Tx <small><samp>{{currTxIdForIn}}</samp></small></h3>
-
-        <div class="row">
-          <div class="col-6">
-            <strong> {{currTxIns.length}} Inputs :</strong>
-
-            <table class="table table-sm">
-              <thead>
-                <tr>
-                  <th class="text-right">#</th>
-                  <th class="text-center">script type</th>
-                  <th class="text-center">address</th>
-                  <th class="text-right">satoshi</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="txin in currTxIns">
-                  <td class="text-right"><small><samp>{{ txin.idx }}</samp></small></td>
-                  <td class="text-center"><small><samp>{{ txin.script_type }}</samp></small></td>
-                  <td class="text-left">
-                    <a type="button"
-                       v-on:click="viewTxOutpointByAddress(txin.address); showAddress=true; showTx=false"
-                       class="btn-link"><small><samp>{{ txin.address }}</samp></small></a>
-                  </td>
-                  <td class="text-right">
-                    <a type="button"
-                       v-on:click="viewTxIns(-1, txin.utxid); viewTxOuts(-1, txin.utxid)"
-                       class="btn-link"><small><samp>{{ txin.satoshi }}</samp></small></a>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <div class="col-6">
-            <strong> {{currTxOuts.length}} Outputs :</strong>
-
-            <table class="table table-sm">
-              <thead>
-                <tr>
-                  <th class="text-right">#</th>
-                  <th class="text-center">script type</th>
-                  <th class="text-center">address</th>
-                  <th class="text-right">satoshi</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="txout in currTxOuts">
-                  <td class="text-right"><small><samp>{{ txout.vout }}</samp></small></td>
-                  <td class="text-center"><small><samp>{{ txout.script_type }}</samp></small></td>
-                  <td class="text-center">
-                    <a type="button"
-                       v-on:click="viewTxOutpointByAddress(txout.address); showAddress=true; showTx=false"
-                       title="View TxOutput"
-                       class="btn-link"><small><samp>{{ txout.address }}</samp></small></a></td>
-                  <td class="text-right"><small><samp>{{ txout.satoshi }}</samp></small></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-      <!-- address -->
-      <div v-if="showAddress">
-
-        <h3> Address <small><samp>{{currAddress}}<samp></small>:</h3>
-
-          <strong> Outputs :</strong>
           <table class="table table-sm">
             <thead>
               <tr>
                 <th class="text-right">#</th>
-                <th class="text-center">utxo</th>
-                <th class="text-center">script type</th>
-                <th class="text-right">satoshi</th>
+                <th class="text-center">block id</th>
+                <th class="text-right">tx count</th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(txout, index) in currAddressTxOuts">
-                <td class="text-right"><small><samp>{{ index }}</samp></small></td>
-                <td class="text-left"><small><samp>{{ txout.txid }}:{{ txout.vout }}</samp></small></td>
-                <td class="text-center"><small><samp>{{ txout.script_type }}</samp></small></td>
-                <td class="text-right"><small><samp>{{ txout.satoshi }}</samp></small></td>
+              <tr v-for="blk in Blocks">
+                <td class="text-right"><small><samp>{{ blk.height }}</samp></small></td>
+                <td class="text-center">
+                  <a type="button"
+                     v-on:click="viewBlockHeightTxs(blk.height, blk.id);showBlock=false; showTxs=true"
+                     title="View Txs"
+                     class="btn-link"><small><samp>{{ blk.id }}</samp></small></a></td>
+                <td class="text-right"><small><samp>{{ blk.ntx }}</samp></small></td>
               </tr>
             </tbody>
           </table>
+
+        </div>
+
+        <!-- txs -->
+        <div v-if="showTxs">
+
+          <h3> Tx <small>list in block <samp>{{currBlockId}}</samp></small></h3>
+
+          <table class="table table-sm">
+            <thead>
+              <tr>
+                <th class="text-right">#</th>
+                <th class="text-center">tx id</th>
+                <th class="text-right">txin count</th>
+                <th class="text-right">txout count</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="tx in currBlockTxs">
+                <td class="text-right"><small><samp>{{ tx.idx }}</samp></small></td>
+                <td class="text-center">
+                  <a type="button"
+                     v-on:click="viewTxInsInside(tx.height, tx.txid); viewTxOutsInside(tx.height, tx.txid); showTxs=false; showTx=true"
+                     title="View tx detail"
+                     class="btn-link"><small><samp>{{ tx.txid }}</samp></small></a></td>
+                <td class="text-right"><small><samp>{{ tx.nIn }}</samp></small></td>
+                <td class="text-right"><small><samp>{{ tx.nOut }}</samp></small></td>
+              </tr>
+            </tbody>
+          </table>
+
+        </div>
+
+        <!-- tx -->
+        <div v-if="showTx">
+
+          <h3> Tx <small><samp>{{currTxIdForIn}}</samp></small></h3>
+
+          <div class="row">
+            <div class="col-6">
+              <strong> {{currTxIns.length}} Inputs :</strong>
+
+              <table class="table table-sm">
+                <thead>
+                  <tr>
+                    <th class="text-left"></th>
+                    <th class="text-right">#</th>
+                    <th class="text-center">script type</th>
+                    <th class="text-center">address</th>
+                    <th class="text-right">satoshi</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="txin in currTxIns">
+                    <td class="text-left">
+                      <a type="button"
+                         v-on:click="viewTxInsBefore(txin.height, txin.utxid); viewTxOutsBefore(txin.height, txin.utxid)"
+                         class="btn-link"><small><samp>❰</samp></small></a>
+                    </td>
+                    <td class="text-right"><small><samp>{{ txin.idx }}</samp></small></td>
+                    <td class="text-center"><small><samp>{{ txin.script_type }}</samp></small></td>
+                    <td class="text-left">
+                      <a type="button"
+                         v-on:click="viewTxOutpointByAddress(txin.address); showAddress=true; showTx=false"
+                         class="btn-link"><small><samp>{{ txin.address }}</samp></small></a>
+                    </td>
+                    <td class="text-right">
+                      <small><samp>{{ txin.satoshi }}</samp></small>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="col-6">
+              <strong> {{currTxOuts.length}} Outputs :</strong>
+
+              <table class="table table-sm">
+                <thead>
+                  <tr>
+                    <th class="text-right">#</th>
+                    <th class="text-center">script type</th>
+                    <th class="text-center">address</th>
+                    <th class="text-right">satoshi</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="txout in currTxOuts">
+                    <td class="text-right"><small><samp>{{ txout.vout }}</samp></small></td>
+                    <td class="text-center"><small><samp>{{ txout.script_type }}</samp></small></td>
+                    <td class="text-center">
+                      <a type="button"
+                         v-on:click="viewTxOutpointByAddress(txout.address); showAddress=true; showTx=false"
+                         title="View TxOutput"
+                         class="btn-link"><small><samp>{{ txout.address }}</samp></small></a></td>
+                    <td class="text-right"><small><samp>{{ txout.satoshi }}</samp></small></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <!-- address -->
+        <div v-if="showAddress">
+
+          <h3> Address <small><samp>{{currAddress}}<samp></small>:</h3>
+
+            <strong> Outputs :</strong>
+            <table class="table table-sm">
+              <thead>
+                <tr>
+                  <th class="text-right">#</th>
+                  <th class="text-center">utxo</th>
+                  <th class="text-center">script type</th>
+                  <th class="text-right">satoshi</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(txout, index) in currAddressTxOuts">
+                  <td class="text-right"><small><samp>{{ index }}</samp></small></td>
+                  <td class="text-left"><small><samp>{{ txout.txid }}:{{ txout.vout }}</samp></small></td>
+                  <td class="text-center"><small><samp>{{ txout.script_type }}</samp></small></td>
+                  <td class="text-right"><small><samp>{{ txout.satoshi }}</samp></small></td>
+                </tr>
+              </tbody>
+            </table>
+        </div>
       </div>
     </div>
 
@@ -221,7 +227,7 @@
         const app = new Vue({
             el: '#app',
             data: {
-                apiPoint: "http://120.92.153.221:5555/",
+              apiPoint: "http://120.92.153.221:5555/",
               /* apiPoint: "http://localhost:8000/",*/
 
                 blockStartHeight: 0,
@@ -259,8 +265,8 @@
                 } else if (this.showTxs) {
                   this.viewBlockIdTxs(this.navInputValue)
                 } else if (this.showTx) {
-                  this.viewTxIns(-1, this.navInputValue)
-                  this.viewTxOuts(-1, this.navInputValue)
+                  this.viewTxIns(this.navInputValue)
+                  this.viewTxOuts(this.navInputValue)
                 } else if (this.showAddress) {
                   this.viewTxOutpointByAddress(this.navInputValue)
                 }
@@ -316,7 +322,33 @@
                   )
               },
 
-              viewTxIns: function (height, txid) {
+              viewTxIns: function (txid) {
+                this.currTxIdForIn = txid
+                this.currTxIns = []
+
+                axios
+                  .get(this.apiPoint + "/tx/"+ txid +"/ins")
+                  .then(
+                    response => {
+                      this.currTxIns = response.data.data
+                    }
+                  )
+              },
+              viewTxOuts: function (txid) {
+                this.currTxIdForOut = txid
+                this.currTxOuts = []
+
+                axios
+                  .get(this.apiPoint + "/tx/"+ txid +"/outs")
+                  .then(
+                    response => {
+                      this.currTxOuts = response.data.data
+                    }
+                  )
+              },
+
+
+              viewTxInsInside: function (height, txid) {
                 this.currTxIdForIn = txid
                 this.currTxIns = []
 
@@ -328,7 +360,7 @@
                     }
                   )
               },
-              viewTxOuts: function (height, txid) {
+              viewTxOutsInside: function (height, txid) {
                 this.currTxIdForOut = txid
                 this.currTxOuts = []
 
@@ -340,6 +372,33 @@
                     }
                   )
               },
+
+
+              viewTxInsBefore: function (height, txid) {
+                this.currTxIdForIn = txid
+                this.currTxIns = []
+
+                axios
+                  .get(this.apiPoint + "before/"+ height +"/tx/"+ txid +"/ins")
+                  .then(
+                    response => {
+                      this.currTxIns = response.data.data
+                    }
+                  )
+              },
+              viewTxOutsBefore: function (height, txid) {
+                this.currTxIdForOut = txid
+                this.currTxOuts = []
+
+                axios
+                  .get(this.apiPoint + "before/"+ height +"/tx/"+ txid +"/outs")
+                  .then(
+                    response => {
+                      this.currTxOuts = response.data.data
+                    }
+                  )
+              },
+
               viewTxOutpointByAddress: function (address) {
                 this.currAddress = address
                 this.currAddressTxOuts = []

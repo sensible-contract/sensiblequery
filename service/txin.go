@@ -33,10 +33,8 @@ func txInResultSRF(rows *sql.Rows) (interface{}, error) {
 	return &ret, nil
 }
 
-func GetTxInputsByTxId(blkHeight int, txidHex string) (txInsRsp []*model.TxInResp, err error) {
-	var psql string
-	if blkHeight < 0 {
-		psql = fmt.Sprintf(`
+func GetTxInputsByTxId(txidHex string) (txInsRsp []*model.TxInResp, err error) {
+	psql := fmt.Sprintf(`
 SELECT height, txid, idx, script_sig,
        height_txo, utxid, vout, address, genesis, satoshi, script_type FROM txin_full
 WHERE txid = unhex('%s') AND
@@ -44,14 +42,31 @@ height IN (
     SELECT height FROM tx
     WHERE txid = unhex('%s') LIMIT 1
 )`, txidHex, txidHex)
-	} else {
-		psql = fmt.Sprintf(`
+
+	return GetTxInputsBySql(psql)
+}
+
+func GetTxInputsByTxIdInsideHeight(blkHeight int, txidHex string) (txInsRsp []*model.TxInResp, err error) {
+	psql := fmt.Sprintf(`
 SELECT height, txid, idx, script_sig,
        height_txo, utxid, vout, address, genesis, satoshi, script_type FROM txin_full
 WHERE txid = unhex('%s') AND
     height = %d`, txidHex, blkHeight)
-	}
 
+	return GetTxInputsBySql(psql)
+}
+
+func GetTxInputsByTxIdBeforeHeight(blkHeight int, txidHex string) (txInsRsp []*model.TxInResp, err error) {
+	psql := fmt.Sprintf(`
+SELECT height, txid, idx, script_sig,
+       height_txo, utxid, vout, address, genesis, satoshi, script_type FROM txin_full
+WHERE txid = unhex('%s') AND
+    height <= %d`, txidHex, blkHeight)
+
+	return GetTxInputsBySql(psql)
+}
+
+func GetTxInputsBySql(psql string) (txInsRsp []*model.TxInResp, err error) {
 	txInsRet, err := clickhouse.ScanAll(psql, txInResultSRF)
 	if err != nil {
 		log.Printf("query txs by blkid failed: %v", err)
@@ -77,25 +92,54 @@ WHERE txid = unhex('%s') AND
 	return
 }
 
-func GetTxInputByTxIdAndIdx(blkHeight int, txidHex string, index int) (txInRsp *model.TxInResp, err error) {
-	var psql string
-	if blkHeight < 0 {
-		psql = fmt.Sprintf(`
+func GetTxInputByTxIdAndIdx(txidHex string, index int) (txInRsp *model.TxInResp, err error) {
+	psql := fmt.Sprintf(`
 SELECT height, txid, idx, script_sig,
        height_txo, utxid, vout, address, genesis, satoshi, script_type FROM txin_full
 WHERE txid = unhex('%s') AND
        idx = %d
 LIMIT 1`, txidHex, index)
-	} else {
-		psql = fmt.Sprintf(`
+
+	return GetTxInputBySql(psql)
+}
+
+func GetTxInputByTxIdAndIdxInsideHeight(blkHeight int, txidHex string, index int) (txInRsp *model.TxInResp, err error) {
+	psql := fmt.Sprintf(`
 SELECT height, txid, idx, script_sig,
        height_txo, utxid, vout, address, genesis, satoshi, script_type FROM txin_full
 WHERE txid = unhex('%s') AND
        idx = %d AND
     height = %d
 LIMIT 1`, txidHex, index, blkHeight)
-	}
 
+	return GetTxInputBySql(psql)
+}
+
+func GetTxInputByTxIdAndIdxBeforeHeight(blkHeight int, txidHex string, index int) (txInRsp *model.TxInResp, err error) {
+	psql := fmt.Sprintf(`
+SELECT height, txid, idx, script_sig,
+       height_txo, utxid, vout, address, genesis, satoshi, script_type FROM txin_full
+WHERE txid = unhex('%s') AND
+       idx = %d AND
+    height <= %d
+LIMIT 1`, txidHex, index, blkHeight)
+
+	return GetTxInputBySql(psql)
+}
+
+func GetTxInputByTxIdAndIdxAfterHeight(blkHeight int, txidHex string, index int) (txInRsp *model.TxInResp, err error) {
+	psql := fmt.Sprintf(`
+SELECT height, txid, idx, script_sig,
+       height_txo, utxid, vout, address, genesis, satoshi, script_type FROM txin_full
+WHERE txid = unhex('%s') AND
+       idx = %d AND
+    height >= %d
+LIMIT 1`, txidHex, index, blkHeight)
+
+	return GetTxInputBySql(psql)
+}
+
+func GetTxInputBySql(psql string) (txInRsp *model.TxInResp, err error) {
 	txInRet, err := clickhouse.ScanOne(psql, txInResultSRF)
 	if err != nil {
 		log.Printf("query tx by blkid failed: %v", err)

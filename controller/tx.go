@@ -65,8 +65,8 @@ func GetBlockTxsByBlockId(ctx *gin.Context) {
 	})
 }
 
-func GetTxById(ctx *gin.Context) {
-	log.Printf("GetTxById enter")
+func GetTxByIdBeforeHeight(ctx *gin.Context) {
+	log.Printf("GetTxByIdBeforeHeight enter")
 
 	// may have height
 	blkHeightString := ctx.Param("height")
@@ -85,7 +85,103 @@ func GetTxById(ctx *gin.Context) {
 	}
 	txId := utils.ReverseBytes(txIdReverse)
 
-	tx, err := service.GetTxById(blkHeight, hex.EncodeToString(txId))
+	tx, err := service.GetTxByIdBeforeHeight(blkHeight, hex.EncodeToString(txId))
+	if err != nil {
+		log.Printf("get tx failed: %v", err)
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get tx failed"})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, model.Response{
+		Code: 0,
+		Msg:  "ok",
+		Data: tx,
+	})
+}
+
+func GetTxByIdAfterHeight(ctx *gin.Context) {
+	log.Printf("GetTxByIdAfterHeight enter")
+
+	// may have height
+	blkHeightString := ctx.Param("height")
+	blkHeight, err := strconv.Atoi(blkHeightString)
+	if err != nil {
+		blkHeight = -1
+	}
+
+	txIdHex := ctx.Param("txid")
+	// check
+	txIdReverse, err := hex.DecodeString(txIdHex)
+	if err != nil {
+		log.Printf("txid invalid: %v", err)
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "txid invalid"})
+		return
+	}
+	txId := utils.ReverseBytes(txIdReverse)
+
+	tx, err := service.GetTxByIdAfterHeight(blkHeight, hex.EncodeToString(txId))
+	if err != nil {
+		log.Printf("get tx failed: %v", err)
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get tx failed"})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, model.Response{
+		Code: 0,
+		Msg:  "ok",
+		Data: tx,
+	})
+}
+
+func GetTxById(ctx *gin.Context) {
+	log.Printf("GetTxById enter")
+
+	txIdHex := ctx.Param("txid")
+	// check
+	txIdReverse, err := hex.DecodeString(txIdHex)
+	if err != nil {
+		log.Printf("txid invalid: %v", err)
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "txid invalid"})
+		return
+	}
+	txId := utils.ReverseBytes(txIdReverse)
+
+	tx, err := service.GetTxById(hex.EncodeToString(txId))
+	if err != nil {
+		log.Printf("get tx failed: %v", err)
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get tx failed"})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, model.Response{
+		Code: 0,
+		Msg:  "ok",
+		Data: tx,
+	})
+}
+
+func GetTxByIdInsideHeight(ctx *gin.Context) {
+	log.Printf("GetTxByIdInsideHeight enter")
+
+	blkHeightString := ctx.Param("height")
+	blkHeight, err := strconv.Atoi(blkHeightString)
+	if err != nil {
+		log.Printf("height invalid: %v", err)
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "height invalid"})
+		return
+	}
+
+	txIdHex := ctx.Param("txid")
+	// check
+	txIdReverse, err := hex.DecodeString(txIdHex)
+	if err != nil {
+		log.Printf("txid invalid: %v", err)
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "txid invalid"})
+		return
+	}
+	txId := utils.ReverseBytes(txIdReverse)
+
+	tx, err := service.GetTxByIdInsideHeight(blkHeight, hex.EncodeToString(txId))
 	if err != nil {
 		log.Printf("get tx failed: %v", err)
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get tx failed"})
