@@ -39,8 +39,8 @@ SELECT height, txid, idx, script_sig,
        height_txo, utxid, vout, address, genesis, satoshi, script_type FROM txin_full
 WHERE txid = unhex('%s') AND
 height IN (
-    SELECT height FROM tx
-    WHERE txid = unhex('%s') LIMIT 1
+    SELECT height FROM tx_height
+    WHERE txid = unhex('%s')
 )`, txidHex, txidHex)
 
 	return GetTxInputsBySql(psql)
@@ -56,6 +56,7 @@ WHERE txid = unhex('%s') AND
 	return GetTxInputsBySql(psql)
 }
 
+// no need use tx_height instead
 func GetTxInputsByTxIdBeforeHeight(blkHeight int, txidHex string) (txInsRsp []*model.TxInResp, err error) {
 	psql := fmt.Sprintf(`
 SELECT height, txid, idx, script_sig,
@@ -71,6 +72,9 @@ func GetTxInputsBySql(psql string) (txInsRsp []*model.TxInResp, err error) {
 	if err != nil {
 		log.Printf("query txs by blkid failed: %v", err)
 		return nil, err
+	}
+	if txInsRet == nil {
+		return nil, errors.New("not exist")
 	}
 	txIns := txInsRet.([]*model.TxInDO)
 	for _, txin := range txIns {
@@ -97,8 +101,12 @@ func GetTxInputByTxIdAndIdx(txidHex string, index int) (txInRsp *model.TxInResp,
 SELECT height, txid, idx, script_sig,
        height_txo, utxid, vout, address, genesis, satoshi, script_type FROM txin_full
 WHERE txid = unhex('%s') AND
-       idx = %d
-LIMIT 1`, txidHex, index)
+       idx = %d AND
+height IN (
+    SELECT height FROM tx_height
+    WHERE txid = unhex('%s')
+)
+LIMIT 1`, txidHex, index, txidHex)
 
 	return GetTxInputBySql(psql)
 }
@@ -115,6 +123,7 @@ LIMIT 1`, txidHex, index, blkHeight)
 	return GetTxInputBySql(psql)
 }
 
+// no need, use tx_height instead
 func GetTxInputByTxIdAndIdxBeforeHeight(blkHeight int, txidHex string, index int) (txInRsp *model.TxInResp, err error) {
 	psql := fmt.Sprintf(`
 SELECT height, txid, idx, script_sig,
@@ -127,6 +136,7 @@ LIMIT 1`, txidHex, index, blkHeight)
 	return GetTxInputBySql(psql)
 }
 
+// no need
 func GetTxInputByTxIdAndIdxAfterHeight(blkHeight int, txidHex string, index int) (txInRsp *model.TxInResp, err error) {
 	psql := fmt.Sprintf(`
 SELECT height, txid, idx, script_sig,
@@ -148,9 +158,7 @@ func GetTxInputBySql(psql string) (txInRsp *model.TxInResp, err error) {
 	if txInRet == nil {
 		return nil, errors.New("not exist")
 	}
-
 	txin := txInRet.(*model.TxInDO)
-
 	txInRsp = &model.TxInResp{
 		Height:       int(txin.Height),
 		TxIdHex:      blkparser.HashString(txin.TxId),

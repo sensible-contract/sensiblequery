@@ -21,12 +21,18 @@ func txResultSRF(rows *sql.Rows) (interface{}, error) {
 }
 
 func GetBlockTxsByBlockHeight(blkHeight int) (txsRsp []*model.TxInfoResp, err error) {
-	psql := fmt.Sprintf("SELECT txid, nin, nout, height, blkid, idx FROM blktx WHERE height = %d", blkHeight)
+	psql := fmt.Sprintf("SELECT txid, nin, nout, height, blkid, idx FROM blktx_height WHERE height = %d", blkHeight)
 	return GetBlockTxsBySql(psql)
 }
 
 func GetBlockTxsByBlockId(blkidHex string) (txsRsp []*model.TxInfoResp, err error) {
-	psql := fmt.Sprintf("SELECT txid, nin, nout, height, blkid, idx FROM blktx WHERE blkid = unhex('%s')", blkidHex)
+	psql := fmt.Sprintf(`
+SELECT txid, nin, nout, height, blkid, idx FROM blktx_height
+WHERE height IN (
+    SELECT height FROM blk
+    WHERE blkid = unhex('%s') LIMIT 1
+)`, blkidHex)
+
 	return GetBlockTxsBySql(psql)
 }
 
@@ -35,6 +41,9 @@ func GetBlockTxsBySql(psql string) (txsRsp []*model.TxInfoResp, err error) {
 	if err != nil {
 		log.Printf("query txs by blkid failed: %v", err)
 		return nil, err
+	}
+	if txsRet == nil {
+		return nil, errors.New("not exist")
 	}
 	txs := txsRet.([]*model.TxDO)
 	for _, tx := range txs {
@@ -52,8 +61,14 @@ func GetBlockTxsBySql(psql string) (txsRsp []*model.TxInfoResp, err error) {
 }
 
 func GetTxById(txidHex string) (txRsp *model.TxInfoResp, err error) {
-	psql := fmt.Sprintf("SELECT txid, nin, nout, height, blkid, idx FROM tx WHERE txid = unhex('%s') LIMIT 1", txidHex)
-
+	psql := fmt.Sprintf(`
+SELECT txid, nin, nout, height, blkid, idx FROM tx
+WHERE txid = unhex('%s') AND
+height IN (
+    SELECT height FROM tx_height
+    WHERE txid = unhex('%s')
+)
+LIMIT 1`, txidHex)
 	return GetTxBySql(psql)
 }
 
@@ -62,11 +77,13 @@ func GetTxByIdInsideHeight(blkHeight int, txidHex string) (txRsp *model.TxInfoRe
 	return GetTxBySql(psql)
 }
 
+// no need
 func GetTxByIdBeforeHeight(blkHeight int, txidHex string) (txRsp *model.TxInfoResp, err error) {
 	psql := fmt.Sprintf("SELECT txid, nin, nout, height, blkid, idx FROM tx WHERE txid = unhex('%s') AND height <= %d", txidHex, blkHeight)
 	return GetTxBySql(psql)
 }
 
+// no need
 func GetTxByIdAfterHeight(blkHeight int, txidHex string) (txRsp *model.TxInfoResp, err error) {
 	psql := fmt.Sprintf("SELECT txid, nin, nout, height, blkid, idx FROM tx WHERE txid = unhex('%s') AND height >= %d", txidHex, blkHeight)
 	return GetTxBySql(psql)
@@ -78,11 +95,9 @@ func GetTxBySql(psql string) (txRsp *model.TxInfoResp, err error) {
 		log.Printf("query tx failed: %v", err)
 		return nil, err
 	}
-
 	if txRet == nil {
 		return nil, errors.New("not exist")
 	}
-
 	tx := txRet.(*model.TxDO)
 	txRsp = &model.TxInfoResp{
 		TxIdHex:  blkparser.HashString(tx.TxId),

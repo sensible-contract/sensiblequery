@@ -28,7 +28,9 @@ func GetBlocksByHeightRange(blkStartHeight, blkEndHeight int) (blksRsp []*model.
 		log.Printf("query blk failed: %v", err)
 		return nil, err
 	}
-
+	if blksRet == nil {
+		return nil, errors.New("not exist")
+	}
 	blocks := blksRet.([]*model.BlockDO)
 	for _, block := range blocks {
 		blksRsp = append(blksRsp, &model.BlockInfoResp{
@@ -58,13 +60,10 @@ func GetBlockBySql(psql string) (blk *model.BlockInfoResp, err error) {
 		log.Printf("query blk failed: %v", err)
 		return nil, err
 	}
-
 	if blkRet == nil {
 		return nil, errors.New("not exist")
 	}
-
 	block := blkRet.(*model.BlockDO)
-
 	blk = &model.BlockInfoResp{
 		Height:         int(block.Height),
 		BlockIdHex:     blkparser.HashString(block.BlockId),

@@ -27,9 +27,10 @@ func GetTxOutputsByTxId(txidHex string) (txOutsRsp []*model.TxOutResp, err error
 SELECT txid, vout, address, genesis, satoshi, script_type, script, height FROM txout
 WHERE txid = unhex('%s') AND
 height IN (
-    SELECT height FROM tx
-    WHERE txid = unhex('%s') LIMIT 1
-)`, txidHex, txidHex)
+    SELECT height FROM tx_height
+    WHERE txid = unhex('%s')
+)
+`, txidHex, txidHex)
 
 	return GetTxOutputsBySql(psql)
 }
@@ -43,6 +44,7 @@ WHERE txid = unhex('%s') AND
 	return GetTxOutputsBySql(psql)
 }
 
+// no need
 func GetTxOutputsByTxIdBeforeHeight(blkHeight int, txidHex string) (txOutsRsp []*model.TxOutResp, err error) {
 	psql := fmt.Sprintf(`
 SELECT txid, vout, address, genesis, satoshi, script_type, script, height FROM txout
@@ -52,6 +54,7 @@ WHERE txid = unhex('%s') AND
 	return GetTxOutputsBySql(psql)
 }
 
+// no need
 func GetTxOutputsByTxIdAfterHeight(blkHeight int, txidHex string) (txOutsRsp []*model.TxOutResp, err error) {
 	psql := fmt.Sprintf(`
 SELECT txid, vout, address, genesis, satoshi, script_type, script, height FROM txout
@@ -66,6 +69,9 @@ func GetTxOutputsBySql(psql string) (txOutsRsp []*model.TxOutResp, err error) {
 	if err != nil {
 		log.Printf("query txs by blkid failed: %v", err)
 		return nil, err
+	}
+	if txOutsRet == nil {
+		return nil, errors.New("not exist")
 	}
 	txOuts := txOutsRet.([]*model.TxOutDO)
 	for _, txout := range txOuts {
@@ -88,8 +94,12 @@ func GetTxOutputByTxIdAndIdx(txidHex string, index int) (txOutRsp *model.TxOutRe
 	psql := fmt.Sprintf(`
 SELECT txid, vout, address, genesis, satoshi, script_type, script, height FROM txout
 WHERE txid = unhex('%s') AND
-      vout = %d
-LIMIT 1`, txidHex, index)
+      vout = %d AND
+height IN (
+    SELECT height FROM tx_height
+    WHERE txid = unhex('%s')
+)
+LIMIT 1`, txidHex, index, txidHex)
 	return GetTxOutputBySql(psql)
 }
 
@@ -104,6 +114,7 @@ LIMIT 1`, txidHex, index, blkHeight)
 	return GetTxOutputBySql(psql)
 }
 
+// no need
 func GetTxOutputByTxIdAndIdxBeforeHeight(blkHeight int, txidHex string, index int) (txOutRsp *model.TxOutResp, err error) {
 	psql := fmt.Sprintf(`
 SELECT txid, vout, address, genesis, satoshi, script_type, script, height FROM txout
@@ -115,6 +126,7 @@ LIMIT 1`, txidHex, index, blkHeight)
 	return GetTxOutputBySql(psql)
 }
 
+// no need
 func GetTxOutputByTxIdAndIdxAfterHeight(blkHeight int, txidHex string, index int) (txOutRsp *model.TxOutResp, err error) {
 	psql := fmt.Sprintf(`
 SELECT txid, vout, address, genesis, satoshi, script_type, script, height FROM txout
@@ -164,6 +176,9 @@ LIMIT 100`,
 		log.Printf("query txs by address failed: %v", err)
 		return nil, err
 	}
+	if txOutsRet == nil {
+		return nil, errors.New("not exist")
+	}
 	txOuts := txOutsRet.([]*model.TxOutDO)
 	for _, txout := range txOuts {
 		txOutsRsp = append(txOutsRsp, &model.TxOutResp{
@@ -194,6 +209,9 @@ LIMIT 100`,
 	if err != nil {
 		log.Printf("query txs by genesis failed: %v", err)
 		return nil, err
+	}
+	if txOutsRet == nil {
+		return nil, errors.New("not exist")
 	}
 	txOuts := txOutsRet.([]*model.TxOutDO)
 	for _, txout := range txOuts {

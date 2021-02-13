@@ -38,9 +38,8 @@
             </li>
           </ul>
         </div>
-
-        <form class="form-inline">
-          <input class="form-control mr-sm-2" type="search"
+        <form class="form-inline col-7">
+          <input class="form-control mr-sm-2 col" type="search"
                  v-model="navInputValue"
                  placeholder="Search" aria-label="Search">
           <a class="btn btn-outline-success my-2 my-sm-0"
@@ -49,28 +48,46 @@
       </nav>
 
       <div class="col">
+        <div class="alert alert-info" role="alert">
+          {{message}}
+        </div>
+
         <!-- blocks -->
         <div v-if="showBlock">
 
-          <h3> Blocks: </h3>
-          <form class="form-inline">
-            <div class="form-group mb-2">
-              <label for="blockStartHeight" class="sr-only">Start</label>
-              <input type="text" class="form-control" v-model="blockStartHeight" id="blockStartHeight"
-                     placeholder="input start blk height">
-            </div>
-            <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
-              <div class="btn-group mr-2" role="group" aria-label="First group">
+          <h3> Blocks </h3>
+
+          <div class="row justify-content-center">
+            <div class="col-1">
+              <div class="btn-group btn-group-lg mr-2" role="group" aria-label="First group">
                 <a class="btn btn-secondary mb-2" v-on:click="viewBlockRange(-pageSize)" title="prev page">-</a>
+              </div>
+            </div>
+
+            <div class="col-4">
+              <form class="form-inline col">
+                <div class="form-group col">
+                  <label for="blockStartHeight" class="sr-only">Start</label>
+                  <input type="text" class="form-control col" v-model="blockStartHeight" id="blockStartHeight"
+                         placeholder="input start blk height">
+                </div>
+              </form>
+            </div>
+
+            <div class="col-1">
+              <div class="btn-group btn-group-lg mr-2" role="group" aria-label="First group">
                 <a class="btn btn-secondary mb-2" v-on:click="viewBlockRange(pageSize)" title="next page">+</a>
               </div>
-              <div class="btn-group" role="group" aria-label="Third group">
+            </div>
+
+            <div class="col-1">
+              <div class="btn-group btn-group-lg mr-2" role="group" aria-label="First group">
                 <a class="btn btn-primary mb-2" v-on:click="viewBlockRange(0)" title="View Blocks">Go</a>
               </div>
             </div>
-          </form>
+          </div>
 
-          <table class="table table-sm">
+          <table class="table">
             <thead>
               <tr>
                 <th class="text-right">#</th>
@@ -80,13 +97,13 @@
             </thead>
             <tbody>
               <tr v-for="blk in Blocks">
-                <td class="text-right"><small><samp>{{ blk.height }}</samp></small></td>
+                <td class="text-right"><samp>{{ blk.height }}</samp></td>
                 <td class="text-center">
                   <a type="button"
                      v-on:click="viewBlockHeightTxs(blk.height, blk.id);showBlock=false; showTxs=true"
                      title="View Txs"
-                     class="btn-link"><small><samp>{{ blk.id }}</samp></small></a></td>
-                <td class="text-right"><small><samp>{{ blk.ntx }}</samp></small></td>
+                     class="btn-link"><samp>{{ blk.id }}</samp></a></td>
+                <td class="text-right"><samp>{{ blk.ntx }}</samp></td>
               </tr>
             </tbody>
           </table>
@@ -96,9 +113,30 @@
         <!-- txs -->
         <div v-if="showTxs">
 
-          <h3> Tx <small>list in block <samp>{{currBlockId}}</samp></small></h3>
+          <h3> Txs <small>in block</small></h3>
 
-          <table class="table table-sm">
+          <div class="row">
+            <div class="col">
+
+              <table class="table table-bordered">
+                <thead>
+                  <tr>
+                    <th class="text-right">BlockId:</th>
+                    <th class="text-left"><samp>{{currBlockId}}</samp></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th class="text-right">Tx Count:</th>
+                    <td class="text-left"><samp> {{ currBlockTxs.length }} </samp></td>
+                  </tr>
+                </tbody>
+              </table>
+
+            </div>
+          </div>
+
+          <table class="table">
             <thead>
               <tr>
                 <th class="text-right">#</th>
@@ -109,14 +147,14 @@
             </thead>
             <tbody>
               <tr v-for="tx in currBlockTxs">
-                <td class="text-right"><small><samp>{{ tx.idx }}</samp></small></td>
+                <td class="text-right"><samp>{{ tx.idx }}</samp></td>
                 <td class="text-center">
                   <a type="button"
                      v-on:click="viewTxInsInside(tx.height, tx.txid); viewTxOutsInside(tx.height, tx.txid); showTxs=false; showTx=true"
                      title="View tx detail"
-                     class="btn-link"><small><samp>{{ tx.txid }}</samp></small></a></td>
-                <td class="text-right"><small><samp>{{ tx.nIn }}</samp></small></td>
-                <td class="text-right"><small><samp>{{ tx.nOut }}</samp></small></td>
+                     class="btn-link"><samp>{{ tx.txid }}</samp></a></td>
+                <td class="text-right"><samp>{{ tx.nIn }}</samp></td>
+                <td class="text-right"><samp>{{ tx.nOut }}</samp></td>
               </tr>
             </tbody>
           </table>
@@ -126,38 +164,59 @@
         <!-- tx -->
         <div v-if="showTx">
 
-          <h3> Tx <small><samp>{{currTxIdForIn}}</samp></small></h3>
+          <h3> Tx </h3>
+
+          <div class="row">
+            <div class="col">
+
+              <table class="table table-bordered">
+                <thead>
+                  <tr>
+                    <th class="text-right">TxId:</th>
+                    <th class="text-left"><samp>{{currTxIdForIn}}</samp></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th class="text-right">Fee:</th>
+                    <td class="text-left"><samp> {{((currTxIdInputValue-currTxIdOutputValue)/100000000.0)}} </samp></td>
+                  </tr>
+                </tbody>
+              </table>
+
+            </div>
+          </div>
 
           <div class="row">
             <div class="col-6">
-              <strong> {{currTxIns.length}} Inputs :</strong>
 
-              <table class="table table-sm">
+              <table class="table">
                 <thead>
                   <tr>
                     <th class="text-left"></th>
                     <th class="text-right">#</th>
-                    <th class="text-center">script type</th>
-                    <th class="text-center">address</th>
-                    <th class="text-right">satoshi</th>
+                    <th class="text-center">{{currTxIns.length}} Inputs</th>
+                    <th class="text-right">{{(currTxIdInputValue/100000000.0)}}</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr v-for="txin in currTxIns">
                     <td class="text-left">
                       <a type="button"
-                         v-on:click="viewTxInsBefore(txin.height, txin.utxid); viewTxOutsBefore(txin.height, txin.utxid)"
-                         class="btn-link"><small><samp>❰</samp></small></a>
+                         v-on:click="viewTxInsInside(txin.height_txo, txin.utxid); viewTxOutsInside(txin.height_txo, txin.utxid)"
+                         class="btn-link"><samp>❰</samp></a>
                     </td>
-                    <td class="text-right"><small><samp>{{ txin.idx }}</samp></small></td>
-                    <td class="text-center"><small><samp>{{ txin.script_type }}</samp></small></td>
+                    <td class="text-right">
+                      <small><samp>{{txin.idx}}</samp></small>
+                    </td>
                     <td class="text-left">
                       <a type="button"
                          v-on:click="viewTxOutpointByAddress(txin.address); showAddress=true; showTx=false"
-                         class="btn-link"><small><samp>{{ txin.address }}</samp></small></a>
+                         class="btn-link"><samp>{{ txin.address }}</samp></a>
+                      <div><small><samp>{{ txin.script_type }}</small></samp></div>
                     </td>
                     <td class="text-right">
-                      <small><samp>{{ txin.satoshi }}</samp></small>
+                      <small><samp>{{ (txin.satoshi/100000000.0) }}</samp></small>
                     </td>
                   </tr>
                 </tbody>
@@ -165,27 +224,30 @@
             </div>
 
             <div class="col-6">
-              <strong> {{currTxOuts.length}} Outputs :</strong>
 
-              <table class="table table-sm">
+              <table class="table">
                 <thead>
                   <tr>
                     <th class="text-right">#</th>
-                    <th class="text-center">script type</th>
-                    <th class="text-center">address</th>
-                    <th class="text-right">satoshi</th>
+                    <th class="text-center">{{currTxOuts.length}} Outputs</th>
+                    <th class="text-right">{{(currTxIdOutputValue/100000000.0)}}</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr v-for="txout in currTxOuts">
-                    <td class="text-right"><small><samp>{{ txout.vout }}</samp></small></td>
-                    <td class="text-center"><small><samp>{{ txout.script_type }}</samp></small></td>
-                    <td class="text-center">
+                    <td class="text-right">
+                      <small><samp>{{txout.vout}}</samp></small>
+                    </td>
+                    <td class="text-left">
                       <a type="button"
                          v-on:click="viewTxOutpointByAddress(txout.address); showAddress=true; showTx=false"
                          title="View TxOutput"
-                         class="btn-link"><small><samp>{{ txout.address }}</samp></small></a></td>
-                    <td class="text-right"><small><samp>{{ txout.satoshi }}</samp></small></td>
+                         class="btn-link"><samp>{{ txout.address }}</samp></a>
+                      <div><small><samp>{{ txout.script_type }}</small></samp></div>
+                    </td>
+                    <td class="text-right">
+                      <small><samp>{{ (txout.satoshi/100000000.0) }}</samp></small>
+                    </td>
                   </tr>
                 </tbody>
               </table>
@@ -195,24 +257,23 @@
         <!-- address -->
         <div v-if="showAddress">
 
-          <h3> Address <small><samp>{{currAddress}}<samp></small>:</h3>
+          <h3> Address : <small><samp>{{currAddress}}<samp></small></h3>
 
-            <strong> Outputs :</strong>
-            <table class="table table-sm">
+            <table class="table">
               <thead>
                 <tr>
                   <th class="text-right">#</th>
                   <th class="text-center">utxo</th>
                   <th class="text-center">script type</th>
-                  <th class="text-right">satoshi</th>
+                  <th class="text-right">value</th>
                 </tr>
               </thead>
               <tbody>
                 <tr v-for="(txout, index) in currAddressTxOuts">
-                  <td class="text-right"><small><samp>{{ index }}</samp></small></td>
-                  <td class="text-left"><small><samp>{{ txout.txid }}:{{ txout.vout }}</samp></small></td>
-                  <td class="text-center"><small><samp>{{ txout.script_type }}</samp></small></td>
-                  <td class="text-right"><small><samp>{{ txout.satoshi }}</samp></small></td>
+                  <td class="text-right"><samp>{{ index }}</samp></td>
+                  <td class="text-left"><samp>{{ txout.txid }}:{{ txout.vout }}</samp></td>
+                  <td class="text-center"><samp>{{ txout.script_type }}</samp></td>
+                  <td class="text-right"><samp>{{ txout.satoshi/100000000.0 }}</samp></td>
                 </tr>
               </tbody>
             </table>
@@ -227,11 +288,14 @@
         const app = new Vue({
             el: '#app',
             data: {
-              apiPoint: "http://120.92.153.221:5555/",
-              /* apiPoint: "http://localhost:8000/",*/
+              /* apiPoint: "http://120.92.153.221:5555/",*/
+
+              apiPoint: "http://localhost:8000/",
+
+              message: "",
 
                 blockStartHeight: 0,
-                pageSize: 32,
+                pageSize: 64,
 
               navInputValue: "",
 
@@ -250,6 +314,9 @@
                 currTxInsOutpoint: [],
                 currTxIdForIn: "",
                 currTxIdForOut: "",
+
+              currTxIdInputValue: 0,
+              currTxIdOutputValue: 0,
 
               currAddress: "",
 
@@ -291,9 +358,8 @@
                   .then(
                     response => {
                       this.blockStartHeight = response.data.data.height
-
-                      this.viewBlockIdTxs(blkid)
                       this.viewBlockRange(0)
+                      /* this.viewBlockIdTxs(blkid)*/
                     }
                   )
               },
@@ -302,7 +368,7 @@
                 this.currBlockId = blkid
                 this.currBlockTxs = []
                 axios
-                  .get(this.apiPoint + "/block/txs/"+ blkid)
+                  .get(this.apiPoint + "block/txs/"+ blkid)
                   .then(
                     response => {
                       this.currBlockTxs = response.data.data
@@ -323,81 +389,62 @@
               },
 
               viewTxIns: function (txid) {
-                this.currTxIdForIn = txid
-                this.currTxIns = []
-
-                axios
-                  .get(this.apiPoint + "/tx/"+ txid +"/ins")
-                  .then(
-                    response => {
-                      this.currTxIns = response.data.data
-                    }
-                  )
+                this.updateTxIns(txid, this.apiPoint + "tx/"+ txid +"/ins")
               },
               viewTxOuts: function (txid) {
-                this.currTxIdForOut = txid
-                this.currTxOuts = []
-
-                axios
-                  .get(this.apiPoint + "/tx/"+ txid +"/outs")
-                  .then(
-                    response => {
-                      this.currTxOuts = response.data.data
-                    }
-                  )
+                this.updateTxOuts(txid, this.apiPoint + "tx/"+ txid +"/outs")
               },
-
 
               viewTxInsInside: function (height, txid) {
-                this.currTxIdForIn = txid
-                this.currTxIns = []
-
-                axios
-                  .get(this.apiPoint + "height/"+ height +"/tx/"+ txid +"/ins")
-                  .then(
-                    response => {
-                      this.currTxIns = response.data.data
-                    }
-                  )
+                this.updateTxIns(txid, this.apiPoint + "height/"+ height +"/tx/"+ txid +"/ins")
               },
               viewTxOutsInside: function (height, txid) {
-                this.currTxIdForOut = txid
-                this.currTxOuts = []
+                this.updateTxOuts(txid, this.apiPoint + "height/"+ height +"/tx/"+ txid +"/outs")
+              },
 
+
+              updateTxIns: function(txid, url) {
+                this.message = "..."
                 axios
-                  .get(this.apiPoint + "height/"+ height +"/tx/"+ txid +"/outs")
+                  .get(url)
                   .then(
                     response => {
-                      this.currTxOuts = response.data.data
+                      if (response.data.code == 0) {
+
+                        this.currTxIdForIn = txid
+                        this.currTxIns = response.data.data
+
+                        this.currTxIdInputValue = 0
+                        for(let i = 0; i < this.currTxIns.length; i++) {
+                          this.currTxIdInputValue += this.currTxIns[i].satoshi
+                        }
+
+                      }
+                      this.message = response.data.msg
                     }
                   )
               },
 
-
-              viewTxInsBefore: function (height, txid) {
-                this.currTxIdForIn = txid
-                this.currTxIns = []
-
+              updateTxOuts: function(txid, url) {
+                this.message = "..."
                 axios
-                  .get(this.apiPoint + "before/"+ height +"/tx/"+ txid +"/ins")
+                  .get(url)
                   .then(
                     response => {
-                      this.currTxIns = response.data.data
+                      if (response.data.code == 0) {
+                        this.currTxIdForOut = txid
+                        this.currTxOuts = response.data.data
+
+                        this.currTxIdOutputValue = 0
+                        for(let i = 0; i < this.currTxOuts.length; i++) {
+                          this.currTxIdOutputValue += this.currTxOuts[i].satoshi
+                        }
+                      }
+                      this.message = response.data.msg
                     }
                   )
               },
-              viewTxOutsBefore: function (height, txid) {
-                this.currTxIdForOut = txid
-                this.currTxOuts = []
 
-                axios
-                  .get(this.apiPoint + "before/"+ height +"/tx/"+ txid +"/outs")
-                  .then(
-                    response => {
-                      this.currTxOuts = response.data.data
-                    }
-                  )
-              },
 
               viewTxOutpointByAddress: function (address) {
                 this.currAddress = address
