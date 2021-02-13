@@ -176,23 +176,16 @@ func GetTxInputBySql(psql string) (txInRsp *model.TxInResp, err error) {
 	return
 }
 
-func GetTxOutputSpentStatusByTxIdAndIdx(blkHeight int, txidHex string, index int) (txInRsp *model.TxInSpentResp, err error) {
-	var psql string
-	if blkHeight < 0 {
-		psql = fmt.Sprintf(`
-SELECT height, txid, idx, utxid, vout FROM txin_spent
-WHERE utxid = unhex('%s') AND
-       vout = %d
-LIMIT 1`, txidHex, index)
-	} else {
-		psql = fmt.Sprintf(`
+func GetTxOutputSpentStatusByTxIdAndIdx(txidHex string, index int) (txInRsp *model.TxInSpentResp, err error) {
+	psql := fmt.Sprintf(`
 SELECT height, txid, idx, utxid, vout FROM txin_spent
 WHERE utxid = unhex('%s') AND
        vout = %d AND
-     height = %d
-LIMIT 1`,
-			txidHex, index, blkHeight)
-	}
+height IN (
+    SELECT height FROM txout_spent_height
+    WHERE utxid = unhex('%s')
+)
+LIMIT 1`, txidHex, index, txidHex)
 
 	txInRet, err := clickhouse.ScanOne(psql, txInSpentResultSRF)
 	if err != nil {
@@ -202,7 +195,7 @@ LIMIT 1`,
 	if txInRet == nil {
 		return nil, errors.New("not exist")
 	}
-	txIn := txInRet.(*model.TxInDO)
+	txIn := txInRet.(*model.TxInSpentDO)
 	txInRsp = &model.TxInSpentResp{
 		Height:   int(txIn.Height),
 		TxIdHex:  blkparser.HashString(txIn.TxId),

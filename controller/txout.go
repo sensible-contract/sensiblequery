@@ -192,13 +192,6 @@ func GetTxOutputByTxIdAndIdxInsideHeight(ctx *gin.Context) {
 func GetTxOutputSpentStatusByTxIdAndIdx(ctx *gin.Context) {
 	log.Printf("GetTxOutputSpentStatusByTxIdAndIdx enter")
 
-	// may have height
-	blkHeightString := ctx.Param("height")
-	blkHeight, err := strconv.Atoi(blkHeightString)
-	if err != nil {
-		blkHeight = -1
-	}
-
 	// check tx
 	txIdHex := ctx.Param("txid")
 	txIdReverse, err := hex.DecodeString(txIdHex)
@@ -218,7 +211,7 @@ func GetTxOutputSpentStatusByTxIdAndIdx(ctx *gin.Context) {
 		return
 	}
 
-	result, err := service.GetTxOutputSpentStatusByTxIdAndIdx(blkHeight, hex.EncodeToString(txId), txIndex)
+	result, err := service.GetTxOutputSpentStatusByTxIdAndIdx(hex.EncodeToString(txId), txIndex)
 	if err != nil {
 		log.Printf("get block failed: %v", err)
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get vout failed"})

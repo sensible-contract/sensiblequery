@@ -231,6 +231,7 @@
                     <th class="text-right">#</th>
                     <th class="text-center">{{currTxOuts.length}} Outputs</th>
                     <th class="text-right">{{(currTxIdOutputValue/100000000.0)}}</th>
+                    <th class="text-right"></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -247,6 +248,11 @@
                     </td>
                     <td class="text-right">
                       <small><samp>{{ (txout.satoshi/100000000.0) }}</samp></small>
+                    </td>
+                    <td class="text-right">
+                      <a type="button"
+                         v-on:click="viewTxOutsStatus(txout.txid, txout.vout)"
+                         class="btn-link"><samp>❱</samp></a>
                     </td>
                   </tr>
                 </tbody>
@@ -402,6 +408,21 @@
                 this.updateTxOuts(txid, this.apiPoint + "height/"+ height +"/tx/"+ txid +"/outs")
               },
 
+              viewTxOutsStatus: function (txid, idx) {
+                let url = this.apiPoint + "tx/"+ txid +"/out/"+idx+"/spent"
+                axios
+                  .get(url)
+                  .then(
+                    response => {
+                      if (response.data.code == 0) {
+                        this.viewTxInsInside(response.data.data.height, response.data.data.txid)
+                        this.viewTxOutsInside(response.data.data.height, response.data.data.txid)
+                      } else {
+                        this.message = "unspent"
+                      }
+                    }
+                  )
+              },
 
               updateTxIns: function(txid, url) {
                 this.message = "..."
