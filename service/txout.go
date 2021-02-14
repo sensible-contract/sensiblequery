@@ -167,8 +167,7 @@ func GetUtxoByAddress(addressHex string) (txOutsRsp []*model.TxOutResp, err erro
 	psql := fmt.Sprintf(`
 SELECT txid, vout, address, genesis, satoshi, script_type, script, height FROM txout_address
 WHERE address = unhex('%s')
-ORDER BY height DESC
-LIMIT 100`,
+LIMIT 32`,
 		addressHex)
 
 	txOutsRet, err := clickhouse.ScanAll(psql, txOutResultSRF)
@@ -201,8 +200,7 @@ func GetUtxoByGenesis(genesisHex string) (txOutsRsp []*model.TxOutResp, err erro
 	psql := fmt.Sprintf(`
 SELECT txid, vout, address, genesis, satoshi, script_type, script, height FROM txout_genesis
 WHERE genesis = unhex('%s')
-ORDER BY height DESC
-LIMIT 100`,
+LIMIT 32`,
 		genesisHex)
 
 	txOutsRet, err := clickhouse.ScanAll(psql, txOutResultSRF)

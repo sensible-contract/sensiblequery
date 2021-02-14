@@ -183,9 +183,10 @@ WHERE utxid = unhex('%s') AND
        vout = %d AND
 height IN (
     SELECT height FROM txout_spent_height
-    WHERE utxid = unhex('%s')
+    WHERE utxid = unhex('%s') AND
+           vout = %d
 )
-LIMIT 1`, txidHex, index, txidHex)
+LIMIT 1`, txidHex, index, txidHex, index)
 
 	txInRet, err := clickhouse.ScanOne(psql, txInSpentResultSRF)
 	if err != nil {
