@@ -68,7 +68,7 @@ height IN (
     SELECT height FROM tx_height
     WHERE txid = unhex('%s')
 )
-LIMIT 1`, txidHex)
+LIMIT 1`, txidHex, txidHex)
 	return GetTxBySql(psql)
 }
 
