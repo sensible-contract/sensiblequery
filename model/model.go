@@ -97,6 +97,20 @@ type TxOutResp struct {
 	Height        int    `json:"height"`
 }
 
+type TxOutStatusResp struct {
+	TxIdHex       string `json:"txid"`
+	Vout          int    `json:"vout"`
+	Address       string `json:"address"`
+	GenesisHex    string `json:"genesis"`
+	Satoshi       int    `json:"satoshi"`
+	ScriptTypeHex string `json:"script_type"`
+	ScriptHex     string `json:"script"`
+	Height        int    `json:"height"`
+
+	TxIdSpentHex string `json:"txid_spent"`
+	HeightSpent  int    `json:"height_spent"`
+}
+
 ////////////////
 type BlockDO struct {
 	Height      uint32 `db:"height"`
@@ -146,4 +160,18 @@ type TxOutDO struct {
 	ScriptType []byte `db:"script_type"`
 	Script     []byte `db:"script"`
 	Height     uint32 `db:"height"`
+}
+
+type TxOutStatusDO struct {
+	TxId       []byte `db:"txid"`
+	Vout       uint32 `db:"vout"`
+	Address    []byte `db:"address"`
+	Genesis    []byte `db:"genesis"`
+	Satoshi    uint64 `db:"satoshi"`
+	ScriptType []byte `db:"script_type"`
+	Script     []byte `db:"script"`
+	Height     uint32 `db:"height"`
+
+	TxIdSpent   []byte `db:"txid_spent"`
+	HeightSpent uint32 `db:"height_spent"`
 }

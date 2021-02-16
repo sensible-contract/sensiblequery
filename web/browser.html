@@ -146,28 +146,44 @@
             <table class="table">
               <thead>
                 <tr>
-                  <th class="text-left"></th>
                   <th class="text-right">#</th>
                   <th class="text-center">{{currTxIns.length}} Inputs</th>
                   <th class="text-right">{{(currTxIdInputValue/100000000.0)}}</th>
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="txin in currTxIns">
-                  <td class="text-left">
-                    <router-link :to="{path:`/tx/${txin.height_txo}/${txin.utxid}`}"><samp>❰</samp></router-link>
-                  </td>
+                <template v-for="txin in currTxIns">
+
+                <tr>
                   <td class="text-right">
-                    <small><samp>{{txin.idx}}</samp></small>
+                    <router-link :to="{path:`/tx/${txin.height_txo}/${txin.utxid}`}">
+                      <small><samp>❰&nbsp;{{txin.idx}}</samp></small>
+                    </router-link>
+
                   </td>
                   <td class="text-left">
                     <router-link :to="{path:`/address/${txin.address}`}"><samp>{{ txin.address }}</samp></router-link>
-                    <div><small><samp>{{ txin.script_type }}</samp></small></div>
+                    <div>
+                      <small><samp class="d-inline-block text-truncate"
+                                   v-bind:title="txin.script_type"
+                                   style="max-width: 380px;">{{ txin.script_type }}</samp></small>
+                    </div>
                   </td>
                   <td class="text-right">
                     <small><samp>{{ (txin.satoshi/100000000.0) }}</samp></small>
                   </td>
                 </tr>
+                <!-- <tr>
+                     <td class="text-left">
+                     </td>
+                     <td class="text-right">
+                     </td>
+                     <td class="text-left" colspan="2">
+                     <small><samp>{{ txin.script_type }}</samp></small>
+                     </td>
+                     </tr> -->
+                </template>
+
               </tbody>
             </table>
           </div>
@@ -180,7 +196,6 @@
                   <th class="text-right">#</th>
                   <th class="text-center">{{currTxOuts.length}} Outputs</th>
                   <th class="text-right">{{(currTxIdOutputValue/100000000.0)}}</th>
-                  <th class="text-right"></th>
                 </tr>
               </thead>
               <tbody>
@@ -190,13 +205,20 @@
                   </td>
                   <td class="text-left">
                     <router-link :to="{path:`/address/${txout.address}`}"><samp>{{ txout.address }}</samp></router-link>
-                    <div><small><samp>{{ txout.script_type }}</samp></small></div>
+                    <div>
+                      <small><samp class="d-inline-block text-truncate"
+                                   v-bind:title="txout.script_type"
+                                   style="max-width: 380px;">{{ txout.script_type }}</samp></small>
+                    </div>
                   </td>
                   <td class="text-right">
-                    <small><samp>{{ (txout.satoshi/100000000.0) }}</samp></small>
-                  </td>
-                  <td class="text-right">
-                    <router-link :to="{path:`/txout/${txout.txid}/${txout.vout}`}"><samp>❱</samp></router-link>
+                    <router-link v-if="txout.height_spent"
+                                 :to="{path:`/tx/${txout.height_spent}/${txout.txid_spent}`}">
+                      <small><samp>{{ (txout.satoshi/100000000.0) }}&nbsp;❱</samp></small>
+                    </router-link>
+                    <div v-else>
+                      <small>{{ (txout.satoshi/100000000.0) }}&nbsp;❱</samp></small>
+                    </div>
                   </td>
                 </tr>
               </tbody>
@@ -222,7 +244,11 @@
             <tbody>
               <tr v-for="(txout, index) in currAddressTxOuts">
                 <td class="text-right"><samp>{{ index }}</samp></td>
-                <td class="text-left"><samp>{{ txout.txid }}:{{ txout.vout }}</samp></td>
+                <td class="text-left">
+                  <router-link :to="{path:`/tx/${txout.height}/${txout.txid}`}">
+                    <samp>{{ txout.txid }}:{{ txout.vout }}</samp>
+                  </router-link>
+                </td>
                 <td class="text-center"><samp>{{ txout.script_type }}</samp></td>
                 <td class="text-right"><samp>{{ txout.satoshi/100000000.0 }}</samp></td>
               </tr>
@@ -278,6 +304,7 @@
     <script>
      const blocks = Vue.component('blocks', {
        template: '#blocks',
+
        data: function () {
          return {
            pageSize: 64,
@@ -285,6 +312,7 @@
            Blocks: []
          }
        },
+
        created: function () {
          this.viewBlockRange(0)
        },
@@ -309,6 +337,7 @@
                 .then(
                   response => {
                     this.Blocks = response.data.data
+                    this.$root.message = response.data.msg
                   }
                 )
          },
@@ -320,6 +349,7 @@
                response => {
                  this.blockStartHeight = response.data.data.height
                  this.viewBlockRange(0)
+                 this.$root.message = response.data.msg
                }
              )
          },
@@ -330,14 +360,10 @@
 /* txs */
      const transactions = Vue.component('transactions', {
        template: '#transactions',
-       props: {
-         currBlockId: "",
-         currBlockTxs: []
-       },
        data: function () {
          return {
-           currBlockId: this.currBlockId,
-           currBlockTxs: this.currBlockTxs
+           currBlockId: "",
+           currBlockTxs: []
          }
        },
 
@@ -349,7 +375,7 @@
            }
 
 
-           if (to.path.startsWith("/txs/id/")) {
+           if (to.path.startsWith("/txs-of-blkid/")) {
              this.viewBlockIdTxs(to.params.blkid)
            } else if (to.path.startsWith("/txs/")) {
              this.viewBlockHeightTxs(to.params.height, to.params.blkid)
@@ -377,6 +403,7 @@
              .then(
                response => {
                  this.currBlockTxs = response.data.data
+                 this.$root.message = response.data.msg
                }
              )
          },
@@ -389,6 +416,7 @@
              .then(
                response => {
                  this.currBlockTxs = response.data.data
+                 this.$root.message = response.data.msg
                }
              )
          },
@@ -400,35 +428,27 @@
 /* tx */
      const transaction = Vue.component('transaction', {
        template: '#transaction',
-       props: {
-         currTxId: "",
-         currTxIdInputValue: 0,
-         currTxIdOutputValue: 0,
-         currTxIns: [],
-         currTxOuts: [],
-       },
 
        data: function () {
          return {
-           currTxId: this.currTxId,
-           currTxIdInputValue: this.currTxIdInputValue,
-           currTxIdOutputValue: this.currTxIdOutputValue,
-           currTxIns: this.currTxIns,
-           currTxOuts: this.currTxOuts,
+           currTxId: "",
+           currTxIdInputValue: 0,
+           currTxIdOutputValue: 0,
+           currTxIns: [],
+           currTxOuts: [],
          }
        },
 
        watch: {
          $route(to, from) {
-           // 对路由变化作出响应...
            console.log("watch", to, this.currTxIns, this.currTxOuts)
 
-           if (this.currTxIns === undefined || this.currTxOuts === undefined) {
-             this.currTxIns = []
-             this.currTxOuts = []
-           }
+           /* if (this.currTxIns === undefined || this.currTxOuts === undefined) {
+            *   this.currTxIns = []
+            *   this.currTxOuts = []
+            * }*/
 
-           if (to.path.startsWith("/tx/id/") == true ) {
+           if (to.path.startsWith("/txid/") == true ) {
              this.viewTxIns(to.params.txid)
              this.viewTxOuts(to.params.txid)
            } else if (to.path.startsWith("/tx/") == true ) {
@@ -447,12 +467,12 @@
 
          console.log("create", this.$route, this.currTxIns, this.currTxOuts)
 
-         if (this.currTxIns === undefined || this.currTxOuts === undefined) {
-           this.currTxIns = []
-           this.currTxOuts = []
-         }
+         /* if (this.currTxIns === undefined || this.currTxOuts === undefined) {
+          *   this.currTxIns = []
+          *   this.currTxOuts = []
+          * }*/
 
-         if (this.$route.path.startsWith("/tx/id/") == true ) {
+         if (this.$route.path.startsWith("/txid/") == true ) {
            this.viewTxIns(this.$route.params.txid)
            this.viewTxOuts(this.$route.params.txid)
          } else if (this.$route.path.startsWith("/tx/") == true ) {
@@ -492,14 +512,14 @@
                         this.viewTxInsInside(response.data.data.height, response.data.data.txid)
                         this.viewTxOutsInside(response.data.data.height, response.data.data.txid)
                       } else {
-                        this.message = "unspent"
+                        this.$root.message = "unspent"
                       }
                     }
                   )
               },
 
               updateTxIns: function(txid, url) {
-                this.message = "..."
+                this.$root.message = "..."
                 axios
                   .get(url)
                   .then(
@@ -515,13 +535,13 @@
                         }
 
                       }
-                      this.message = response.data.msg
+                      this.$root.message = response.data.msg
                     }
                   )
               },
 
               updateTxOuts: function(txid, url) {
-                this.message = "..."
+                this.$root.message = "..."
                 axios
                   .get(url)
                   .then(
@@ -534,7 +554,7 @@
                           this.currTxIdOutputValue += this.currTxOuts[i].satoshi
                         }
                       }
-                      this.message = response.data.msg
+                      this.$root.message = response.data.msg
                     }
                   )
               },
@@ -546,20 +566,18 @@
 /* address */
      const address = Vue.component('address', {
        template: '#address',
-       props: {
-         currAddress: "",
-         currAddressTxOuts: []
-       },
 
        data: function () {
          return {
-           currAddress: this.currAddress,
-           currAddressTxOuts: this.currAddressTxOuts
+           currAddress: "",
+           currAddressTxOuts: []
          }
        },
 
        watch: {
          $route(to, from) {
+           console.log("watch", this.$route, this.currBlockTxs)
+
            if (this.currAddressTxOuts === undefined) {
              this.currAddressTxOuts = []
            }
@@ -571,7 +589,7 @@
        },
 
        created: function () {
-         console.log(this.$route, this.currBlockTxs)
+         console.log("create", this.$route, this.currBlockTxs)
 
          if (this.currAddressTxOuts === undefined) {
            this.currAddressTxOuts = []
@@ -583,14 +601,20 @@
 
        methods: {
          viewTxOutpointByAddress: function (address) {
+           console.log(address)
            this.currAddress = address
            this.currAddressTxOuts = []
-
+           this.$root.message = "..."
            axios
              .get(this.$root.apiPoint + "address/"+ address +"/utxo")
              .then(
                response => {
-                 this.currAddressTxOuts = response.data.data
+                 if (response.data.code == 0) {
+                   this.currAddressTxOuts = response.data.data
+                   this.$root.message = response.data.msg
+                 } else {
+                   this.$root.message = "no utxo"
+                 }
                }
              )
          },
@@ -607,10 +631,10 @@
        { path: '/blocks/id/:blkid', component: blocks },
        { path: '/blocks/:height', component: blocks },
 
-       { path: '/txs/id/:blkid', component: transactions },
+       { path: '/txs-of-blkid/:blkid', component: transactions },
        { path: '/txs/:height/:blkid', component: transactions },
 
-       { path: '/tx/id/:txid', component: transaction },
+       { path: '/txid/:txid', component: transaction },
        { path: '/tx/:height/:txid', component: transaction },
 
        { path: '/txout/:txid/:vout', component: transaction },
@@ -644,11 +668,11 @@
 
                 } else if (this.$route.path.startsWith("/txs")) {
 
-                  this.$router.push(`/txs/id/${this.navInputValue}`)
+                  this.$router.push(`/txs-of-blkid/${this.navInputValue}`)
 
                 } else if (this.$route.path.startsWith("/tx")) {
 
-                  this.$router.push(`/tx/id/${this.navInputValue}`)
+                  this.$router.push(`/txid/${this.navInputValue}`)
 
                 } else if (this.$route.path.startsWith("/address")) {
                   this.$router.push(`/address/${this.navInputValue}`)
