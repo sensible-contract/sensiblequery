@@ -77,18 +77,6 @@ func GetTxByIdInsideHeight(blkHeight int, txidHex string) (txRsp *model.TxInfoRe
 	return GetTxBySql(psql)
 }
 
-// no need
-func GetTxByIdBeforeHeight(blkHeight int, txidHex string) (txRsp *model.TxInfoResp, err error) {
-	psql := fmt.Sprintf("SELECT txid, nin, nout, height, blkid, idx FROM tx WHERE txid = unhex('%s') AND height <= %d", txidHex, blkHeight)
-	return GetTxBySql(psql)
-}
-
-// no need
-func GetTxByIdAfterHeight(blkHeight int, txidHex string) (txRsp *model.TxInfoResp, err error) {
-	psql := fmt.Sprintf("SELECT txid, nin, nout, height, blkid, idx FROM tx WHERE txid = unhex('%s') AND height >= %d", txidHex, blkHeight)
-	return GetTxBySql(psql)
-}
-
 func GetTxBySql(psql string) (txRsp *model.TxInfoResp, err error) {
 	txRet, err := clickhouse.ScanOne(psql, txResultSRF)
 	if err != nil {

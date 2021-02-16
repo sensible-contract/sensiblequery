@@ -74,41 +74,6 @@ func GetTxInputsByTxIdInsideHeight(ctx *gin.Context) {
 	})
 }
 
-func GetTxInputsByTxIdBeforeHeight(ctx *gin.Context) {
-	log.Printf("GetTxInputsByTxIdBeforeHeight enter")
-
-	blkHeightString := ctx.Param("height")
-	blkHeight, err := strconv.Atoi(blkHeightString)
-	if err != nil {
-		log.Printf("height invalid: %v", err)
-		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "height invalid"})
-		return
-	}
-
-	txIdHex := ctx.Param("txid")
-	// check
-	txIdReverse, err := hex.DecodeString(txIdHex)
-	if err != nil {
-		log.Printf("txid invalid: %v", err)
-		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "txid invalid"})
-		return
-	}
-	txId := utils.ReverseBytes(txIdReverse)
-
-	result, err := service.GetTxInputsByTxIdBeforeHeight(blkHeight, hex.EncodeToString(txId))
-	if err != nil {
-		log.Printf("get block failed: %v", err)
-		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get txin failed"})
-		return
-	}
-
-	ctx.JSON(http.StatusOK, model.Response{
-		Code: 0,
-		Msg:  "ok",
-		Data: result,
-	})
-}
-
 func GetTxInputByTxIdAndIdx(ctx *gin.Context) {
 	log.Printf("GetTxInputByTxIdAndIdx enter")
 

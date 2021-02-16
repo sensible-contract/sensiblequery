@@ -56,17 +56,6 @@ WHERE txid = unhex('%s') AND
 	return GetTxInputsBySql(psql)
 }
 
-// no need use tx_height instead
-func GetTxInputsByTxIdBeforeHeight(blkHeight int, txidHex string) (txInsRsp []*model.TxInResp, err error) {
-	psql := fmt.Sprintf(`
-SELECT height, txid, idx, script_sig,
-       height_txo, utxid, vout, address, genesis, satoshi, script_type FROM txin_full
-WHERE txid = unhex('%s') AND
-    height <= %d`, txidHex, blkHeight)
-
-	return GetTxInputsBySql(psql)
-}
-
 func GetTxInputsBySql(psql string) (txInsRsp []*model.TxInResp, err error) {
 	txInsRet, err := clickhouse.ScanAll(psql, txInResultSRF)
 	if err != nil {
@@ -118,32 +107,6 @@ SELECT height, txid, idx, script_sig,
 WHERE txid = unhex('%s') AND
        idx = %d AND
     height = %d
-LIMIT 1`, txidHex, index, blkHeight)
-
-	return GetTxInputBySql(psql)
-}
-
-// no need, use tx_height instead
-func GetTxInputByTxIdAndIdxBeforeHeight(blkHeight int, txidHex string, index int) (txInRsp *model.TxInResp, err error) {
-	psql := fmt.Sprintf(`
-SELECT height, txid, idx, script_sig,
-       height_txo, utxid, vout, address, genesis, satoshi, script_type FROM txin_full
-WHERE txid = unhex('%s') AND
-       idx = %d AND
-    height <= %d
-LIMIT 1`, txidHex, index, blkHeight)
-
-	return GetTxInputBySql(psql)
-}
-
-// no need
-func GetTxInputByTxIdAndIdxAfterHeight(blkHeight int, txidHex string, index int) (txInRsp *model.TxInResp, err error) {
-	psql := fmt.Sprintf(`
-SELECT height, txid, idx, script_sig,
-       height_txo, utxid, vout, address, genesis, satoshi, script_type FROM txin_full
-WHERE txid = unhex('%s') AND
-       idx = %d AND
-    height >= %d
 LIMIT 1`, txidHex, index, blkHeight)
 
 	return GetTxInputBySql(psql)
