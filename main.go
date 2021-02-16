@@ -53,8 +53,8 @@ func main() {
 	router.GET("/address/:address/utxo", controller.GetUtxoByAddress)
 	router.GET("/genesis/:genesis/utxo", controller.GetUtxoByGenesis)
 
-	router.GET("/address/:address/history", controller.GetUtxoByAddress)
-	router.GET("/genesis/:genesis/history", controller.GetUtxoByGenesis)
+	router.GET("/address/:address/history", controller.GetHistoryByAddress)
+	router.GET("/genesis/:genesis/history", controller.GetHistoryByGenesis)
 
 	heightAPI := router.Group("/height/:height")
 	{
