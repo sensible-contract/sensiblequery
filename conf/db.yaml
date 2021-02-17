@@ -1,0 +1,28 @@
+# 地址(必需). 多值用逗号分隔
+address: "192.168.31.236:9000"
+# DB名字(必需)
+database: "bsv"
+# 用户名(可选)
+username: ""
+# 密码(可选)
+password: ""
+# 最大空闲数量(可选0)
+maxIdleConns: 10
+# 最大打开数量(可选0)
+maxOpenConns: 10
+# 最大lifetime(分钟，可选0)
+connMaxLifetime: "10m"
+# 读超时(秒)
+read_timeout: 10
+# 写超时(秒)
+write_timeout: 10
+# 无延迟
+no_delay: true
+# connection_open_strategy 连接打开策略
+connection_open_strategy: "random"
+# 读写块大小
+block_size: 1000000
+# 连接池大小
+pool_size: 10
+# 是否debug
+debug: false

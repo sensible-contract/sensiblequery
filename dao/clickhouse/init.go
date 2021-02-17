@@ -2,64 +2,46 @@ package clickhouse
 
 import (
 	"database/sql"
+	"fmt"
 	"net/url"
+	"strconv"
 	"strings"
-	"time"
 
 	_ "github.com/ClickHouse/clickhouse-go"
+	"github.com/spf13/viper"
 )
 
 var (
 	CK *clickhImpl
 )
 
-//     # 地址(必需). 多值用逗号分隔
-//     address: "10.11.165.44:9000"
-//     # DB名字(必需)
-//     database: "demo"
-//     # 用户名(可选)
-//     username: ""
-//     # 密码(可选)
-//     password: ""
-//     # 最大空闲数量(可选)
-//     maxIdleConns:
-//     # 最大打开数量(可选)
-//     maxOpenConns:
-//     # 最大lifetime(可选)
-//     connMaxLifetime: "0s"
-//     # 读超时(秒)
-//     read_timeout: 10
-//     # 写超时(秒)
-//     write_timeout : 10
-//     # 无延迟
-//     no_delay: true
-//     # connection_open_strategy 连接打开策略
-//     connection_open_strategy: "random"
-//     # 读写块大小
-//     block_size: 1000000
-//     # 连接池大小
-//     pool_size: 100
-//     # 是否debug
-//     debug: false
-
 func init() {
-	config := map[string]string{
-		"username":                 "",
-		"password":                 "",
-		"database":                 "bsv",
-		"read_timeout":             "10",
-		"write_timeout":            "10",
-		"no_delay":                 "true",
-		"connection_open_strategy": "random",
-		"block_size":               "1000000",
-		"pool_size":                "10",
-		"debug":                    "false",
+	viper.SetConfigFile("conf/db.yaml")
+	if err := viper.ReadInConfig(); err != nil {
+		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
+			panic(fmt.Errorf("Fatal error config file: %s \n", err))
+		} else {
+			panic(fmt.Errorf("Fatal error config file: %s \n", err))
+		}
 	}
-	maxIdleConns := 10
-	maxOpenConns := 10
-	connMaxLifetime := 10 * time.Minute
 
-	address := "192.168.31.236:9000"
+	address := viper.GetString("address")
+
+	config := map[string]string{
+		"username":                 viper.GetString("username"),
+		"password":                 viper.GetString("password"),
+		"database":                 viper.GetString("database"),
+		"read_timeout":             strconv.Itoa(viper.GetInt("read_timeout")),
+		"write_timeout":            strconv.Itoa(viper.GetInt("write_timeout")),
+		"no_delay":                 fmt.Sprintf("%t", viper.GetBool("no_delay")),
+		"connection_open_strategy": viper.GetString("connection_open_strategy"),
+		"block_size":               strconv.Itoa(viper.GetInt("block_size")),
+		"pool_size":                strconv.Itoa(viper.GetInt("pool_size")),
+		"debug":                    fmt.Sprintf("%t", viper.GetBool("debug")),
+	}
+	maxIdleConns := viper.GetInt("maxIdleConns")
+	maxOpenConns := viper.GetInt("maxOpenConns")
+	connMaxLifetime := viper.GetDuration("connMaxLifetime")
 
 	sb := new(strings.Builder)
 	for key, value := range config {

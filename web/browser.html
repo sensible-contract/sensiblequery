@@ -1,7 +1,9 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
+          integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
     <title>BSV Browser</title>
   </head>
   <body>
@@ -152,9 +154,7 @@
                 </tr>
               </thead>
               <tbody>
-                <template v-for="txin in currTxIns">
-
-                <tr>
+                <tr v-for="txin in currTxIns">
                   <td class="text-right">
                     <router-link :to="{path:`/tx/${txin.height_txo}/${txin.utxid}`}">
                       <small><samp>❰&nbsp;{{txin.idx}}</samp></small>
@@ -178,17 +178,6 @@
                     <small><samp>{{ txin.satoshi/100000000.0 }}</samp></small>
                   </td>
                 </tr>
-                <!-- <tr>
-                     <td class="text-left">
-                     </td>
-                     <td class="text-right">
-                     </td>
-                     <td class="text-left" colspan="2">
-                     <small><samp>{{ txin.script_type }}</samp></small>
-                     </td>
-                     </tr> -->
-                </template>
-
               </tbody>
             </table>
           </div>
@@ -241,128 +230,128 @@
 <!-- address -->
     <template id="address">
       <div>
-          <h3> Address History: <small><samp>{{ currAddress }}</samp></small></h3>
-          <router-link :to="{path:`/utxo/${currAddress}`}"><samp>View UTXO</samp></router-link>
-          <table class="table">
-            <thead>
-              <tr>
-                <th class="text-right">#</th>
-                <th class="text-center">history</th>
-                <th class="text-right">value</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(txout, index) in currAddressTxOuts">
-                <td class="text-right"><samp>{{ index }}</samp></td>
-                <td class="text-left">
-                  <router-link :to="{path:`/tx/${txout.height}/${txout.txid}`}">
-                    <samp>{{ txout.txid }}:{{ txout.vout }}</samp>
+        <h3> Address History: <small><samp>{{ currAddress }}</samp></small></h3>
+        <router-link :to="{path:`/utxo/${currAddress}`}"><samp>View UTXO</samp></router-link>
+        <table class="table">
+          <thead>
+            <tr>
+              <th class="text-right">#</th>
+              <th class="text-center">history</th>
+              <th class="text-right">value</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(txout, index) in currAddressTxOuts">
+              <td class="text-right"><samp>{{ index }}</samp></td>
+              <td class="text-left">
+                <router-link :to="{path:`/tx/${txout.height}/${txout.txid}`}">
+                  <samp>{{ txout.txid }}:{{ txout.vout }}</samp>
+                </router-link>
+                <div>
+                  <small><samp>script: {{ txout.script_type }}</samp></small>
+                </div>
+                <div v-if="txout.genesis != '0000000000000000000000000000000000000000'">
+                  <router-link :to="{path:`/genesis/${txout.genesis}`}">
+                    <small><samp>genesis: {{ txout.genesis }}</samp></small>
                   </router-link>
-                  <div>
-                    <small><samp>script: {{ txout.script_type }}</samp></small>
-                  </div>
-                  <div v-if="txout.genesis != '0000000000000000000000000000000000000000'">
-                    <router-link :to="{path:`/genesis/${txout.genesis}`}">
-                      <small><samp>genesis: {{ txout.genesis }}</samp></small>
-                    </router-link>
-                  </div>
-                </td>
-                <td class="text-right">
-                  <samp v-if="txout.io_type">+{{ txout.satoshi/100000000.0 }}</samp>
-                  <code v-else>-{{ txout.satoshi/100000000.0 }}</code>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+                </div>
+              </td>
+              <td class="text-right">
+                <samp v-if="txout.io_type">+{{ txout.satoshi/100000000.0 }}</samp>
+                <code v-else>-{{ txout.satoshi/100000000.0 }}</code>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </template>
 
 
-<!-- utxo -->
+    <!-- utxo -->
     <template id="utxo">
       <div>
-          <h3> Address UTXO: <small>{{ currAddress }}</small></h3>
-          <router-link :to="{path:`/address/${currAddress}`}"><samp>View History</samp></router-link>
+        <h3> Address UTXO: <small>{{ currAddress }}</small></h3>
+        <router-link :to="{path:`/address/${currAddress}`}"><samp>View History</samp></router-link>
 
-          <table class="table">
-            <thead>
-              <tr>
-                <th class="text-right">#</th>
-                <th class="text-center">utxo</th>
-                <th class="text-right">value</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(txout, index) in currAddressTxOuts">
-                <td class="text-right"><samp>{{ index }}</samp></td>
-                <td class="text-left">
-                  <router-link :to="{path:`/tx/${txout.height}/${txout.txid}`}">
-                    <samp>{{ txout.txid }}:{{ txout.vout }}</samp>
+        <table class="table">
+          <thead>
+            <tr>
+              <th class="text-right">#</th>
+              <th class="text-center">utxo</th>
+              <th class="text-right">value</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(txout, index) in currAddressTxOuts">
+              <td class="text-right"><samp>{{ index }}</samp></td>
+              <td class="text-left">
+                <router-link :to="{path:`/tx/${txout.height}/${txout.txid}`}">
+                  <samp>{{ txout.txid }}:{{ txout.vout }}</samp>
+                </router-link>
+                <div>
+                  <small><samp>script: {{ txout.script_type }}</samp></small>
+                </div>
+                <div v-if="txout.genesis != '0000000000000000000000000000000000000000'">
+                  <router-link :to="{path:`/genesis/${txout.genesis}`}">
+                    <small><samp>genesis: {{ txout.genesis }}</samp></small>
                   </router-link>
-                  <div>
-                    <small><samp>script: {{ txout.script_type }}</samp></small>
-                  </div>
-                  <div v-if="txout.genesis != '0000000000000000000000000000000000000000'">
-                    <router-link :to="{path:`/genesis/${txout.genesis}`}">
-                      <small><samp>genesis: {{ txout.genesis }}</samp></small>
-                    </router-link>
-                  </div>
-                </td>
-                <td class="text-right"><samp>{{ txout.satoshi/100000000.0 }}</samp></td>
-              </tr>
-            </tbody>
-          </table>
+                </div>
+              </td>
+              <td class="text-right"><samp>{{ txout.satoshi/100000000.0 }}</samp></td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </template>
 
 
 
-<!-- genesis -->
+    <!-- genesis -->
     <template id="genesis">
       <div>
-          <h3> Genesis History:
-            <small>
-              <samp>{{ currGenesis }}</samp>
-            </small>
-          </h3>
-          <router-link :to="{path:`/genesis-utxo/${currGenesis}`}"><samp>View UTXO</samp></router-link>
+        <h3> Genesis History:
+          <small>
+            <samp>{{ currGenesis }}</samp>
+          </small>
+        </h3>
+        <router-link :to="{path:`/genesis-utxo/${currGenesis}`}"><samp>View UTXO</samp></router-link>
 
-          <table class="table">
-            <thead>
-              <tr>
-                <th class="text-right">#</th>
-                <th class="text-center">history</th>
-                <th class="text-right">value</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(txout, index) in currGenesisTxOuts">
-                <td class="text-right"><samp>{{ index }}</samp></td>
-                <td class="text-left">
-                  <router-link :to="{path:`/tx/${txout.height}/${txout.txid}`}">
-                    <samp>{{ txout.txid }}:{{ txout.vout }}</samp>
+        <table class="table">
+          <thead>
+            <tr>
+              <th class="text-right">#</th>
+              <th class="text-center">history</th>
+              <th class="text-right">value</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(txout, index) in currGenesisTxOuts">
+              <td class="text-right"><samp>{{ index }}</samp></td>
+              <td class="text-left">
+                <router-link :to="{path:`/tx/${txout.height}/${txout.txid}`}">
+                  <samp>{{ txout.txid }}:{{ txout.vout }}</samp>
+                </router-link>
+                <div>
+                  <small><samp>script: {{ txout.script_type }}</samp></small>
+                </div>
+                <div v-if="txout.genesis != '0000000000000000000000000000000000000000'">
+                  <router-link :to="{path:`/address/${txout.address}`}">
+                    <small><samp>address: {{ txout.address }}</samp></small>
                   </router-link>
-                  <div>
-                    <small><samp>script: {{ txout.script_type }}</samp></small>
-                  </div>
-                  <div v-if="txout.genesis != '0000000000000000000000000000000000000000'">
-                    <router-link :to="{path:`/address/${txout.address}`}">
-                      <small><samp>address: {{ txout.address }}</samp></small>
-                    </router-link>
-                  </div>
-                </td>
-                <td class="text-right">
-                  <samp v-if="txout.io_type">+{{ txout.satoshi/100000000.0 }}</samp>
-                  <code v-else>-{{ txout.satoshi/100000000.0 }}</code>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+                </div>
+              </td>
+              <td class="text-right">
+                <samp v-if="txout.io_type">+{{ txout.satoshi/100000000.0 }}</samp>
+                <code v-else>-{{ txout.satoshi/100000000.0 }}</code>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </template>
 
 
-<!-- genesis utxo -->
+    <!-- genesis utxo -->
     <template id="genesis-utxo">
       <div>
         <h3> Genesis UTXO: <small><samp>{{ currGenesis }}</samp></small></h3>
@@ -985,49 +974,49 @@
      })
 
      const app = new Vue({
-            router: router,
-            el: '#app',
+       router: router,
+       el: '#app',
 
-            data: {
-              currentRoute: window.location.pathname,
+       data: {
+         currentRoute: window.location.pathname,
 
-              /* apiPoint: "http://120.92.153.221:5555/",*/
+         /* apiPoint: "http://120.92.153.221:5555/",*/
 
-              apiPoint: "http://localhost:8000/",
+         apiPoint: "http://localhost:8000/",
 
-              message: "",
+         message: "",
 
-              navInputValue: "",
-            },
-            methods: {
-              pressNavButton: function () {
-                if (this.$route.path.startsWith("/blocks")) {
+         navInputValue: "",
+       },
+       methods: {
+         pressNavButton: function () {
+           if (this.$route.path.startsWith("/blocks")) {
 
-                  this.$router.push(`/blocks/id/${this.navInputValue}`)
+             this.$router.push(`/blocks/id/${this.navInputValue}`)
 
-                } else if (this.$route.path.startsWith("/txs")) {
+           } else if (this.$route.path.startsWith("/txs")) {
 
-                  this.$router.push(`/txs-of-blkid/${this.navInputValue}`)
+             this.$router.push(`/txs-of-blkid/${this.navInputValue}`)
 
-                } else if (this.$route.path.startsWith("/tx")) {
+           } else if (this.$route.path.startsWith("/tx")) {
 
-                  this.$router.push(`/txid/${this.navInputValue}`)
+             this.$router.push(`/txid/${this.navInputValue}`)
 
-                } else if (this.$route.path.startsWith("/address")) {
-                  this.$router.push(`/address/${this.navInputValue}`)
-                } else if (this.$route.path.startsWith("/utxo")) {
-                  this.$router.push(`/utxo/${this.navInputValue}`)
+           } else if (this.$route.path.startsWith("/address")) {
+             this.$router.push(`/address/${this.navInputValue}`)
+           } else if (this.$route.path.startsWith("/utxo")) {
+             this.$router.push(`/utxo/${this.navInputValue}`)
 
-                } else if (this.$route.path.startsWith("/genesis-utxo")) {
-                  this.$router.push(`/genesis-utxo/${this.navInputValue}`)
+           } else if (this.$route.path.startsWith("/genesis-utxo")) {
+             this.$router.push(`/genesis-utxo/${this.navInputValue}`)
 
-                } else if (this.$route.path.startsWith("/genesis")) {
-                  this.$router.push(`/genesis/${this.navInputValue}`)
-                }
-              },
+           } else if (this.$route.path.startsWith("/genesis")) {
+             this.$router.push(`/genesis/${this.navInputValue}`)
+           }
+         },
 
-            }
-        })
+       }
+     })
     </script>
   </body>
 </html>

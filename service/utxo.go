@@ -36,7 +36,7 @@ LIMIT 128
 func GetUtxoBySql(psql string) (txOutsRsp []*model.TxOutResp, err error) {
 	txOutsRet, err := clickhouse.ScanAll(psql, txOutResultSRF)
 	if err != nil {
-		log.Printf("query txs by sql failed: %v", err)
+		log.Printf("query utxo by sql failed: %v", err)
 		return nil, err
 	}
 	if txOutsRet == nil {

@@ -65,7 +65,7 @@ WHERE txid = unhex('%s') AND
 func GetTxOutputsBySql(psql string) (txOutsRsp []*model.TxOutStatusResp, err error) {
 	txOutsRet, err := clickhouse.ScanAll(psql, txOutStatusResultSRF)
 	if err != nil {
-		log.Printf("query txs by blkid failed: %v", err)
+		log.Printf("query txouts by blkid failed: %v", err)
 		return nil, err
 	}
 	if txOutsRet == nil {
@@ -127,7 +127,7 @@ func txOutResultSRF(rows *sql.Rows) (interface{}, error) {
 func GetTxOutputBySql(psql string) (txOutRsp *model.TxOutResp, err error) {
 	txOutRet, err := clickhouse.ScanOne(psql, txOutResultSRF)
 	if err != nil {
-		log.Printf("query txs by blkid failed: %v", err)
+		log.Printf("query txout by blkid failed: %v", err)
 		return nil, err
 	}
 	if txOutRet == nil {
@@ -137,7 +137,7 @@ func GetTxOutputBySql(psql string) (txOutRsp *model.TxOutResp, err error) {
 	txOutRsp = &model.TxOutResp{
 		TxIdHex: blkparser.HashString(txOut.TxId),
 		Vout:    int(txOut.Vout),
-		Address: utils.EncodeAddress(txOut.Address, utils.PubKeyHashAddrIDMainNet), // fixme
+		Address: utils.EncodeAddress(txOut.Address, utils.PubKeyHashAddrIDMainNet),
 		Satoshi: int(txOut.Satoshi),
 
 		GenesisHex:    hex.EncodeToString(txOut.Genesis),

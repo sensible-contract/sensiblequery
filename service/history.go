@@ -12,6 +12,7 @@ import (
 	"satoblock/model"
 )
 
+//////////////// history
 func txOutHistoryResultSRF(rows *sql.Rows) (interface{}, error) {
 	var ret model.TxOutHistoryDO
 	err := rows.Scan(&ret.TxId, &ret.Vout, &ret.Address, &ret.Genesis, &ret.Satoshi, &ret.ScriptType, &ret.Height, &ret.IOType)
@@ -82,7 +83,7 @@ LIMIT 128
 func GetHistoryBySql(psql string) (txOutsRsp []*model.TxOutHistoryResp, err error) {
 	txOutsRet, err := clickhouse.ScanAll(psql, txOutHistoryResultSRF)
 	if err != nil {
-		log.Printf("query txs by genesis failed: %v", err)
+		log.Printf("query tx history by genesis failed: %v", err)
 		return nil, err
 	}
 	if txOutsRet == nil {
@@ -93,7 +94,7 @@ func GetHistoryBySql(psql string) (txOutsRsp []*model.TxOutHistoryResp, err erro
 		txOutsRsp = append(txOutsRsp, &model.TxOutHistoryResp{
 			TxIdHex: blkparser.HashString(txout.TxId),
 			Vout:    int(txout.Vout),
-			Address: utils.EncodeAddress(txout.Address, utils.PubKeyHashAddrIDMainNet), // fixme
+			Address: utils.EncodeAddress(txout.Address, utils.PubKeyHashAddrIDMainNet),
 			Satoshi: int(txout.Satoshi),
 
 			GenesisHex:    hex.EncodeToString(txout.Genesis),
