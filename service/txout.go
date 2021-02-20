@@ -13,8 +13,10 @@ import (
 )
 
 const (
-	SQL_FIELEDS_TXOUT        = "utxid, vout, address, genesis, satoshi, script_type, script_pk, height"
-	SQL_FIELEDS_TXOUT_STATUS = SQL_FIELEDS_TXOUT + ", u.txid, u.height"
+	SQL_FIELEDS_TXOUT_WITHOUT_SCRIPT        = "utxid, vout, address, genesis, satoshi, script_type, '', height"
+	SQL_FIELEDS_TXOUT_STATUS_WITHOUT_SCRIPT = SQL_FIELEDS_TXOUT_WITHOUT_SCRIPT + ", u.txid, u.height"
+
+	SQL_FIELEDS_TXOUT = "utxid, vout, address, genesis, satoshi, script_type, script_pk, height"
 )
 
 //////////////// txout
@@ -44,7 +46,7 @@ height IN (
     SELECT height FROM tx_height
     WHERE txid = unhex('%s')
 )
-`, SQL_FIELEDS_TXOUT_STATUS, txidHex, txidHex, txidHex, txidHex)
+`, SQL_FIELEDS_TXOUT_STATUS_WITHOUT_SCRIPT, txidHex, txidHex, txidHex, txidHex)
 
 	return GetTxOutputsBySql(psql)
 }
@@ -62,7 +64,7 @@ LEFT JOIN
 ) AS u USING (utxid, vout)
 WHERE utxid = unhex('%s') AND
      height = %d
-`, SQL_FIELEDS_TXOUT_STATUS, txidHex, txidHex, txidHex, blkHeight)
+`, SQL_FIELEDS_TXOUT_STATUS_WITHOUT_SCRIPT, txidHex, txidHex, txidHex, blkHeight)
 
 	return GetTxOutputsBySql(psql)
 }

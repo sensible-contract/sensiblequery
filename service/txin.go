@@ -13,6 +13,9 @@ import (
 )
 
 const (
+	SQL_FIELEDS_TXIN_WITHOUT_SCRIPT = `height, txid, idx, '', nsequence,
+       height_txo, utxid, vout, address, genesis, satoshi, script_type, ''`
+
 	SQL_FIELEDS_TXIN = `height, txid, idx, script_sig, nsequence,
        height_txo, utxid, vout, address, genesis, satoshi, script_type, script_pk`
 	SQL_FIELEDS_TXIN_SPENT = "height, txid, idx, utxid, vout"
@@ -46,7 +49,7 @@ WHERE txid = unhex('%s') AND
 height IN (
     SELECT height FROM tx_height
     WHERE txid = unhex('%s')
-)`, SQL_FIELEDS_TXIN, txidHex, txidHex)
+)`, SQL_FIELEDS_TXIN_WITHOUT_SCRIPT, txidHex, txidHex)
 
 	return GetTxInputsBySql(psql)
 }
@@ -55,7 +58,7 @@ func GetTxInputsByTxIdInsideHeight(blkHeight int, txidHex string) (txInsRsp []*m
 	psql := fmt.Sprintf(`
 SELECT %s FROM txin_full
 WHERE txid = unhex('%s') AND
-    height = %d`, SQL_FIELEDS_TXIN, txidHex, blkHeight)
+    height = %d`, SQL_FIELEDS_TXIN_WITHOUT_SCRIPT, txidHex, blkHeight)
 
 	return GetTxInputsBySql(psql)
 }
