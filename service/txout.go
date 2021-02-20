@@ -12,10 +12,15 @@ import (
 	"satoblock/model"
 )
 
+const (
+	SQL_FIELEDS_TXOUT        = "utxid, vout, address, genesis, satoshi, script_type, script_pk, height"
+	SQL_FIELEDS_TXOUT_STATUS = SQL_FIELEDS_TXOUT + ", u.txid, u.height"
+)
+
 //////////////// txout
 func txOutStatusResultSRF(rows *sql.Rows) (interface{}, error) {
 	var ret model.TxOutStatusDO
-	err := rows.Scan(&ret.TxId, &ret.Vout, &ret.Address, &ret.Genesis, &ret.Satoshi, &ret.ScriptType, &ret.Script, &ret.Height,
+	err := rows.Scan(&ret.TxId, &ret.Vout, &ret.Address, &ret.Genesis, &ret.Satoshi, &ret.ScriptType, &ret.ScriptPk, &ret.Height,
 		&ret.TxIdSpent, &ret.HeightSpent)
 	if err != nil {
 		return nil, err
@@ -25,7 +30,7 @@ func txOutStatusResultSRF(rows *sql.Rows) (interface{}, error) {
 
 func GetTxOutputsByTxId(txidHex string) (txOutsRsp []*model.TxOutStatusResp, err error) {
 	psql := fmt.Sprintf(`
-SELECT txid, vout, address, genesis, satoshi, script_type, script, height, u.txid, u.height FROM txout
+SELECT %s FROM txout
 LEFT JOIN
 (
     SELECT utxid, vout, txid, height FROM txin_spent
@@ -33,20 +38,20 @@ LEFT JOIN
          height IN (SELECT height FROM txout_spent_height
                     WHERE utxid = unhex('%s')
                     )
-) AS u ON txout.txid = u.utxid AND txout.vout = u.vout
-WHERE txid = unhex('%s') AND
+) AS u USING (utxid, vout)
+WHERE utxid = unhex('%s') AND
 height IN (
     SELECT height FROM tx_height
     WHERE txid = unhex('%s')
 )
-`, txidHex, txidHex, txidHex, txidHex)
+`, SQL_FIELEDS_TXOUT_STATUS, txidHex, txidHex, txidHex, txidHex)
 
 	return GetTxOutputsBySql(psql)
 }
 
 func GetTxOutputsByTxIdInsideHeight(blkHeight int, txidHex string) (txOutsRsp []*model.TxOutStatusResp, err error) {
 	psql := fmt.Sprintf(`
-SELECT txid, vout, address, genesis, satoshi, script_type, script, height, u.txid, u.height FROM txout
+SELECT %s FROM txout
 LEFT JOIN
 (
     SELECT utxid, vout, txid, height FROM txin_spent
@@ -54,10 +59,10 @@ LEFT JOIN
          height IN (SELECT height FROM txout_spent_height
                     WHERE utxid = unhex('%s')
                     )
-) AS u ON txout.txid = u.utxid AND txout.vout = u.vout
-WHERE txid = unhex('%s') AND
-    height = %d
-`, txidHex, txidHex, txidHex, blkHeight)
+) AS u USING (utxid, vout)
+WHERE utxid = unhex('%s') AND
+     height = %d
+`, SQL_FIELEDS_TXOUT_STATUS, txidHex, txidHex, txidHex, blkHeight)
 
 	return GetTxOutputsBySql(psql)
 }
@@ -81,7 +86,7 @@ func GetTxOutputsBySql(psql string) (txOutsRsp []*model.TxOutStatusResp, err err
 
 			GenesisHex:    hex.EncodeToString(txout.Genesis),
 			ScriptTypeHex: hex.EncodeToString(txout.ScriptType),
-			ScriptHex:     hex.EncodeToString(txout.Script),
+			ScriptPkHex:   hex.EncodeToString(txout.ScriptPk),
 			Height:        int(txout.Height),
 
 			TxIdSpentHex: blkparser.HashString(txout.TxIdSpent),
@@ -93,31 +98,31 @@ func GetTxOutputsBySql(psql string) (txOutsRsp []*model.TxOutStatusResp, err err
 
 func GetTxOutputByTxIdAndIdx(txidHex string, index int) (txOutRsp *model.TxOutResp, err error) {
 	psql := fmt.Sprintf(`
-SELECT txid, vout, address, genesis, satoshi, script_type, script, height FROM txout
-WHERE txid = unhex('%s') AND
-      vout = %d AND
+SELECT %s FROM txout
+WHERE utxid = unhex('%s') AND
+       vout = %d AND
 height IN (
     SELECT height FROM tx_height
     WHERE txid = unhex('%s')
 )
-LIMIT 1`, txidHex, index, txidHex)
+LIMIT 1`, SQL_FIELEDS_TXOUT, txidHex, index, txidHex)
 	return GetTxOutputBySql(psql)
 }
 
 func GetTxOutputByTxIdAndIdxInsideHeight(blkHeight int, txidHex string, index int) (txOutRsp *model.TxOutResp, err error) {
 	psql := fmt.Sprintf(`
-SELECT txid, vout, address, genesis, satoshi, script_type, script, height FROM txout
-WHERE txid = unhex('%s') AND
-      vout = %d AND
-    height = %d
-LIMIT 1`, txidHex, index, blkHeight)
+SELECT %s FROM txout
+WHERE utxid = unhex('%s') AND
+       vout = %d AND
+     height = %d
+LIMIT 1`, SQL_FIELEDS_TXOUT, txidHex, index, blkHeight)
 
 	return GetTxOutputBySql(psql)
 }
 
 func txOutResultSRF(rows *sql.Rows) (interface{}, error) {
 	var ret model.TxOutDO
-	err := rows.Scan(&ret.TxId, &ret.Vout, &ret.Address, &ret.Genesis, &ret.Satoshi, &ret.ScriptType, &ret.Script, &ret.Height)
+	err := rows.Scan(&ret.TxId, &ret.Vout, &ret.Address, &ret.Genesis, &ret.Satoshi, &ret.ScriptType, &ret.ScriptPk, &ret.Height)
 	if err != nil {
 		return nil, err
 	}
@@ -142,7 +147,7 @@ func GetTxOutputBySql(psql string) (txOutRsp *model.TxOutResp, err error) {
 
 		GenesisHex:    hex.EncodeToString(txOut.Genesis),
 		ScriptTypeHex: hex.EncodeToString(txOut.ScriptType),
-		ScriptHex:     hex.EncodeToString(txOut.Script),
+		ScriptPkHex:   hex.EncodeToString(txOut.ScriptPk),
 		Height:        int(txOut.Height),
 	}
 	return

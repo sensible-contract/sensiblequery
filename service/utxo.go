@@ -14,22 +14,22 @@ import (
 //////////////// address
 func GetUtxoByAddress(addressHex string) (txOutsRsp []*model.TxOutResp, err error) {
 	psql := fmt.Sprintf(`
-SELECT txid, vout, address, genesis, satoshi, script_type, script, height FROM utxo_address
+SELECT %s FROM utxo_address
 WHERE address = unhex('%s')
 ORDER BY height DESC
 LIMIT 128
-`, addressHex)
+`, SQL_FIELEDS_TXOUT, addressHex)
 	return GetUtxoBySql(psql)
 }
 
 //////////////// genesis
 func GetUtxoByGenesis(genesisHex string) (txOutsRsp []*model.TxOutResp, err error) {
 	psql := fmt.Sprintf(`
-SELECT txid, vout, address, genesis, satoshi, script_type, script, height FROM utxo_genesis
+SELECT %s FROM utxo_genesis
 WHERE genesis = unhex('%s')
 ORDER BY height DESC
 LIMIT 128
-`, genesisHex)
+`, SQL_FIELEDS_TXOUT, genesisHex)
 	return GetUtxoBySql(psql)
 }
 
@@ -52,7 +52,7 @@ func GetUtxoBySql(psql string) (txOutsRsp []*model.TxOutResp, err error) {
 
 			GenesisHex:    hex.EncodeToString(txout.Genesis),
 			ScriptTypeHex: hex.EncodeToString(txout.ScriptType),
-			ScriptHex:     hex.EncodeToString(txout.Script),
+			ScriptPkHex:   hex.EncodeToString(txout.ScriptPk),
 			Height:        int(txout.Height),
 		})
 	}

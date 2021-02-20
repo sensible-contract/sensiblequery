@@ -23,13 +23,19 @@ type BlockInfoResp struct {
 	Height         int    `json:"height"`
 	BlockIdHex     string `json:"id"`
 	PrevBlockIdHex string `json:"prev"`
+	MerkleRootHex  string `json:"merkle"`
 	TxCount        int    `json:"ntx"`
+	BlockTime      int    `json:"timestamp"`
+	Bits           int    `json:"bits"`
+	BlockSize      int    `json:"size"`
 }
 
 type TxInfoResp struct {
 	TxIdHex  string `json:"txid"`
 	InCount  int    `json:"nIn"`
 	OutCount int    `json:"nOut"`
+	TxSize   int    `json:"size"`
+	LockTime int    `json:"locktime"`
 
 	Height     int    `json:"height"`
 	BlockIdHex string `json:"blkid"`
@@ -49,6 +55,7 @@ type TxInResp struct {
 	TxIdHex      string `json:"txid"`
 	Idx          int    `json:"idx"`
 	ScriptSigHex string `json:"script_sig"`
+	Sequence     int    `json:"sequence"`
 
 	HeightTxo     int    `json:"height_txo"`
 	UtxIdHex      string `json:"utxid"`
@@ -57,6 +64,7 @@ type TxInResp struct {
 	GenesisHex    string `json:"genesis"`
 	Satoshi       int    `json:"satoshi"`
 	ScriptTypeHex string `json:"script_type"`
+	ScriptPkHex   string `json:"script_pk"`
 }
 
 type TxOutResp struct {
@@ -66,7 +74,7 @@ type TxOutResp struct {
 	GenesisHex    string `json:"genesis"`
 	Satoshi       int    `json:"satoshi"`
 	ScriptTypeHex string `json:"script_type"`
-	ScriptHex     string `json:"script"`
+	ScriptPkHex   string `json:"script_pk"`
 	Height        int    `json:"height"`
 }
 
@@ -88,7 +96,7 @@ type TxOutStatusResp struct {
 	GenesisHex    string `json:"genesis"`
 	Satoshi       int    `json:"satoshi"`
 	ScriptTypeHex string `json:"script_type"`
-	ScriptHex     string `json:"script"`
+	ScriptPkHex   string `json:"script_pk"`
 	Height        int    `json:"height"`
 
 	TxIdSpentHex string `json:"txid_spent"`

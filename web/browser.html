@@ -47,8 +47,10 @@
           <thead>
             <tr>
               <th class="text-right">#</th>
-              <th class="text-center">block id</th>
-              <th class="text-right">tx count</th>
+              <th class="text-center">Id</th>
+              <th class="text-right">Time</th>
+              <th class="text-right">Size</th>
+              <th class="text-right">Txs</th>
             </tr>
           </thead>
           <tbody>
@@ -59,7 +61,8 @@
                 <router-link :to="{path:`/txs/${blk.height}/${blk.id}`}"><samp>{{ blk.id }}</samp></router-link>
 
               </td>
-
+              <td class="text-right"><samp>{{ new Date(blk.timestamp*1000).toISOString().slice(0, 19).replace('T', ' ') }}</samp></td>
+              <td class="text-right"><samp>{{ blk.size }}</samp></td>
               <td class="text-right"><samp>{{ blk.ntx }}</samp></td>
             </tr>
           </tbody>
@@ -97,9 +100,10 @@
           <thead>
             <tr>
               <th class="text-right">#</th>
-              <th class="text-center">tx id</th>
-              <th class="text-right">txin count</th>
-              <th class="text-right">txout count</th>
+              <th class="text-center">Id</th>
+              <th class="text-right">Size</th>
+              <th class="text-right">TxIn</th>
+              <th class="text-right">TxOut</th>
             </tr>
           </thead>
           <tbody>
@@ -108,6 +112,7 @@
               <td class="text-center">
                 <router-link :to="{path:`/tx/${tx.height}/${tx.txid}`}"><samp>{{ tx.txid }}</samp></router-link>
               </td>
+              <td class="text-right"><samp>{{ tx.size }}</samp></td>
               <td class="text-right"><samp>{{ tx.nIn }}</samp></td>
               <td class="text-right"><samp>{{ tx.nOut }}</samp></td>
             </tr>
@@ -980,9 +985,9 @@
        data: {
          currentRoute: window.location.pathname,
 
-         /* apiPoint: "http://120.92.153.221:5555/",*/
-
-         apiPoint: "http://localhost:8000/",
+         apiPoint: "http://120.92.153.221:5555/",
+         /*
+          *          apiPoint: "http://localhost:8000/",*/
 
          message: "",
 

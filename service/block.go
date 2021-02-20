@@ -10,9 +10,13 @@ import (
 	"satoblock/model"
 )
 
+const (
+	SQL_FIELEDS_BLOCK = "height, blkid, previd, merkle, ntx, blocktime, bits, blocksize"
+)
+
 func blockResultSRF(rows *sql.Rows) (interface{}, error) {
 	var ret model.BlockDO
-	err := rows.Scan(&ret.Height, &ret.BlockId, &ret.PrevBlockId, &ret.TxCount)
+	err := rows.Scan(&ret.Height, &ret.BlockId, &ret.PrevBlockId, &ret.MerkleRoot, &ret.TxCount, &ret.BlockTime, &ret.Bits, &ret.BlockSize)
 	if err != nil {
 		return nil, err
 	}
@@ -20,8 +24,8 @@ func blockResultSRF(rows *sql.Rows) (interface{}, error) {
 }
 
 func GetBlocksByHeightRange(blkStartHeight, blkEndHeight int) (blksRsp []*model.BlockInfoResp, err error) {
-	psql := fmt.Sprintf("SELECT height, blkid, previd, ntx FROM blk_height WHERE height >= %d AND height < %d",
-		blkStartHeight, blkEndHeight)
+	psql := fmt.Sprintf("SELECT %s FROM blk_height WHERE height >= %d AND height < %d",
+		SQL_FIELEDS_BLOCK, blkStartHeight, blkEndHeight)
 
 	blksRet, err := clickhouse.ScanAll(psql, blockResultSRF)
 	if err != nil {
@@ -37,7 +41,11 @@ func GetBlocksByHeightRange(blkStartHeight, blkEndHeight int) (blksRsp []*model.
 			Height:         int(block.Height),
 			BlockIdHex:     blkparser.HashString(block.BlockId),
 			PrevBlockIdHex: blkparser.HashString(block.PrevBlockId),
+			MerkleRootHex:  blkparser.HashString(block.MerkleRoot),
 			TxCount:        int(block.TxCount),
+			BlockTime:      int(block.BlockTime),
+			Bits:           int(block.Bits),
+			BlockSize:      int(block.BlockSize),
 		})
 	}
 	return
@@ -45,12 +53,12 @@ func GetBlocksByHeightRange(blkStartHeight, blkEndHeight int) (blksRsp []*model.
 }
 
 func GetBlockByHeight(blkHeight int) (blk *model.BlockInfoResp, err error) {
-	psql := fmt.Sprintf("SELECT height, blkid, previd, ntx FROM blk_height WHERE height = %d", blkHeight)
+	psql := fmt.Sprintf("SELECT %s FROM blk_height WHERE height = %d", SQL_FIELEDS_BLOCK, blkHeight)
 	return GetBlockBySql(psql)
 }
 
 func GetBlockById(blkidHex string) (blk *model.BlockInfoResp, err error) {
-	psql := fmt.Sprintf("SELECT height, blkid, previd, ntx FROM blk WHERE blkid = unhex('%s')", blkidHex)
+	psql := fmt.Sprintf("SELECT %s FROM blk WHERE blkid = unhex('%s')", SQL_FIELEDS_BLOCK, blkidHex)
 	return GetBlockBySql(psql)
 }
 
@@ -68,7 +76,11 @@ func GetBlockBySql(psql string) (blk *model.BlockInfoResp, err error) {
 		Height:         int(block.Height),
 		BlockIdHex:     blkparser.HashString(block.BlockId),
 		PrevBlockIdHex: blkparser.HashString(block.PrevBlockId),
+		MerkleRootHex:  blkparser.HashString(block.MerkleRoot),
 		TxCount:        int(block.TxCount),
+		BlockTime:      int(block.BlockTime),
+		Bits:           int(block.Bits),
+		BlockSize:      int(block.BlockSize),
 	}
 	return
 }

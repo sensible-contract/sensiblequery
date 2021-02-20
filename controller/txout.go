@@ -27,7 +27,7 @@ func GetTxOutputsByTxId(ctx *gin.Context) {
 
 	result, err := service.GetTxOutputsByTxId(hex.EncodeToString(txId))
 	if err != nil {
-		log.Printf("get block failed: %v", err)
+		log.Printf("get txouts failed: %v", err)
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get txo failed"})
 		return
 	}
@@ -62,7 +62,7 @@ func GetTxOutputsByTxIdInsideHeight(ctx *gin.Context) {
 
 	result, err := service.GetTxOutputsByTxIdInsideHeight(blkHeight, hex.EncodeToString(txId))
 	if err != nil {
-		log.Printf("get block failed: %v", err)
+		log.Printf("get txout with height failed: %v", err)
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get txo failed"})
 		return
 	}
@@ -98,7 +98,7 @@ func GetTxOutputByTxIdAndIdx(ctx *gin.Context) {
 
 	result, err := service.GetTxOutputByTxIdAndIdx(hex.EncodeToString(txId), txIndex)
 	if err != nil {
-		log.Printf("get block failed: %v", err)
+		log.Printf("get txout failed: %v", err)
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get txo failed"})
 		return
 	}
@@ -142,7 +142,7 @@ func GetTxOutputByTxIdAndIdxInsideHeight(ctx *gin.Context) {
 
 	result, err := service.GetTxOutputByTxIdAndIdxInsideHeight(blkHeight, hex.EncodeToString(txId), txIndex)
 	if err != nil {
-		log.Printf("get block failed: %v", err)
+		log.Printf("get txout with height failed: %v", err)
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get txo failed"})
 		return
 	}
@@ -178,7 +178,7 @@ func GetTxOutputSpentStatusByTxIdAndIdx(ctx *gin.Context) {
 
 	result, err := service.GetTxOutputSpentStatusByTxIdAndIdx(hex.EncodeToString(txId), txIndex)
 	if err != nil {
-		log.Printf("get block failed: %v", err)
+		log.Printf("get txout spent status failed: %v", err)
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get vout failed"})
 		return
 	}

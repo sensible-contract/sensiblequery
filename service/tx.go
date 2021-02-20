@@ -10,10 +10,14 @@ import (
 	"satoblock/model"
 )
 
+const (
+	SQL_FIELEDS_TX = "txid, nin, nout, txsize, locktime, height, blkid, idx"
+)
+
 //////////////// tx
 func txResultSRF(rows *sql.Rows) (interface{}, error) {
 	var ret model.TxDO
-	err := rows.Scan(&ret.TxId, &ret.InCount, &ret.OutCount, &ret.Height, &ret.BlockId, &ret.Idx)
+	err := rows.Scan(&ret.TxId, &ret.InCount, &ret.OutCount, &ret.TxSize, &ret.LockTime, &ret.Height, &ret.BlockId, &ret.Idx)
 	if err != nil {
 		return nil, err
 	}
@@ -21,17 +25,17 @@ func txResultSRF(rows *sql.Rows) (interface{}, error) {
 }
 
 func GetBlockTxsByBlockHeight(blkHeight int) (txsRsp []*model.TxInfoResp, err error) {
-	psql := fmt.Sprintf("SELECT txid, nin, nout, height, blkid, idx FROM blktx_height WHERE height = %d", blkHeight)
+	psql := fmt.Sprintf("SELECT %s FROM blktx_height WHERE height = %d", SQL_FIELEDS_TX, blkHeight)
 	return GetBlockTxsBySql(psql)
 }
 
 func GetBlockTxsByBlockId(blkidHex string) (txsRsp []*model.TxInfoResp, err error) {
 	psql := fmt.Sprintf(`
-SELECT txid, nin, nout, height, blkid, idx FROM blktx_height
+SELECT %s FROM blktx_height
 WHERE height IN (
     SELECT height FROM blk
     WHERE blkid = unhex('%s') LIMIT 1
-)`, blkidHex)
+)`, SQL_FIELEDS_TX, blkidHex)
 
 	return GetBlockTxsBySql(psql)
 }
@@ -51,8 +55,9 @@ func GetBlockTxsBySql(psql string) (txsRsp []*model.TxInfoResp, err error) {
 			TxIdHex:  blkparser.HashString(tx.TxId),
 			InCount:  int(tx.InCount),
 			OutCount: int(tx.OutCount),
-
-			Height: int(tx.Height),
+			TxSize:   int(tx.TxSize),
+			LockTime: int(tx.LockTime),
+			Height:   int(tx.Height),
 			// BlockIdHex: blkparser.HashString(tx.BlockId),
 			Idx: int(tx.Idx),
 		})
@@ -62,18 +67,18 @@ func GetBlockTxsBySql(psql string) (txsRsp []*model.TxInfoResp, err error) {
 
 func GetTxById(txidHex string) (txRsp *model.TxInfoResp, err error) {
 	psql := fmt.Sprintf(`
-SELECT txid, nin, nout, height, blkid, idx FROM tx
+SELECT %s FROM tx
 WHERE txid = unhex('%s') AND
 height IN (
     SELECT height FROM tx_height
     WHERE txid = unhex('%s')
 )
-LIMIT 1`, txidHex, txidHex)
+LIMIT 1`, SQL_FIELEDS_TX, txidHex, txidHex)
 	return GetTxBySql(psql)
 }
 
 func GetTxByIdInsideHeight(blkHeight int, txidHex string) (txRsp *model.TxInfoResp, err error) {
-	psql := fmt.Sprintf("SELECT txid, nin, nout, height, blkid, idx FROM tx WHERE txid = unhex('%s') AND height = %d", txidHex, blkHeight)
+	psql := fmt.Sprintf("SELECT %s FROM tx WHERE txid = unhex('%s') AND height = %d", SQL_FIELEDS_TX, txidHex, blkHeight)
 	return GetTxBySql(psql)
 }
 
@@ -88,10 +93,11 @@ func GetTxBySql(psql string) (txRsp *model.TxInfoResp, err error) {
 	}
 	tx := txRet.(*model.TxDO)
 	txRsp = &model.TxInfoResp{
-		TxIdHex:  blkparser.HashString(tx.TxId),
-		InCount:  int(tx.InCount),
-		OutCount: int(tx.OutCount),
-
+		TxIdHex:    blkparser.HashString(tx.TxId),
+		InCount:    int(tx.InCount),
+		OutCount:   int(tx.OutCount),
+		TxSize:     int(tx.TxSize),
+		LockTime:   int(tx.LockTime),
 		Height:     int(tx.Height),
 		BlockIdHex: blkparser.HashString(tx.BlockId),
 		Idx:        int(tx.Idx),

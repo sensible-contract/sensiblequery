@@ -5,13 +5,19 @@ type BlockDO struct {
 	Height      uint32 `db:"height"`
 	BlockId     []byte `db:"blkid"`
 	PrevBlockId []byte `db:"previd"`
+	MerkleRoot  []byte `db:"merkle"`
 	TxCount     uint64 `db:"ntx"`
+	BlockTime   uint32 `db:"blocktime"`
+	Bits        uint32 `db:"bits"`
+	BlockSize   uint32 `db:"blocksize"`
 }
 
 type TxDO struct {
 	TxId     []byte `db:"txid"`
 	InCount  uint32 `db:"nin"`
 	OutCount uint32 `db:"nout"`
+	TxSize   uint32 `db:"txsize"`
+	LockTime uint32 `db:"locktime"`
 	Height   uint32 `db:"height"`
 	BlockId  []byte `db:"blkid"`
 	Idx      uint64 `db:"idx"`
@@ -30,6 +36,7 @@ type TxInDO struct {
 	TxId      []byte `db:"txid"`
 	Idx       uint32 `db:"idx"`
 	ScriptSig []byte `db:"script_sig"`
+	Sequence  uint32 `db:"nsequence"`
 
 	HeightTxo  uint32 `db:"height_txo"`
 	UtxId      []byte `db:"utxid"`
@@ -38,6 +45,7 @@ type TxInDO struct {
 	Genesis    []byte `db:"genesis"`
 	Satoshi    uint64 `db:"satoshi"`
 	ScriptType []byte `db:"script_type"`
+	ScriptPk   []byte `db:"script_pk"`
 }
 
 type TxOutDO struct {
@@ -47,7 +55,7 @@ type TxOutDO struct {
 	Genesis    []byte `db:"genesis"`
 	Satoshi    uint64 `db:"satoshi"`
 	ScriptType []byte `db:"script_type"`
-	Script     []byte `db:"script"`
+	ScriptPk   []byte `db:"script_pk"`
 	Height     uint32 `db:"height"`
 }
 
@@ -69,7 +77,7 @@ type TxOutStatusDO struct {
 	Genesis    []byte `db:"genesis"`
 	Satoshi    uint64 `db:"satoshi"`
 	ScriptType []byte `db:"script_type"`
-	Script     []byte `db:"script"`
+	ScriptPk   []byte `db:"script_pk"`
 	Height     uint32 `db:"height"`
 
 	TxIdSpent   []byte `db:"txid_spent"`

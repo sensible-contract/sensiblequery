@@ -12,6 +12,10 @@ import (
 	"satoblock/model"
 )
 
+const (
+	SQL_FIELEDS_TX_HISTORY = "txid, idx, address, genesis, satoshi, script_type, height, io_type"
+)
+
 //////////////// history
 func txOutHistoryResultSRF(rows *sql.Rows) (interface{}, error) {
 	var ret model.TxOutHistoryDO
@@ -27,8 +31,8 @@ func GetHistoryByAddress(addressHex string) (txOutsRsp []*model.TxOutHistoryResp
 	psql := fmt.Sprintf(`
 SELECT txid, idx, address, genesis, satoshi, script_type, height, io_type FROM
 (
-SELECT txid, vout AS idx, address, genesis, satoshi, script_type, height, 1 AS io_type FROM txout
-WHERE (txid, vout, height) in (
+SELECT utxid AS txid, vout AS idx, address, genesis, satoshi, script_type, height, 1 AS io_type FROM txout
+WHERE (utxid, vout, height) in (
     SELECT utxid, vout, height FROM txout_address_height
     WHERE address = unhex('%s')
     ORDER BY height DESC
@@ -56,8 +60,8 @@ func GetHistoryByGenesis(genesisHex string) (txOutsRsp []*model.TxOutHistoryResp
 	psql := fmt.Sprintf(`
 SELECT txid, idx, address, genesis, satoshi, script_type, height, io_type FROM
 (
-SELECT txid, vout AS idx, address, genesis, satoshi, script_type, height, 1 AS io_type FROM txout
-WHERE (txid, vout, height) in (
+SELECT utxid AS txid, vout AS idx, address, genesis, satoshi, script_type, height, 1 AS io_type FROM txout
+WHERE (utxid, vout, height) in (
     SELECT utxid, vout, height FROM txout_genesis_height
     WHERE genesis = unhex('%s')
     ORDER BY height DESC
