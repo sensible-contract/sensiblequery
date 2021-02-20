@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"satoblock/model"
+	"satoblock/service"
 
 	"github.com/gin-gonic/gin"
 )
@@ -26,16 +27,23 @@ func Satotx(ctx *gin.Context) {
 func GetBlockchainInfo(ctx *gin.Context) {
 	log.Printf("GetBlockchainInfo enter")
 
+	blk, err := service.GetBestBlock()
+	if err != nil {
+		log.Printf("best block failed: %v", err)
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get best block failed"})
+		return
+	}
+
 	ctx.JSON(http.StatusOK, model.Response{
 		Code: 0,
 		Msg:  "ok",
 		Data: &model.BlockchainInfoResp{
 			Chain:         "main",
-			Blocks:        0,
-			Headers:       0,
-			BestBlockHash: "",
+			Blocks:        blk.Height + 1,
+			Headers:       blk.Height + 1,
+			BestBlockHash: blk.BlockIdHex,
 			Difficulty:    "",
-			MedianTime:    0,
+			MedianTime:    blk.BlockTime,
 			Chainwork:     "",
 		},
 	})

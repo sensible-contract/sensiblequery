@@ -23,8 +23,8 @@
           <div class="col-4">
             <form class="form-inline col">
               <div class="form-group col">
-                <label for="blockStartHeight" class="sr-only">Start</label>
-                <input type="text" class="form-control col" v-model="blockStartHeight" id="blockStartHeight"
+                <label for="blockEndHeight" class="sr-only">End</label>
+                <input type="text" class="form-control col" v-model="blockEndHeight" id="blockEndHeight"
                        placeholder="input start blk height">
               </div>
             </form>
@@ -456,17 +456,17 @@
          return {
            pageSize: 64,
            blockStartHeight: 0,
+           blockEndHeight: 0,
            Blocks: []
          }
        },
 
        created: function () {
-         this.viewBlockRange(0)
+         this.viewLatestBlock()
        },
 
        watch: {
          $route(to, from) {
-
            if (to.path.startsWith("/blocks/id/")) {
              this.viewBlockById(to.params.blkid)
            } else if (to.path.startsWith("/blocks/")) {
@@ -477,13 +477,18 @@
 
        methods: {
          viewBlockRange: function (step) {
-           this.blockStartHeight = parseInt(this.blockStartHeight) + step
-           blockEndHeight = this.blockStartHeight + this.pageSize
+           this.blockEndHeight = parseInt(this.blockEndHeight) + step
+           this.blockStartHeight = this.blockEndHeight - this.pageSize
+           if (this.blockStartHeight < 0) {
+             this.blockStartHeight = 0
+           }
 
-           axios.get(this.$root.apiPoint + "blocks/"+ this.blockStartHeight + "/" + blockEndHeight)
+           axios.get(this.$root.apiPoint + "blocks/"+ this.blockStartHeight + "/" + this.blockEndHeight)
                 .then(
                   response => {
-                    this.Blocks = response.data.data
+                    if (response.data.code == 0) {
+                      this.Blocks = response.data.data.reverse()
+                    }
                     this.$root.message = response.data.msg
                   }
                 )
@@ -494,7 +499,19 @@
              .get(this.$root.apiPoint + "block/id/"+ blkid)
              .then(
                response => {
-                 this.blockStartHeight = response.data.data.height
+                 this.blockEndHeight = response.data.data.height
+                 this.viewBlockRange(0)
+                 this.$root.message = response.data.msg
+               }
+             )
+         },
+
+         viewLatestBlock: function () {
+           axios
+             .get(this.$root.apiPoint + "blockchain/info")
+             .then(
+               response => {
+                 this.blockEndHeight = response.data.data.blocks
                  this.viewBlockRange(0)
                  this.$root.message = response.data.msg
                }
@@ -947,6 +964,7 @@
 
 /* routes */
      const routes = [
+       { path: '/', component: blocks },
        { path: '/blocks', component: blocks },
        { path: '/txs', component: transactions },
        { path: '/tx', component: transaction },

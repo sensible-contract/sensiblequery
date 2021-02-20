@@ -62,6 +62,11 @@ func GetBlockById(blkidHex string) (blk *model.BlockInfoResp, err error) {
 	return GetBlockBySql(psql)
 }
 
+func GetBestBlock() (blk *model.BlockInfoResp, err error) {
+	psql := fmt.Sprintf("SELECT %s FROM blk_height ORDER BY height DESC LIMIT 1", SQL_FIELEDS_BLOCK)
+	return GetBlockBySql(psql)
+}
+
 func GetBlockBySql(psql string) (blk *model.BlockInfoResp, err error) {
 	blkRet, err := clickhouse.ScanOne(psql, blockResultSRF)
 	if err != nil {

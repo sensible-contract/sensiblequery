@@ -17,19 +17,26 @@ Api Endpoint: `http://120.92.153.221:5555/`
 
 data包括字段为：
 
-- latest: 最新blockId
-- height: 最新区块高度
+- chain: main/testnet
+- blocks: 最新区块总数
+- headers: 最新区块头总数
+- bestBlockHash: 最新blockId
+- medianTime: 最新区块时间戳
 - github: 项目地址
 
 - Body
 ```
 {
   code: 0,
-  msg: "Welcome to use sensible contract on Bitcoin SV!",
+  msg: "ok",
   data: {
-    "latest": "000000006a625f06636b8bb6ac7b960a8d03705d1ace08b1a19da3fdcc99ddbd",
-    "height": 2,
-    "github": "https://github.com/sensible-group"
+    chain: "main",
+    blocks: 674936,
+    headers: 674936,
+    bestBlockHash: "000000000000000007d4c4d5da6f35a29d4a4ed9eba61e9627634d910f93b2ee",
+    difficulty: "",
+    medianTime: 1613626720,
+    chainwork: ""
   }
 }
 ```
