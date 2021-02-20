@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS tx_height (
 ) engine=MergeTree()
 ORDER BY txid
 PARTITION BY substring(txid, 1, 1)
-SETTINGS storage_policy = 'prefer_ssd_policy';
+SETTINGS storage_policy = 'prefer_nvme_policy';
 
 -- 从tx表创建tx_height
 INSERT INTO tx_height SELECT txid, height FROM tx;

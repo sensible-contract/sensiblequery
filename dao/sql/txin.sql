@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS txout_spent_height (
 ) engine=MergeTree()
 ORDER BY (utxid, vout)
 PARTITION BY substring(utxid, 1, 1)
-SETTINGS storage_policy = 'prefer_ssd_policy';
+SETTINGS storage_policy = 'prefer_nvme_policy';
 
 -- 从txin_spent表创建txout_spent_height
 INSERT INTO txout_spent_height SELECT height, utxid, vout FROM txin_spent;
@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS txin_address_height (
 PRIMARY KEY address
 ORDER BY (address, genesis, height)
 PARTITION BY substring(address, 1, 1)
-SETTINGS storage_policy = 'prefer_ssd_policy';
+SETTINGS storage_policy = 'prefer_nvme_policy';
 
 -- 添加
 INSERT INTO txin_address_height
@@ -55,10 +55,7 @@ CREATE TABLE IF NOT EXISTS txin_genesis_height (
 PRIMARY KEY genesis
 ORDER BY (genesis, address, height)
 PARTITION BY substring(genesis, 1, 1)
-SETTINGS storage_policy = 'prefer_ssd_policy';
-
-
-SETTINGS storage_policy = 'multi_tiered_policy';
+SETTINGS storage_policy = 'prefer_nvme_policy';
 
 -- 添加
 INSERT INTO txin_genesis_height
