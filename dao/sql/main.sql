@@ -18,7 +18,7 @@ ORDER BY height
 PARTITION BY intDiv(height, 2100)
 SETTINGS storage_policy = 'prefer_nvme_policy';
 -- load
--- cat /data/674936/blk.ch | clickhouse-client -h 192.168.31.236 --database="bitcoin" --query="INSERT INTO blk_height FORMAT RowBinary"
+-- cat /data/674936/blk.ch | clickhouse-client -h 192.168.31.236 --database="bsv" --query="INSERT INTO blk_height FORMAT RowBinary"
 
 
 -- 区块头，分区内按区块blkid排序、索引。按blkid查询时将遍历所有分区 (慢)
@@ -58,7 +58,7 @@ ORDER BY height
 PARTITION BY intDiv(height, 2100)
 SETTINGS storage_policy = 'prefer_nvme_policy';
 -- load
--- cat /data/674936/tx.ch | clickhouse-client -h 192.168.31.236 --database="bitcoin" --query="INSERT INTO blktx_height FORMAT RowBinary"
+-- cat /data/674936/tx.ch | clickhouse-client -h 192.168.31.236 --database="bsv" --query="INSERT INTO blktx_height FORMAT RowBinary"
 
 
 -- 区块包含的交易列表，分区内按交易txid排序、索引。仅按txid查询时将遍历所有分区 (慢)
@@ -99,7 +99,7 @@ ORDER BY (utxid, vout)
 PARTITION BY intDiv(height, 2100)
 SETTINGS storage_policy = 'prefer_nvme_policy';
 -- load
--- cat /data/674936/tx-out.ch | clickhouse-client -h 192.168.31.236 --database="bitcoin" --query="INSERT INTO txout FORMAT RowBinary"
+-- cat /data/674936/tx-out.ch | clickhouse-client -h 192.168.31.236 --database="bsv" --query="INSERT INTO txout FORMAT RowBinary"
 
 
 
@@ -121,7 +121,9 @@ ORDER BY (txid, idx)
 PARTITION BY intDiv(height, 2100)
 SETTINGS storage_policy = 'prefer_nvme_policy';
 -- load
--- cat /data/674936/tx-in.ch | clickhouse-client -h 192.168.31.236 --database="bitcoin" --query="INSERT INTO txin FORMAT RowBinary"
+-- cat /data/674936/tx-in.ch | clickhouse-client -h 192.168.31.236 --database="bsv" --query="INSERT INTO txin FORMAT RowBinary"
+-- or insert
+INSERT INTO txin SELECT txid, idx, utxid, vout, script_sig, nsequence, height FROM txin_full
 
 
 -- 交易输入的outpoint列表，分区内按outpoint txid+idx排序、索引。用于查询某txo被哪个tx花费，需遍历所有分区（慢）
@@ -164,8 +166,8 @@ ORDER BY (txid, idx)
 PARTITION BY intDiv(height, 2100)
 SETTINGS storage_policy = 'prefer_nvme_policy';
 -- load
--- cat /data256/674936/tx-in.ch | clickhouse-client -h 192.168.31.236 --database="bitcoin" --query="INSERT INTO txin_full FORMAT RowBinary"
--- insert
+-- cat /data256/674936/tx-in.ch | clickhouse-client -h 192.168.31.236 --database="bsv" --query="INSERT INTO txin_full FORMAT RowBinary"
+-- or insert
 INSERT INTO txin_full
 SELECT txin.height, txin.txid, txin.idx, txin.script_sig, txin.nsequence,
        txout.height, txin.utxid, txin.vout, txout.address, txout.genesis, txout.satoshi, txout.script_type, txout.script_pk FROM txin

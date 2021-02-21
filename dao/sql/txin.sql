@@ -36,8 +36,7 @@ PARTITION BY substring(address, 1, 1)
 SETTINGS storage_policy = 'prefer_nvme_policy';
 
 -- 添加
-INSERT INTO txin_address_height
-  SELECT height, txid, idx, address, genesis FROM txin_full
+INSERT INTO txin_address_height SELECT height, txid, idx, address, genesis FROM txin_full
 
 
 
@@ -58,5 +57,4 @@ PARTITION BY substring(genesis, 1, 1)
 SETTINGS storage_policy = 'prefer_nvme_policy';
 
 -- 添加
-INSERT INTO txin_genesis_height
-  SELECT height, txid, idx, address, genesis FROM txin_full
+INSERT INTO txin_genesis_height SELECT height, txid, idx, address, genesis FROM txin_full

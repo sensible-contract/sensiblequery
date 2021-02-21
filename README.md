@@ -17,7 +17,7 @@ Api Endpoint: `http://120.92.153.221:5555/`
 
 data包括字段为：
 
-- chain: main/testnet
+- chain: main/test
 - blocks: 最新区块总数
 - headers: 最新区块头总数
 - bestBlockHash: 最新blockId
@@ -46,7 +46,7 @@ data包括字段为：
 
 #### Request
 
-`GET /blocks/0/10`
+`GET /blocks/0/3`
 
 #### Response
 
