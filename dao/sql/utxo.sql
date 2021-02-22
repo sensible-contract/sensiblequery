@@ -49,8 +49,9 @@ CREATE TABLE IF NOT EXISTS utxo_674936 (
 	satoshi      UInt64,
 	script_type  String,
 	script_pk    String,
-	height       UInt32
-) engine=MergeTree()
+	height       UInt32,
+   sign         Int8
+) engine=CollapsingMergeTree(sign)
 ORDER BY (utxid, vout)
 SETTINGS storage_policy = 'prefer_ssd_policy';
 -- 创建备份
@@ -68,13 +69,14 @@ CREATE TABLE IF NOT EXISTS utxo_address (
 	satoshi      UInt64,
 	script_type  String,
 	script_pk    String,
-	height       UInt32
-) engine=MergeTree()
+	height       UInt32,
+   sign         Int8
+) engine=CollapsingMergeTree(sign)
 PRIMARY KEY address
 ORDER BY (address, genesis, height)
 SETTINGS storage_policy = 'prefer_nvme_policy';
 -- 从utxo创建address
-INSERT INTO utxo_address SELECT utxid, vout, address, genesis, satoshi, script_type, script_pk, height FROM utxo
+INSERT INTO utxo_address SELECT utxid, vout, address, genesis, satoshi, script_type, script_pk, height, 1 FROM utxo
 -- 通过address查询utxo
 SELECT hex(reverse(utxid)), vout, satoshi, height FROM utxo_address
 WHERE address = unhex('64629ceff0c8da44ef193c6c34a0b5b9aa5f19db')
@@ -93,10 +95,11 @@ CREATE TABLE IF NOT EXISTS utxo_genesis (
 	satoshi      UInt64,
 	script_type  String,
 	script_pk    String,
-	height       UInt32
-) engine=MergeTree()
+	height       UInt32,
+   sign         Int8
+) engine=CollapsingMergeTree(sign)
 PRIMARY KEY genesis
 ORDER BY (genesis, address, height)
 SETTINGS storage_policy = 'prefer_nvme_policy';
 -- 从utxo创建address
-INSERT INTO utxo_genesis SELECT utxid, vout, address, genesis, satoshi, script_type, script_pk, height FROM utxo
+INSERT INTO utxo_genesis SELECT utxid, vout, address, genesis, satoshi, script_type, script_pk, height, 1 FROM utxo

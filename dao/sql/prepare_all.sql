@@ -1,6 +1,7 @@
 /*
-预先创建并导入新表：blk_height、blktx_height、txin、txout、txin_full。新表包含全量数据。
+预先创建17张表，见sql定义文件。
 
+并导入相应全量数据到：blk_height、blktx_height、txin、txout、txin_full。
 
 cat /data/blk.ch | clickhouse-client -h DBHOST --database="bsv" --query="INSERT INTO blk_height FORMAT RowBinary"
 cat /data/tx.ch | clickhouse-client -h DBHOST --database="bsv" --query="INSERT INTO blktx_height FORMAT RowBinary"
@@ -8,9 +9,8 @@ cat /data/txin.ch | clickhouse-client -h DBHOST --database="bsv" --query="INSERT
 cat /data/txout.ch | clickhouse-client -h DBHOST --database="bsv" --query="INSERT INTO txout FORMAT RowBinary"
 cat /data/txin_full.ch | clickhouse-client -h DBHOST --database="bsv" --query="INSERT INTO txin_full FORMAT RowBinary"
 
-再创建中间表，并执行以下预处理语句：
+再执行以下预处理语句：
 */
-
 
 -- 生成区块id索引
 INSERT INTO blk SELECT * FROM blk_height
@@ -62,6 +62,6 @@ INSERT INTO utxo
         NOT startsWith(script_type, char(0x00, 0x6a));
 
 -- 生成地址相关的utxo索引
-INSERT INTO utxo_address SELECT utxid, vout, address, genesis, satoshi, script_type, script_pk, height FROM utxo;
+INSERT INTO utxo_address SELECT utxid, vout, address, genesis, satoshi, script_type, script_pk, height, 1 FROM utxo;
 -- 生成溯源ID相关的utxo索引
-INSERT INTO utxo_genesis SELECT utxid, vout, address, genesis, satoshi, script_type, script_pk, height FROM utxo;
+INSERT INTO utxo_genesis SELECT utxid, vout, address, genesis, satoshi, script_type, script_pk, height, 1 FROM utxo;
