@@ -15,8 +15,7 @@ PARTITION BY substring(address, 1, 1)
 SETTINGS storage_policy = 'prefer_nvme_policy';
 
 -- 添加
-INSERT INTO txout_address_height
-  SELECT height, utxid, vout, address, genesis FROM txout
+-- INSERT INTO txout_address_height SELECT height, utxid, vout, address, genesis FROM txout
 
 
 
@@ -37,5 +36,4 @@ PARTITION BY substring(genesis, 1, 1)
 SETTINGS storage_policy = 'prefer_nvme_policy';
 
 -- 添加
-INSERT INTO txout_genesis_height
-  SELECT height, utxid, vout, address, genesis FROM txout
+-- INSERT INTO txout_genesis_height SELECT height, utxid, vout, address, genesis FROM txout

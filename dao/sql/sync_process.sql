@@ -1,74 +1,12 @@
-/*
-创建并导入增量数据到新表：blk_height_new、blktx_height_new、txin_new、txout_new、txin_full_new。
-
-新表结构如同：blk_height、blktx_height、txin、txout、txin_full。
-*/
-
-CREATE TABLE IF NOT EXISTS blk_height_new AS blk_height;
-CREATE TABLE IF NOT EXISTS blktx_height_new AS blktx_height;
-CREATE TABLE IF NOT EXISTS txin_new AS txin;
-CREATE TABLE IF NOT EXISTS txout_new AS txout;
-CREATE TABLE IF NOT EXISTS txin_full_new AS txin_full;
-
-/*
-DBHOST=192.168.31.236
-cat out/blk.ch | clickhouse-client -h $DBHOST --database="bsv" --query="INSERT INTO blk_height_new FORMAT RowBinary"
-cat out/tx.ch | clickhouse-client -h $DBHOST --database="bsv" --query="INSERT INTO blktx_height_new FORMAT RowBinary"
-cat out/txin.ch | clickhouse-client -h $DBHOST --database="bsv" --query="INSERT INTO txin_new FORMAT RowBinary"
-cat out/txout.ch | clickhouse-client -h $DBHOST --database="bsv" --query="INSERT INTO txout_new FORMAT RowBinary"
-
-针对已有的中间表，执行以下增量预处理语句：
-*/
-
-
--- 在更新之前，如果有上次已导入但是当前被孤立的块，需要先删除这些块的数据。直接从公有块高度（COMMON_HEIGHT）往上删除就可以了。
--- ================ 如果没有孤块，则无需处理
-ALTER TABLE blk_height DELETE WHERE height > COMMON_HEIGHT
-ALTER TABLE blk DELETE WHERE height > COMMON_HEIGHT
-
-ALTER TABLE blktx_height DELETE WHERE height > COMMON_HEIGHT
-ALTER TABLE tx DELETE WHERE height > COMMON_HEIGHT
-
-ALTER TABLE txin DELETE WHERE height > COMMON_HEIGHT
-ALTER TABLE txin_spent DELETE WHERE height > COMMON_HEIGHT
-
--- 回滚已被花费的utxo_address
-INSERT INTO utxo
-  SELECT utxid, vout, address, genesis, satoshi, script_type, script_pk, height_txo, 1 FROM txin_full
-  WHERE satoshi > 0 AND
-      height > COMMON_HEIGHT;
--- 删除新添加的utxo_address˜
-INSERT INTO utxo_address
-  SELECT utxid, vout,'', '', 0, '', '', 0, -1 FROM txout
-  WHERE satoshi > 0 AND
-      NOT startsWith(script_type, char(0x6a)) AND
-      NOT startsWith(script_type, char(0x00, 0x6a)) AND
-      height > COMMON_HEIGHT;
-
--- 回滚已被花费的utxo_genesis
-INSERT INTO utxo_genesis
-  SELECT utxid, vout, address, genesis, satoshi, script_type, script_pk, height_txo, 1 FROM txin_full
-  WHERE satoshi > 0 AND
-      height > COMMON_HEIGHT;
--- 删除新添加的utxo_genesis
-INSERT INTO utxo_genesis
-  SELECT utxid, vout,'', '', 0, '', '', 0, -1 FROM txout
-  WHERE satoshi > 0 AND
-      NOT startsWith(script_type, char(0x6a)) AND
-      NOT startsWith(script_type, char(0x00, 0x6a)) AND
-      height > COMMON_HEIGHT;
-
-ALTER TABLE txin_full DELETE WHERE height > COMMON_HEIGHT
-ALTER TABLE txout DELETE WHERE height > COMMON_HEIGHT
--- ================ 如果没有孤块，则无需处理
-
 
 -- 更新现有基础数据表blk_height、blktx_height、txin、txout
-INSERT INTO blk_height SELECT * FROM blk_height_new
-INSERT INTO blktx_height SELECT * FROM blktx_height_new
-INSERT INTO txin SELECT * FROM txin_new
-INSERT INTO txout SELECT * FROM txout_new
+INSERT INTO blk_height SELECT * FROM blk_height_new;
+INSERT INTO blktx_height SELECT * FROM blktx_height_new;
+INSERT INTO txin SELECT * FROM txin_new;
+INSERT INTO txout SELECT * FROM txout_new;
 
+-- 优化blk表，以便统一按height排序查询
+OPTIMIZE TABLE blk_height FINAL;
 
 -- 更新区块id索引
 INSERT INTO blk SELECT * FROM blk_height_new;
@@ -133,7 +71,7 @@ INSERT INTO utxo_address
 -- 如果一个satoshi=0的txo被花费(早期有这个现象)，就可能遗留一个sign=-1的数据，需要删除
 ALTER TABLE utxo_address DELETE WHERE sign=-1;
 
-OPTIMIZE TABLE utxo_address FINAL
+OPTIMIZE TABLE utxo_address FINAL;
 
 
 -- 更新溯源ID相关的utxo索引
@@ -149,4 +87,4 @@ INSERT INTO utxo_genesis
 -- 如果一个satoshi=0的txo被花费(早期有这个现象)，就可能遗留一个sign=-1的数据，需要删除
 ALTER TABLE utxo_genesis DELETE WHERE sign=-1;
 
-OPTIMIZE TABLE utxo_genesis FINAL
+OPTIMIZE TABLE utxo_genesis FINAL;

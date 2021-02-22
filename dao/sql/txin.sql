@@ -12,11 +12,9 @@ PARTITION BY substring(utxid, 1, 1)
 SETTINGS storage_policy = 'prefer_nvme_policy';
 
 -- 从txin_spent表创建txout_spent_height
-INSERT INTO txout_spent_height SELECT height, utxid, vout FROM txin_spent;
+-- INSERT INTO txout_spent_height SELECT height, utxid, vout FROM txin_spent;
 -- 需验证排序是否可以加快导入速度
-INSERT INTO txout_spent_height SELECT height, utxid, vout FROM txin_spent ORDER BY substring(utxid, 1, 1);
-
-
+-- INSERT INTO txout_spent_height SELECT height, utxid, vout FROM txin_spent ORDER BY substring(utxid, 1, 1);
 
 
 -- address在哪些高度的tx中出现，按address首字节分区，分区内按address+genesis+height排序，按address索引。按address查询时可确定分区 (快)
@@ -36,8 +34,7 @@ PARTITION BY substring(address, 1, 1)
 SETTINGS storage_policy = 'prefer_nvme_policy';
 
 -- 添加
-INSERT INTO txin_address_height SELECT height, txid, idx, address, genesis FROM txin_full
-
+-- INSERT INTO txin_address_height SELECT height, txid, idx, address, genesis FROM txin_full
 
 
 -- genesis在哪些高度的tx中出现，按genesis首字节分区，分区内按genesis+address+height排序，按genesis索引。按genesis查询时可确定分区 (快)
@@ -57,4 +54,4 @@ PARTITION BY substring(genesis, 1, 1)
 SETTINGS storage_policy = 'prefer_nvme_policy';
 
 -- 添加
-INSERT INTO txin_genesis_height SELECT height, txid, idx, address, genesis FROM txin_full
+-- INSERT INTO txin_genesis_height SELECT height, txid, idx, address, genesis FROM txin_full

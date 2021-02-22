@@ -10,16 +10,16 @@ PARTITION BY substring(txid, 1, 1)
 SETTINGS storage_policy = 'prefer_nvme_policy';
 
 -- 从tx表创建tx_height
-INSERT INTO tx_height SELECT txid, height FROM tx;
+-- INSERT INTO tx_height SELECT txid, height FROM tx;
 
 -- 查询例子
-SELECT hex(txid), height from tx_height where txid = unhex('24915ea87ae4f2ebbb30179b3ae35e5538c066550b717953d778e6d272088965');
+-- SELECT hex(txid), height from tx_height where txid = unhex('24915ea87ae4f2ebbb30179b3ae35e5538c066550b717953d778e6d272088965');
 
 -- 查询例子
-SELECT height, hex(txid), idx,
-       height_txo, hex(utxid), vout, satoshi FROM txin_full
-WHERE txid = reverse(unhex('24915ea87ae4f2ebbb30179b3ae35e5538c066550b717953d778e6d272088965')) AND
-height IN (
-    SELECT height FROM tx_height
-    WHERE txid = reverse(unhex('24915ea87ae4f2ebbb30179b3ae35e5538c066550b717953d778e6d272088965'))
-)
+-- SELECT height, hex(txid), idx,
+--        height_txo, hex(utxid), vout, satoshi FROM txin_full
+-- WHERE txid = reverse(unhex('24915ea87ae4f2ebbb30179b3ae35e5538c066550b717953d778e6d272088965')) AND
+-- height IN (
+--     SELECT height FROM tx_height
+--     WHERE txid = reverse(unhex('24915ea87ae4f2ebbb30179b3ae35e5538c066550b717953d778e6d272088965'))
+-- )

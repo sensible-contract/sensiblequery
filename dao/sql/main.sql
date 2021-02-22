@@ -37,7 +37,7 @@ ORDER BY blkid
 PARTITION BY intDiv(height, 2100)
 SETTINGS storage_policy = 'prefer_nvme_policy';
 -- insert
-INSERT INTO blk SELECT * FROM blk_height;
+-- INSERT INTO blk SELECT * FROM blk_height;
 
 
 -- tx list
@@ -78,7 +78,7 @@ ORDER BY txid
 PARTITION BY intDiv(height, 2100)
 SETTINGS storage_policy = 'prefer_nvme_policy';
 -- insert
-INSERT INTO tx SELECT * FROM blktx_height;
+-- INSERT INTO tx SELECT * FROM blktx_height;
 
 -- txout
 -- ================================================================
@@ -102,7 +102,6 @@ SETTINGS storage_policy = 'prefer_nvme_policy';
 -- cat /data/674936/tx-out.ch | clickhouse-client -h 192.168.31.236 --database="bsv" --query="INSERT INTO txout FORMAT RowBinary"
 
 
-
 -- txin
 -- ================================================================
 -- 交易输入列表，分区内按交易txid+idx排序、索引，单条记录包括输入的细节。仅按txid查询时将遍历所有分区（慢）
@@ -123,7 +122,7 @@ SETTINGS storage_policy = 'prefer_nvme_policy';
 -- load
 -- cat /data/674936/tx-in.ch | clickhouse-client -h 192.168.31.236 --database="bsv" --query="INSERT INTO txin FORMAT RowBinary"
 -- or insert
-INSERT INTO txin SELECT txid, idx, utxid, vout, script_sig, nsequence, height FROM txin_full
+-- INSERT INTO txin SELECT txid, idx, utxid, vout, script_sig, nsequence, height FROM txin_full
 
 
 -- 交易输入的outpoint列表，分区内按outpoint txid+idx排序、索引。用于查询某txo被哪个tx花费，需遍历所有分区（慢）
@@ -140,7 +139,7 @@ ORDER BY (utxid, vout)
 PARTITION BY intDiv(height, 2100)
 SETTINGS storage_policy = 'prefer_nvme_policy';
 -- 创建数据
-INSERT INTO txin_spent SELECT height, txid, idx, utxid, vout FROM txin;
+-- INSERT INTO txin_spent SELECT height, txid, idx, utxid, vout FROM txin;
 
 
 -- 交易输入列表，分区内按交易txid+idx排序、索引，单条记录包括输入的各种细节。仅按txid查询时将遍历所有分区（慢）
@@ -168,9 +167,3 @@ SETTINGS storage_policy = 'prefer_nvme_policy';
 -- load
 -- cat /data256/674936/tx-in.ch | clickhouse-client -h 192.168.31.236 --database="bsv" --query="INSERT INTO txin_full FORMAT RowBinary"
 -- or insert
-INSERT INTO txin_full
-SELECT txin.height, txin.txid, txin.idx, txin.script_sig, txin.nsequence,
-       txout.height, txin.utxid, txin.vout, txout.address, txout.genesis, txout.satoshi, txout.script_type, txout.script_pk FROM txin
-LEFT JOIN txout
-ON txout.utxid = txin.utxid AND
-    txout.vout = txin.vout

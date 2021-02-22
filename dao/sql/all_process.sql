@@ -1,19 +1,5 @@
-/*
-预先创建17张表，见sql定义文件。
-
-并导入相应全量数据到：blk_height、blktx_height、txin、txout、txin_full。
-
-cat /data/blk.ch | clickhouse-client -h DBHOST --database="bsv" --query="INSERT INTO blk_height FORMAT RowBinary"
-cat /data/tx.ch | clickhouse-client -h DBHOST --database="bsv" --query="INSERT INTO blktx_height FORMAT RowBinary"
-cat /data/txin.ch | clickhouse-client -h DBHOST --database="bsv" --query="INSERT INTO txin FORMAT RowBinary"
-cat /data/txout.ch | clickhouse-client -h DBHOST --database="bsv" --query="INSERT INTO txout FORMAT RowBinary"
-cat /data/txin_full.ch | clickhouse-client -h DBHOST --database="bsv" --query="INSERT INTO txin_full FORMAT RowBinary"
-
-再执行以下预处理语句：
-*/
-
 -- 生成区块id索引
-INSERT INTO blk SELECT * FROM blk_height
+INSERT INTO blk SELECT * FROM blk_height;
 
 
 -- 生成区块内tx索引
