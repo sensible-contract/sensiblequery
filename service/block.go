@@ -24,7 +24,7 @@ func blockResultSRF(rows *sql.Rows) (interface{}, error) {
 }
 
 func GetBlocksByHeightRange(blkStartHeight, blkEndHeight int) (blksRsp []*model.BlockInfoResp, err error) {
-	psql := fmt.Sprintf("SELECT %s FROM blk_height WHERE height >= %d AND height < %d",
+	psql := fmt.Sprintf("SELECT %s FROM blk_height WHERE height >= %d AND height < %d ORDER BY height ASC",
 		SQL_FIELEDS_BLOCK, blkStartHeight, blkEndHeight)
 
 	blksRet, err := clickhouse.ScanAll(psql, blockResultSRF)
