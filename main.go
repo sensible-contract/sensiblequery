@@ -34,6 +34,9 @@ func main() {
 	}))
 
 	router.GET("/", controller.Satotx)
+
+	router.POST("/pushtx", controller.PushTx)
+
 	router.GET("/blockchain/info", controller.GetBlockchainInfo)
 
 	router.GET("/blocks/:start/:end", controller.GetBlocksByHeightRange)
