@@ -80,10 +80,14 @@ func GetTxOutputsBySql(psql string) (txOutsRsp []*model.TxOutStatusResp, err err
 	}
 	txOuts := txOutsRet.([]*model.TxOutStatusDO)
 	for _, txout := range txOuts {
+		address := "-"
+		if len(txout.Address) == 20 {
+			address = utils.EncodeAddress(txout.Address, utils.PubKeyHashAddrIDMainNet) // fixme
+		}
 		txOutsRsp = append(txOutsRsp, &model.TxOutStatusResp{
 			TxIdHex: blkparser.HashString(txout.TxId),
 			Vout:    int(txout.Vout),
-			Address: utils.EncodeAddress(txout.Address, utils.PubKeyHashAddrIDMainNet), // fixme
+			Address: address,
 			Satoshi: int(txout.Satoshi),
 
 			GenesisHex:    hex.EncodeToString(txout.Genesis),

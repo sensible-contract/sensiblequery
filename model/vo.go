@@ -76,6 +76,7 @@ type TxOutResp struct {
 	ScriptTypeHex string `json:"script_type"`
 	ScriptPkHex   string `json:"script_pk"`
 	Height        int    `json:"height"`
+	Idx           int    `json:"idx"`
 }
 
 type TxOutHistoryResp struct {
@@ -86,6 +87,7 @@ type TxOutHistoryResp struct {
 	Satoshi       int    `json:"satoshi"`
 	ScriptTypeHex string `json:"script_type"`
 	Height        int    `json:"height"`
+	Idx           int    `json:"idx"`
 	IOType        int    `json:"io_type"`
 }
 

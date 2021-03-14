@@ -74,6 +74,11 @@ func GetTxInputsBySql(psql string) (txInsRsp []*model.TxInResp, err error) {
 	}
 	txIns := txInsRet.([]*model.TxInDO)
 	for _, txin := range txIns {
+		address := "-"
+		if len(txin.Address) == 20 {
+			address = utils.EncodeAddress(txin.Address, utils.PubKeyHashAddrIDMainNet) // fixme
+		}
+
 		txInsRsp = append(txInsRsp, &model.TxInResp{
 			Height:       int(txin.Height),
 			TxIdHex:      blkparser.HashString(txin.TxId),
@@ -84,7 +89,7 @@ func GetTxInputsBySql(psql string) (txInsRsp []*model.TxInResp, err error) {
 			HeightTxo:     int(txin.HeightTxo),
 			UtxIdHex:      blkparser.HashString(txin.UtxId),
 			Vout:          int(txin.Vout),
-			Address:       utils.EncodeAddress(txin.Address, utils.PubKeyHashAddrIDMainNet), // fixme
+			Address:       address,
 			GenesisHex:    hex.EncodeToString(txin.Genesis),
 			Satoshi:       int(txin.Satoshi),
 			ScriptTypeHex: hex.EncodeToString(txin.ScriptType),

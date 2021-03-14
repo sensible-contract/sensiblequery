@@ -38,7 +38,7 @@ func NewTx(rawtx []byte) (tx *Tx, offset uint) {
 	tx.Version = binary.LittleEndian.Uint32(rawtx[0:4])
 	offset = 4
 
-	txincnt, txincntsize := DecodeVariableLengthInteger(rawtx[offset:])
+	txincnt, txincntsize := DecodeVarIntForTx(rawtx[offset:])
 	offset += txincntsize
 
 	tx.TxInCnt = uint32(txincnt)
@@ -59,7 +59,7 @@ func NewTx(rawtx []byte) (tx *Tx, offset uint) {
 		}
 	}
 
-	txoutcnt, txoutcntsize := DecodeVariableLengthInteger(rawtx[offset:])
+	txoutcnt, txoutcntsize := DecodeVarIntForTx(rawtx[offset:])
 	offset += txoutcntsize
 
 	tx.TxOutCnt = uint32(txoutcnt)
@@ -101,7 +101,7 @@ func NewTxIn(txinraw []byte) (txin *TxIn, offset uint) {
 	txin.InputVout = binary.LittleEndian.Uint32(txinraw[32:36])
 	offset = 36
 
-	scriptsig, scriptsigsize := DecodeVariableLengthInteger(txinraw[offset:])
+	scriptsig, scriptsigsize := DecodeVarIntForTx(txinraw[offset:])
 	offset += scriptsigsize
 
 	// txin.ScriptSig = txinraw[offset : offset+scriptsig]
@@ -129,7 +129,7 @@ func NewTxOut(txoutraw []byte) (txout *TxOut, offset uint) {
 	txout.Value = binary.LittleEndian.Uint64(txoutraw[0:8])
 	offset = 8
 
-	pkscript, pkscriptsize := DecodeVariableLengthInteger(txoutraw[offset:])
+	pkscript, pkscriptsize := DecodeVarIntForTx(txoutraw[offset:])
 	offset += pkscriptsize
 
 	// invalid

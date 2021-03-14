@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	SQL_FIELEDS_TX = "txid, nin, nout, txsize, locktime, height, blkid, idx"
+	SQL_FIELEDS_TX = "txid, nin, nout, txsize, locktime, height, blkid, txidx"
 )
 
 //////////////// tx
