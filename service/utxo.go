@@ -1,25 +1,84 @@
 package service
 
 import (
+	"encoding/binary"
 	"encoding/hex"
 	"errors"
 	"fmt"
 	"log"
 	"satoblock/dao/clickhouse"
 	"satoblock/lib/blkparser"
+	"satoblock/lib/script"
 	"satoblock/lib/utils"
 	"satoblock/model"
+	"time"
+
+	"github.com/go-redis/redis"
 )
 
+var rdb *redis.Client
+
+func init() {
+	rdb = redis.NewClient(&redis.Options{
+		Addr:        "192.168.31.236:6379",
+		Password:    "", // no password set
+		DB:          0,  // use default DB
+		DialTimeout: time.Second * 3,
+		ReadTimeout: time.Second * 5,
+	})
+}
+
 //////////////// address
-func GetUtxoByAddress(addressHex string) (txOutsRsp []*model.TxOutResp, err error) {
-	psql := fmt.Sprintf(`
-SELECT %s FROM utxo_address
-WHERE address = unhex('%s')
-ORDER BY height DESC
-LIMIT 128
-`, SQL_FIELEDS_TXOUT, addressHex)
-	return GetUtxoBySql(psql)
+func GetUtxoByAddress(addressPkh []byte) (txOutsRsp []*model.TxOutResp, err error) {
+	vals, err := rdb.ZRange("a"+string(addressPkh), 0, 64).Result()
+	if err != nil {
+		panic(err)
+	}
+
+	pipe := rdb.Pipeline()
+	m := map[string]*redis.StringCmd{}
+	for _, key := range vals {
+		m[key] = pipe.Get(key)
+	}
+	_, err = pipe.Exec()
+	if err != nil && err != redis.Nil {
+		panic(err)
+	}
+
+	for key, v := range m {
+		res, err := v.Result()
+		if err == redis.Nil {
+			continue
+		} else if err != nil {
+			panic(err)
+		}
+		txout := &model.TxoData{}
+		txout.Unmarshal([]byte(res))
+
+		// 补充数据
+		txout.UTxid = []byte(key[:32])                            // 32
+		txout.Vout = binary.LittleEndian.Uint32([]byte(key[32:])) // 4
+		txout.ScriptType = script.GetLockingScriptType(txout.Script)
+		txout.GenesisId, txout.AddressPkh = script.ExtractPkScriptAddressPkh(txout.Script, txout.ScriptType)
+		if txout.AddressPkh == nil {
+			txout.GenesisId, txout.AddressPkh = script.ExtractPkScriptGenesisIdAndAddressPkh(txout.Script)
+		}
+
+		txOutsRsp = append(txOutsRsp, &model.TxOutResp{
+			TxIdHex: blkparser.HashString(txout.UTxid),
+			Vout:    int(txout.Vout),
+			Address: utils.EncodeAddress(txout.AddressPkh, utils.PubKeyHashAddrIDMainNet),
+			Satoshi: int(txout.Value),
+
+			GenesisHex:    hex.EncodeToString(txout.GenesisId),
+			ScriptTypeHex: hex.EncodeToString(txout.ScriptType),
+			ScriptPkHex:   hex.EncodeToString(txout.Script),
+			Height:        int(txout.BlockHeight),
+			Idx:           int(txout.TxIdx),
+		})
+	}
+
+	return txOutsRsp, nil
 }
 
 //////////////// genesis

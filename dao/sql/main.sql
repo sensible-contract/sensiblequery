@@ -85,7 +85,7 @@ SETTINGS storage_policy = 'prefer_nvme_policy';
 -- 交易输出列表，分区内按交易txid+idx排序、索引，单条记录包括输出的各种细节。仅按txid查询时将遍历所有分区（慢）
 -- 查询需附带height，可配合tx_height表查询
 DROP TABLE txout;
-CREATE TABLE IF NOT EXISTS bsv.txout (
+CREATE TABLE IF NOT EXISTS txout (
 	utxid        FixedString(32),
 	vout         UInt32,
 	address      FixedString(20),

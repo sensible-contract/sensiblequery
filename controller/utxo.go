@@ -23,7 +23,7 @@ func GetUtxoByAddress(ctx *gin.Context) {
 		return
 	}
 
-	result, err := service.GetUtxoByAddress(hex.EncodeToString(addressPkh))
+	result, err := service.GetUtxoByAddress(addressPkh)
 	if err != nil {
 		log.Printf("get block failed: %v", err)
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get txo failed"})

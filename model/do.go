@@ -67,6 +67,7 @@ type TxOutHistoryDO struct {
 	Satoshi    uint64 `db:"satoshi"`
 	ScriptType []byte `db:"script_type"`
 	Height     uint32 `db:"height"`
+	Idx        uint32 `db:"txidx"`
 	IOType     uint8  `db:"io_type"` // 0: input; 1: output
 }
 
