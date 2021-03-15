@@ -25,8 +25,8 @@ CREATE TABLE IF NOT EXISTS txin_address_height (
 	height       UInt32,
 	txid         FixedString(32),
 	idx          UInt32,
-	address      FixedString(20),
-	genesis      FixedString(20)
+	address      String,
+	genesis      String
 ) engine=MergeTree()
 PRIMARY KEY address
 ORDER BY (address, genesis, height)
@@ -45,8 +45,8 @@ CREATE TABLE IF NOT EXISTS txin_genesis_height (
 	height       UInt32,
 	txid         FixedString(32),
 	idx          UInt32,
-	address      FixedString(20),
-	genesis      FixedString(20)
+	address      String,
+	genesis      String
 ) engine=MergeTree()
 PRIMARY KEY genesis
 ORDER BY (genesis, address, height)

@@ -52,7 +52,7 @@ CREATE TABLE IF NOT EXISTS blktx_height (
 	locktime     UInt32,
 	height       UInt32,
 	blkid        FixedString(32),
-	idx          UInt64
+	txidx        UInt64
 ) engine=MergeTree()
 ORDER BY height
 PARTITION BY intDiv(height, 2100)
@@ -72,7 +72,7 @@ CREATE TABLE IF NOT EXISTS tx (
 	locktime     UInt32,
 	height       UInt32,
 	blkid        FixedString(32),
-	idx          UInt64
+	txidx        UInt64
 ) engine=MergeTree()
 ORDER BY txid
 PARTITION BY intDiv(height, 2100)
@@ -88,12 +88,13 @@ DROP TABLE txout;
 CREATE TABLE IF NOT EXISTS txout (
 	utxid        FixedString(32),
 	vout         UInt32,
-	address      FixedString(20),
-	genesis      FixedString(20),
+	address      String,
+	genesis      String,
 	satoshi      UInt64,
 	script_type  String,
 	script_pk    String,
-	height       UInt32
+	height       UInt32,
+	txidx        UInt64
 ) engine=MergeTree()
 ORDER BY (utxid, vout)
 PARTITION BY intDiv(height, 2100)
@@ -104,25 +105,32 @@ SETTINGS storage_policy = 'prefer_nvme_policy';
 
 -- txin
 -- ================================================================
--- 交易输入列表，分区内按交易txid+idx排序、索引，单条记录包括输入的细节。仅按txid查询时将遍历所有分区（慢）
+-- 交易输入列表，分区内按交易txid+idx排序、索引，单条记录包括输入的各种细节。仅按txid查询时将遍历所有分区（慢）
 -- 查询需附带height。可配合tx_height表查询
-DROP TABLE txin;
-CREATE TABLE IF NOT EXISTS txin (
+DROP TABLE txin_full;
+CREATE TABLE IF NOT EXISTS txin_full (
+	height       UInt32,         --txo 花费的区块高度
+	txidx        UInt64,
 	txid         FixedString(32),
 	idx          UInt32,
-	utxid        FixedString(32),
-	vout         UInt32,
 	script_sig   String,
 	nsequence    UInt32,
-	height       UInt32         --txo 花费的区块高度
+
+	height_txo   UInt32,         --txo 产生的区块高度
+	utxidx       UInt64,
+	utxid        FixedString(32),
+	vout         UInt32,
+	address      String,
+	genesis      String,
+	satoshi      UInt64,
+	script_type  String,
+	script_pk    String
 ) engine=MergeTree()
 ORDER BY (txid, idx)
 PARTITION BY intDiv(height, 2100)
 SETTINGS storage_policy = 'prefer_nvme_policy';
 -- load
--- cat /data/674936/tx-in.ch | clickhouse-client -h 192.168.31.236 --database="bsv" --query="INSERT INTO txin FORMAT RowBinary"
--- or insert
--- INSERT INTO txin SELECT txid, idx, utxid, vout, script_sig, nsequence, height FROM txin_full
+-- cat /data256/674936/tx-in.ch | clickhouse-client -h 192.168.31.236 --database="bsv" --query="INSERT INTO txin_full FORMAT RowBinary"
 
 
 -- 交易输入的outpoint列表，分区内按outpoint txid+idx排序、索引。用于查询某txo被哪个tx花费，需遍历所有分区（慢）
@@ -139,31 +147,4 @@ ORDER BY (utxid, vout)
 PARTITION BY intDiv(height, 2100)
 SETTINGS storage_policy = 'prefer_nvme_policy';
 -- 创建数据
--- INSERT INTO txin_spent SELECT height, txid, idx, utxid, vout FROM txin;
-
-
--- 交易输入列表，分区内按交易txid+idx排序、索引，单条记录包括输入的各种细节。仅按txid查询时将遍历所有分区（慢）
--- 查询需附带height。可配合tx_height表查询
-DROP TABLE txin_full;
-CREATE TABLE IF NOT EXISTS txin_full (
-	height       UInt32,         --txo 花费的区块高度
-	txid         FixedString(32),
-	idx          UInt32,
-	script_sig   String,
-	nsequence    UInt32,
-
-	height_txo   UInt32,         --txo 产生的区块高度
-	utxid        FixedString(32),
-	vout         UInt32,
-	address      FixedString(20),
-	genesis      FixedString(20),
-	satoshi      UInt64,
-	script_type  String,
-	script_pk    String
-) engine=MergeTree()
-ORDER BY (txid, idx)
-PARTITION BY intDiv(height, 2100)
-SETTINGS storage_policy = 'prefer_nvme_policy';
--- load
--- cat /data256/674936/tx-in.ch | clickhouse-client -h 192.168.31.236 --database="bsv" --query="INSERT INTO txin_full FORMAT RowBinary"
--- or insert
+-- INSERT INTO txin_spent SELECT height, txid, idx, utxid, vout FROM txin_full;
