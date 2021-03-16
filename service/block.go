@@ -11,7 +11,8 @@ import (
 )
 
 const (
-	SQL_FIELEDS_BLOCK = "height, blkid, previd, next_blk.blkid, merkle, ntx, invalue, outvalue, coinbase_out, blocktime, bits, blocksize"
+	SQL_FIELEDS_BEST_BLOCK = "height, blkid, previd, '0000000000000000000000000000000000000000000000000000000000000000', merkle, ntx, invalue, outvalue, coinbase_out, blocktime, bits, blocksize"
+	SQL_FIELEDS_BLOCK      = "height, blkid, previd, next_blk.blkid, merkle, ntx, invalue, outvalue, coinbase_out, blocktime, bits, blocksize"
 )
 
 func blockResultSRF(rows *sql.Rows) (interface{}, error) {
@@ -99,7 +100,7 @@ LIMIT 1`, SQL_FIELEDS_BLOCK, blkidHex, blkidHex)
 }
 
 func GetBestBlock() (blk *model.BlockInfoResp, err error) {
-	psql := fmt.Sprintf("SELECT %s FROM blk_height ORDER BY height DESC LIMIT 1", SQL_FIELEDS_BLOCK)
+	psql := fmt.Sprintf("SELECT %s FROM blk_height ORDER BY height DESC LIMIT 1", SQL_FIELEDS_BEST_BLOCK)
 	return GetBlockBySql(psql)
 }
 
