@@ -41,7 +41,7 @@ WHERE (utxid, vout, height) in (
 
 UNION ALL
 
-SELECT txid, idx, address, genesis, satoshi, script_type, height, txidx, 0 AS io_type FROM txin_full
+SELECT txid, idx, address, genesis, satoshi, script_type, height, txidx, 0 AS io_type FROM txin
 WHERE (txid, idx, height) in (
     SELECT txid, idx, height FROM txin_address_height
     WHERE address = unhex('%s')
@@ -70,7 +70,7 @@ WHERE (utxid, vout, height) in (
 
 UNION ALL
 
-SELECT txid, idx, address, genesis, satoshi, script_type, height, txidx, 0 AS io_type FROM txin_full
+SELECT txid, idx, address, genesis, satoshi, script_type, height, txidx, 0 AS io_type FROM txin
 WHERE (txid, idx, height) in (
     SELECT txid, idx, height FROM txin_genesis_height
     WHERE genesis = unhex('%s')

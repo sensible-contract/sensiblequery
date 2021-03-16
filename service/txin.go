@@ -44,7 +44,7 @@ func txInResultSRF(rows *sql.Rows) (interface{}, error) {
 
 func GetTxInputsByTxId(txidHex string) (txInsRsp []*model.TxInResp, err error) {
 	psql := fmt.Sprintf(`
-SELECT %s FROM txin_full
+SELECT %s FROM txin
 WHERE txid = unhex('%s') AND
 height IN (
     SELECT height FROM tx_height
@@ -56,7 +56,7 @@ height IN (
 
 func GetTxInputsByTxIdInsideHeight(blkHeight int, txidHex string) (txInsRsp []*model.TxInResp, err error) {
 	psql := fmt.Sprintf(`
-SELECT %s FROM txin_full
+SELECT %s FROM txin
 WHERE txid = unhex('%s') AND
     height = %d`, SQL_FIELEDS_TXIN_WITHOUT_SCRIPT, txidHex, blkHeight)
 
@@ -101,7 +101,7 @@ func GetTxInputsBySql(psql string) (txInsRsp []*model.TxInResp, err error) {
 
 func GetTxInputByTxIdAndIdx(txidHex string, index int) (txInRsp *model.TxInResp, err error) {
 	psql := fmt.Sprintf(`
-SELECT %s FROM txin_full
+SELECT %s FROM txin
 WHERE txid = unhex('%s') AND
        idx = %d AND
 height IN (
@@ -115,7 +115,7 @@ LIMIT 1`, SQL_FIELEDS_TXIN, txidHex, index, txidHex)
 
 func GetTxInputByTxIdAndIdxInsideHeight(blkHeight int, txidHex string, index int) (txInRsp *model.TxInResp, err error) {
 	psql := fmt.Sprintf(`
-SELECT %s FROM txin_full
+SELECT %s FROM txin
 WHERE txid = unhex('%s') AND
        idx = %d AND
     height = %d
