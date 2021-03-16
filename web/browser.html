@@ -50,20 +50,22 @@
               <th class="text-center">Id</th>
               <th class="text-right">Time</th>
               <th class="text-right">Size</th>
-              <th class="text-right">Txs</th>
+              <th class="text-right">nTx</th>
+              <th class="text-right">vOut</th>
+              <th class="text-right">Reward</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="blk in Blocks">
               <td class="text-right"><samp>{{ blk.height }}</samp></td>
               <td class="text-center">
-
-                <router-link :to="{path:`/txs/${blk.height}/${blk.id}`}"><samp>{{ blk.id }}</samp></router-link>
-
+                <router-link :to="{path:`/txs/${blk.height}/${blk.id}`}"><small><samp>{{ blk.id }}</samp></small></router-link>
               </td>
-              <td class="text-right"><samp>{{ new Date(blk.timestamp*1000).toISOString().slice(0, 19).replace('T', ' ') }}</samp></td>
-              <td class="text-right"><samp>{{ blk.size }}</samp></td>
-              <td class="text-right"><samp>{{ blk.ntx }}</samp></td>
+              <td class="text-right"><small><samp>{{ new Date(blk.timestamp*1000).toISOString().slice(0, 19).replace('T', ' ') }}</samp></small></td>
+              <td class="text-right"><small><samp>{{ blk.size }}</samp></small></td>
+              <td class="text-right"><small><samp>{{ blk.ntx }}</samp></small></td>
+              <td class="text-right"><small><samp>{{ blk.outSatoshi/100000000.0 }}</samp></small></td>
+              <td class="text-right"><small><samp>{{ blk.coinbaseOut/100000000.0 }}</samp></small></td>
             </tr>
           </tbody>
         </table>
@@ -81,15 +83,50 @@
             <table class="table table-bordered">
               <thead>
                 <tr>
-                  <th class="text-right">BlockId:</th>
-                  <th class="text-left"><samp>{{currBlockId}}</samp></th>
+                  <th class="text-right">Height:</th>
+                  <th class="text-left"><samp> {{ currBlockObj.height }} </samp></td>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <th class="text-right">Tx Count:</th>
-                  <td class="text-left"><samp> {{ currBlockTxs.length }} </samp></td>
+                  <th class="text-right">BlockId:</th>
+                  <th class="text-left"><samp>{{currBlockId}}</samp></th>
                 </tr>
+
+                <tr>
+                  <th class="text-right">Prev BlockId:</th>
+                  <td class="text-left">
+                    <router-link :to="{path:`/txs/${currBlockObj.height-1}/${currBlockObj.prev}`}"><small><samp>{{ currBlockObj.prev }}</samp></small></router-link>
+		  </td>
+                </tr>
+
+                <tr>
+                  <th class="text-right">Next BlockId:</th>
+                  <td class="text-left">
+                    <router-link :to="{path:`/txs/${currBlockObj.height+1}/${currBlockObj.next}`}"><small><samp>{{ currBlockObj.next }}</samp></small></router-link>
+		  </td>
+                </tr>
+
+                <tr>
+                  <th class="text-right">Merkle:</th>
+                  <td class="text-left"><samp>{{currBlockObj.merkle}}</samp></td>
+                </tr>
+
+                <tr>
+                  <th class="text-right">Time:</th>
+		  <td class="text-left"><samp>{{ new Date(currBlockObj.timestamp*1000).toISOString().slice(0, 19).replace('T', ' ') }}</samp></td>
+                </tr>
+
+                <tr>
+                  <th class="text-right">Size:</th>
+                  <td class="text-left"><samp> {{ currBlockObj.size }} </samp> Bytes</td>
+                </tr>
+
+                <tr>
+                  <th class="text-right">Tx Count:</th>
+                  <td class="text-left"><samp> {{ currBlockObj.ntx }} </samp></td>
+                </tr>
+
               </tbody>
             </table>
 
@@ -102,19 +139,23 @@
               <th class="text-right">#</th>
               <th class="text-center">Id</th>
               <th class="text-right">Size</th>
-              <th class="text-right">TxIn</th>
-              <th class="text-right">TxOut</th>
+              <th class="text-right">nIn</th>
+              <th class="text-right">nOut</th>
+              <th class="text-right">vOut</th>
+              <th class="text-right">Fee</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="tx in currBlockTxs">
               <td class="text-right"><samp>{{ tx.idx }}</samp></td>
               <td class="text-center">
-                <router-link :to="{path:`/tx/${tx.height}/${tx.txid}`}"><samp>{{ tx.txid }}</samp></router-link>
+                <router-link :to="{path:`/tx/${tx.height}/${tx.txid}`}"><small><samp>{{ tx.txid }}</samp></small></router-link>
               </td>
-              <td class="text-right"><samp>{{ tx.size }}</samp></td>
-              <td class="text-right"><samp>{{ tx.nIn }}</samp></td>
-              <td class="text-right"><samp>{{ tx.nOut }}</samp></td>
+              <td class="text-right"><small><samp>{{ tx.size }}</samp></small></td>
+              <td class="text-right"><small><samp>{{ tx.nIn }}</samp></small></td>
+              <td class="text-right"><small><samp>{{ tx.nOut }}</samp></small></td>
+              <td class="text-right"><small><samp>{{ tx.outSatoshi/100000000.0 }}</samp></small></td>
+              <td class="text-right"><small><samp>{{ (tx.inSatoshi - tx.outSatoshi)/100000000.0 }}</samp></small></td>
             </tr>
           </tbody>
         </table>
@@ -138,8 +179,30 @@
               </thead>
               <tbody>
                 <tr>
+                  <th class="text-right">Height:</th>
+                  <td class="text-left"><samp> {{ currTxObj.height }} </samp></td>
+                </tr>
+                <tr>
+                  <th class="text-right">BlockId/Index:</th>
+                  <th class="text-left">
+                    <router-link :to="{path:`/txs/${currTxObj.height}/${currTxObj.blkid}`}"><small>
+			<samp>{{ currTxObj.blkid }} / {{currTxObj.idx}}</samp></small></router-link>
+		  </th>
+                </tr>
+
+                <tr>
+                  <th class="text-right">Time:</th>
+		  <td class="text-left"><samp>{{ new Date(currTxObj.timestamp*1000).toISOString().slice(0, 19).replace('T', ' ') }}</samp></td>
+                </tr>
+
+                <tr>
+                  <th class="text-right">Size:</th>
+                  <td class="text-left"><samp> {{ currTxObj.size }} </samp> Bytes</td>
+                </tr>
+
+                <tr>
                   <th class="text-right">Fee:</th>
-                  <td class="text-left"><samp> {{((currTxIdInputValue-currTxIdOutputValue)/100000000.0)}} </samp></td>
+                  <td class="text-left"><samp> {{ (currTxObj.inSatoshi - currTxObj.outSatoshi)/100000000.0 }} </samp></td>
                 </tr>
               </tbody>
             </table>
@@ -155,13 +218,13 @@
                 <tr>
                   <th class="text-right">#</th>
                   <th class="text-center">{{currTxIns.length}} Inputs</th>
-                  <th class="text-right">{{currTxIdInputValue/100000000.0}}</th>
+                  <th class="text-right">{{currTxObj.inSatoshi/100000000.0}}</th>
                 </tr>
               </thead>
               <tbody>
                 <tr v-for="txin in currTxIns">
                   <td class="text-right">
-                    <router-link :to="{path:`/tx/${txin.height_txo}/${txin.utxid}`}">
+                    <router-link :to="{path:`/tx/${txin.heightTxo}/${txin.utxid}`}">
                       <small><samp>❰&nbsp;{{txin.idx}}</samp></small>
                     </router-link>
 
@@ -170,8 +233,8 @@
                     <router-link :to="{path:`/address/${txin.address}`}"><samp>{{ txin.address }}</samp></router-link>
                     <div>
                       <small><samp class="d-inline-block text-truncate"
-                                   v-bind:title="txin.script_type"
-                                   style="max-width: 380px;">script: {{ txin.script_type }}</samp></small>
+                                   v-bind:title="txin.scriptType"
+                                   style="max-width: 380px;">script: {{ txin.scriptType }}</samp></small>
                     </div>
                     <div v-if="txin.genesis != '00'">
                       <router-link :to="{path:`/genesis/${txin.genesis}`}">
@@ -194,7 +257,7 @@
                 <tr>
                   <th class="text-right">#</th>
                   <th class="text-center">{{currTxOuts.length}} Outputs</th>
-                  <th class="text-right">{{currTxIdOutputValue/100000000.0}}</th>
+                  <th class="text-right">{{currTxObj.outSatoshi/100000000.0}}</th>
                 </tr>
               </thead>
               <tbody>
@@ -206,8 +269,8 @@
                     <router-link :to="{path:`/address/${txout.address}`}"><samp>{{ txout.address }}</samp></router-link>
                     <div>
                       <small><samp class="d-inline-block text-truncate"
-                                   v-bind:title="txout.script_type"
-                                   style="max-width: 380px;">script: {{ txout.script_type }}</samp></small>
+                                   v-bind:title="txout.scriptType"
+                                   style="max-width: 380px;">script: {{ txout.scriptType }}</samp></small>
                     </div>
                     <div v-if="txout.genesis != '00'">
                       <router-link :to="{path:`/genesis/${txout.genesis}`}">
@@ -216,8 +279,8 @@
                     </div>
                   </td>
                   <td class="text-right">
-                    <router-link v-if="txout.height_spent"
-                                 :to="{path:`/tx/${txout.height_spent}/${txout.txid_spent}`}">
+                    <router-link v-if="txout.heightSpent"
+                                 :to="{path:`/tx/${txout.heightSpent}/${txout.txidSpent}`}">
                       <small><samp>{{ txout.satoshi/100000000.0 }}&nbsp;❱</samp></small>
                     </router-link>
                     <div v-else>
@@ -254,7 +317,7 @@
                   <samp>{{ txout.txid }}:{{ txout.vout }}</samp>
                 </router-link>
                 <div>
-                  <small><samp>script: {{ txout.script_type }}</samp></small>
+                  <small><samp>script: {{ txout.scriptType }}</samp></small>
                 </div>
                 <div v-if="txout.genesis != '00'">
                   <router-link :to="{path:`/genesis/${txout.genesis}`}">
@@ -263,7 +326,7 @@
                 </div>
               </td>
               <td class="text-right">
-                <samp v-if="txout.io_type">+{{ txout.satoshi/100000000.0 }}</samp>
+                <samp v-if="txout.ioType">+{{ txout.satoshi/100000000.0 }}</samp>
                 <code v-else>-{{ txout.satoshi/100000000.0 }}</code>
               </td>
               <td class="text-left">
@@ -298,7 +361,7 @@
                   <samp>{{ txout.txid }}:{{ txout.vout }}</samp>
                 </router-link>
                 <div>
-                  <small><samp>script: {{ txout.script_type }}</samp></small>
+                  <small><samp>script: {{ txout.scriptType }}</samp></small>
                 </div>
                 <div v-if="txout.genesis != '00'">
                   <router-link :to="{path:`/genesis/${txout.genesis}`}">
@@ -341,7 +404,7 @@
                   <samp>{{ txout.txid }}:{{ txout.vout }}</samp>
                 </router-link>
                 <div>
-                  <small><samp>script: {{ txout.script_type }}</samp></small>
+                  <small><samp>script: {{ txout.scriptType }}</samp></small>
                 </div>
                 <div v-if="txout.genesis != '00'">
                   <router-link :to="{path:`/address/${txout.address}`}">
@@ -350,7 +413,7 @@
                 </div>
               </td>
               <td class="text-right">
-                <samp v-if="txout.io_type">+{{ txout.satoshi/100000000.0 }}</samp>
+                <samp v-if="txout.ioType">+{{ txout.satoshi/100000000.0 }}</samp>
                 <code v-else>-{{ txout.satoshi/100000000.0 }}</code>
               </td>
             </tr>
@@ -381,7 +444,7 @@
                   <samp>{{ txout.txid }}:{{ txout.vout }}</samp>
                 </router-link>
                 <div>
-                  <small><samp>script: {{ txout.script_type }}</samp></small>
+                  <small><samp>script: {{ txout.scriptType }}</samp></small>
                 </div>
                 <div v-if="txout.genesis != '00'">
                   <router-link :to="{path:`/address/${txout.address}`}">
@@ -531,6 +594,7 @@
        data: function () {
          return {
            currBlockId: "",
+           currBlockObj: {},
            currBlockTxs: []
          }
        },
@@ -548,6 +612,8 @@
            } else if (to.path.startsWith("/txs/")) {
              this.viewBlockHeightTxs(to.params.height, to.params.blkid)
            }
+
+           this.viewBlockIdInfo(this.$route.params.blkid)
          }
        },
 
@@ -560,6 +626,7 @@
          if (this.$route.path != "/txs") {
            this.viewBlockHeightTxs(this.$route.params.height, this.$route.params.blkid)
          }
+	 this.viewBlockIdInfo(this.$route.params.blkid)
        },
 
        methods: {
@@ -589,6 +656,18 @@
              )
          },
 
+         viewBlockIdInfo: function (blkid) {
+           this.currBlockId = blkid
+           axios
+             .get(this.$root.apiPoint + "block/id/"+ blkid)
+             .then(
+               response => {
+                 this.currBlockObj = response.data.data
+                 this.$root.message = response.data.msg
+               }
+             )
+         },
+
        }
 
      })
@@ -600,8 +679,7 @@
        data: function () {
          return {
            currTxId: "",
-           currTxIdInputValue: 0,
-           currTxIdOutputValue: 0,
+           currTxObj: {},
            currTxIns: [],
            currTxOuts: [],
          }
@@ -610,16 +688,16 @@
        watch: {
          $route(to, from) {
            console.log("watch", to, this.currTxIns, this.currTxOuts)
-
            /* if (this.currTxIns === undefined || this.currTxOuts === undefined) {
             *   this.currTxIns = []
             *   this.currTxOuts = []
             * }*/
-
            if (to.path.startsWith("/txid/") == true ) {
+	     this.viewTxIdInfo(to.params.txid)
              this.viewTxIns(to.params.txid)
              this.viewTxOuts(to.params.txid)
            } else if (to.path.startsWith("/tx/") == true ) {
+             this.viewTxIdInfoInside(to.params.height, to.params.txid)
              this.viewTxInsInside(to.params.height, to.params.txid)
              this.viewTxOutsInside(to.params.height, to.params.txid)
            }
@@ -632,18 +710,17 @@
        },
 
        created: function () {
-
          console.log("create", this.$route, this.currTxIns, this.currTxOuts)
-
          /* if (this.currTxIns === undefined || this.currTxOuts === undefined) {
           *   this.currTxIns = []
           *   this.currTxOuts = []
           * }*/
-
          if (this.$route.path.startsWith("/txid/") == true ) {
+	     this.viewTxIdInfo(this.$route.params.txid)
            this.viewTxIns(this.$route.params.txid)
            this.viewTxOuts(this.$route.params.txid)
          } else if (this.$route.path.startsWith("/tx/") == true ) {
+           this.viewTxIdInfoInside(this.$route.params.height, this.$route.params.txid)
            this.viewTxInsInside(this.$route.params.height, this.$route.params.txid)
            this.viewTxOutsInside(this.$route.params.height, this.$route.params.txid)
          }
@@ -655,7 +732,6 @@
        },
 
        methods: {
-
               viewTxIns: function (txid) {
                 this.updateTxIns(txid, this.$root.apiPoint + "tx/"+ txid +"/ins")
               },
@@ -666,9 +742,33 @@
               viewTxInsInside: function (height, txid) {
                 this.updateTxIns(txid, this.$root.apiPoint + "height/"+ height +"/tx/"+ txid +"/ins")
               },
-              viewTxOutsInside: function (height, txid) {
-                this.updateTxOuts(txid, this.$root.apiPoint + "height/"+ height +"/tx/"+ txid +"/outs")
-              },
+           viewTxOutsInside: function (height, txid) {
+               this.updateTxOuts(txid, this.$root.apiPoint + "height/"+ height +"/tx/"+ txid +"/outs")
+           },
+
+           viewTxIdInfo: function (txid) {
+               this.currTxId = txid
+               axios
+		   .get(this.$root.apiPoint + "tx/"+ txid)
+		   .then(
+		       response => {
+			   this.currTxObj = response.data.data
+			   this.$root.message = response.data.msg
+		       }
+		   )
+           },
+
+           viewTxIdInfoInside: function (height, txid) {
+               this.currTxId = txid
+               axios
+		   .get(this.$root.apiPoint + "height/"+ height + "/tx/"+ txid)
+		   .then(
+		       response => {
+			   this.currTxObj = response.data.data
+			   this.$root.message = response.data.msg
+		       }
+		   )
+           },
 
               viewTxOutsStatus: function (txid, idx) {
                 let url = this.$root.apiPoint + "tx/"+ txid +"/out/"+idx+"/spent"
@@ -693,15 +793,8 @@
                   .then(
                     response => {
                       if (response.data.code == 0) {
-
                         this.currTxId = txid
                         this.currTxIns = response.data.data
-
-                        this.currTxIdInputValue = 0
-                        for(let i = 0; i < this.currTxIns.length; i++) {
-                          this.currTxIdInputValue += this.currTxIns[i].satoshi
-                        }
-
                       }
                       this.$root.message = response.data.msg
                     }
@@ -716,17 +809,11 @@
                     response => {
                       if (response.data.code == 0) {
                         this.currTxOuts = response.data.data
-
-                        this.currTxIdOutputValue = 0
-                        for(let i = 0; i < this.currTxOuts.length; i++) {
-                          this.currTxIdOutputValue += this.currTxOuts[i].satoshi
-                        }
                       }
                       this.$root.message = response.data.msg
                     }
                   )
               },
-
 
        }
      })

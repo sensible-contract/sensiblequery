@@ -5,22 +5,29 @@ type BlockDO struct {
 	Height      uint32 `db:"height"`
 	BlockId     []byte `db:"blkid"`
 	PrevBlockId []byte `db:"previd"`
+	NextBlockId []byte `db:"nextid"`
 	MerkleRoot  []byte `db:"merkle"`
 	TxCount     uint64 `db:"ntx"`
+	InSatoshi   uint64 `db:"invalue"`
+	OutSatoshi  uint64 `db:"outvalue"`
+	CoinbaseOut uint64 `db:"coinbase_out"`
 	BlockTime   uint32 `db:"blocktime"`
 	Bits        uint32 `db:"bits"`
 	BlockSize   uint32 `db:"blocksize"`
 }
 
 type TxDO struct {
-	TxId     []byte `db:"txid"`
-	InCount  uint32 `db:"nin"`
-	OutCount uint32 `db:"nout"`
-	TxSize   uint32 `db:"txsize"`
-	LockTime uint32 `db:"locktime"`
-	Height   uint32 `db:"height"`
-	BlockId  []byte `db:"blkid"`
-	Idx      uint64 `db:"idx"`
+	TxId       []byte `db:"txid"`
+	InCount    uint32 `db:"nin"`
+	OutCount   uint32 `db:"nout"`
+	TxSize     uint32 `db:"txsize"`
+	LockTime   uint32 `db:"locktime"`
+	InSatoshi  uint64 `db:"invalue"`
+	OutSatoshi uint64 `db:"outvalue"`
+	BlockTime  uint32 `db:"blocktime"`
+	Height     uint32 `db:"height"`
+	BlockId    []byte `db:"blkid"`
+	Idx        uint64 `db:"idx"`
 }
 
 type TxInSpentDO struct {
@@ -35,7 +42,7 @@ type TxInDO struct {
 	Height    uint32 `db:"height"`
 	TxId      []byte `db:"txid"`
 	Idx       uint32 `db:"idx"`
-	ScriptSig []byte `db:"script_sig"`
+	ScriptSig []byte `db:"scriptSig"`
 	Sequence  uint32 `db:"nsequence"`
 
 	HeightTxo  uint32 `db:"height_txo"`
