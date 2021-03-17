@@ -57,7 +57,7 @@
           </thead>
           <tbody>
             <tr v-for="blk in Blocks">
-              <td class="text-right"><samp>{{ blk.height }}</samp></td>
+              <td class="text-right"><small><samp>{{ blk.height }}</samp></small></td>
               <td class="text-center">
                 <router-link :to="{path:`/txs/${blk.height}/${blk.id}`}"><small><samp>{{ blk.id }}</samp></small></router-link>
               </td>
@@ -1093,37 +1093,25 @@
 
        data: {
          currentRoute: window.location.pathname,
-
          apiPoint: "http://120.92.153.221:5555/",
-
-         /* apiPoint: "http://localhost:8000/",*/
-
+         // apiPoint: "http://192.168.31.236:5555/",
          message: "",
-
          navInputValue: "",
        },
        methods: {
          pressNavButton: function () {
            if (this.$route.path.startsWith("/blocks")) {
-
              this.$router.push(`/blocks/id/${this.navInputValue}`)
-
            } else if (this.$route.path.startsWith("/txs")) {
-
              this.$router.push(`/txs-of-blkid/${this.navInputValue}`)
-
            } else if (this.$route.path.startsWith("/tx")) {
-
              this.$router.push(`/txid/${this.navInputValue}`)
-
            } else if (this.$route.path.startsWith("/address")) {
              this.$router.push(`/address/${this.navInputValue}`)
            } else if (this.$route.path.startsWith("/utxo")) {
              this.$router.push(`/utxo/${this.navInputValue}`)
-
            } else if (this.$route.path.startsWith("/genesis-utxo")) {
              this.$router.push(`/genesis-utxo/${this.navInputValue}`)
-
            } else if (this.$route.path.startsWith("/genesis")) {
              this.$router.push(`/genesis/${this.navInputValue}`)
            }

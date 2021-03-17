@@ -1,0 +1,12 @@
+# 地址(必需)
+address: "192.168.31.236:6379"
+# DB名字(必需)
+database: 1
+# 密码(可选)
+password: ""
+
+dialTimeout: "10s"
+readTimeout: "30s"
+writeTimeout: "30s"
+
+poolSize: 32

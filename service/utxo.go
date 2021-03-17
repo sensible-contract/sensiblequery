@@ -11,20 +11,38 @@ import (
 	"satoblock/lib/script"
 	"satoblock/lib/utils"
 	"satoblock/model"
-	"time"
 
 	"github.com/go-redis/redis"
+	"github.com/spf13/viper"
 )
 
 var rdb *redis.Client
 
 func init() {
+	viper.SetConfigFile("conf/redis.yaml")
+	if err := viper.ReadInConfig(); err != nil {
+		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
+			panic(fmt.Errorf("Fatal error config file: %s \n", err))
+		} else {
+			panic(fmt.Errorf("Fatal error config file: %s \n", err))
+		}
+	}
+
+	address := viper.GetString("address")
+	password := viper.GetString("password")
+	database := viper.GetInt("database")
+	dialTimeout := viper.GetDuration("dialTimeout")
+	readTimeout := viper.GetDuration("readTimeout")
+	writeTimeout := viper.GetDuration("writeTimeout")
+	poolSize := viper.GetInt("poolSize")
 	rdb = redis.NewClient(&redis.Options{
-		Addr:        "192.168.31.236:6379",
-		Password:    "", // no password set
-		DB:          0,  // use default DB
-		DialTimeout: time.Second * 3,
-		ReadTimeout: time.Second * 5,
+		Addr:         address,
+		Password:     password,
+		DB:           database,
+		DialTimeout:  dialTimeout,
+		ReadTimeout:  readTimeout,
+		WriteTimeout: writeTimeout,
+		PoolSize:     poolSize,
 	})
 }
 
