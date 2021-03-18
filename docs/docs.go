@@ -2148,31 +2148,31 @@ var doc = `{
             "type": "object",
             "properties": {
                 "codehash": {
-                    "description": "FT合约hash160(CodePart)",
+                    "description": "NFT合约hash160(CodePart)",
                     "type": "string"
                 },
                 "desc": {
-                    "description": "FT 描述",
+                    "description": "NFT 描述",
                     "type": "string"
                 },
                 "genesis": {
-                    "description": "FT合约的genesis，Hex编码",
+                    "description": "NFT合约的genesis，Hex编码",
                     "type": "string"
                 },
                 "icon": {
-                    "description": "FT icon url",
+                    "description": "NFT icon url",
                     "type": "string"
                 },
                 "name": {
-                    "description": "FT name",
+                    "description": "NFT name",
                     "type": "string"
                 },
                 "symbol": {
-                    "description": "FT symbol",
+                    "description": "NFT symbol",
                     "type": "string"
                 },
                 "website": {
-                    "description": "FT website url",
+                    "description": "NFT website url",
                     "type": "string"
                 }
             }
