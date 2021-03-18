@@ -319,9 +319,9 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "token NFT"
+                    "token FT"
                 ],
-                "summary": "查询某人持有的所有NFT Token列表。获得持有的nft数量计数",
+                "summary": "查询某人持有的FT Token列表。获得每个token的余额",
                 "parameters": [
                     {
                         "type": "integer",
@@ -362,7 +362,7 @@ var doc = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/model.NFTOwnerByAddressResp"
+                                                "$ref": "#/definitions/model.FTOwnerByAddressResp"
                                             }
                                         }
                                     }
@@ -379,26 +379,10 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "token NFT"
+                    "token FT"
                 ],
-                "summary": "查询某人持有的某NFT Token的所有TokenId",
+                "summary": "查询某人持有的某FT Token的余额",
                 "parameters": [
-                    {
-                        "type": "integer",
-                        "default": 0,
-                        "description": "起始游标",
-                        "name": "cursor",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "default": 10,
-                        "description": "返回记录数量",
-                        "name": "size",
-                        "in": "query",
-                        "required": true
-                    },
                     {
                         "type": "string",
                         "default": "844c56bb99afc374967a27ce3b46244e2e1fba60",
@@ -436,7 +420,7 @@ var doc = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/model.NFTOwnerResp"
+                                            "$ref": "#/definitions/model.FTOwnerBalanceResp"
                                         }
                                     }
                                 }
@@ -1210,6 +1194,79 @@ var doc = `{
                 }
             }
         },
+        "/nft/detail/{codehash}/{genesis}/{address}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "token NFT"
+                ],
+                "summary": "查询某人持有的某NFT Token的所有TokenId",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "起始游标",
+                        "name": "cursor",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "返回记录数量",
+                        "name": "size",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "844c56bb99afc374967a27ce3b46244e2e1fba60",
+                        "description": "Code Hash160",
+                        "name": "codehash",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "74967a27ce3b46244e2e1fba60844c56bb99afc3",
+                        "description": "Genesis ID ",
+                        "name": "genesis",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "17SkEw2md5avVNyYgj6RiXuQKNwkXaxFyQ",
+                        "description": "Address",
+                        "name": "address",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\": 0, \"data\": [{}], \"msg\": \"ok\"}",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/model.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/model.NFTOwnerResp"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
         "/nft/history/{codehash}/{genesis}/{address}": {
             "get": {
                 "produces": [
@@ -1287,7 +1344,7 @@ var doc = `{
                 }
             }
         },
-        "/nft/info": {
+        "/nft/info/all": {
             "get": {
                 "produces": [
                     "application/json"
@@ -1379,6 +1436,66 @@ var doc = `{
                                             "type": "array",
                                             "items": {
                                                 "$ref": "#/definitions/model.NFTOwnerResp"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/nft/summary/{address}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "token NFT"
+                ],
+                "summary": "查询某人持有的所有NFT Token列表。获得持有的nft数量计数",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "起始游标",
+                        "name": "cursor",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "返回记录数量",
+                        "name": "size",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "17SkEw2md5avVNyYgj6RiXuQKNwkXaxFyQ",
+                        "description": "Address",
+                        "name": "address",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\": 0, \"data\": [{}], \"msg\": \"ok\"}",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/model.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/model.NFTOwnerByAddressResp"
                                             }
                                         }
                                     }
@@ -2459,7 +2576,7 @@ type swaggerInfo struct {
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = swaggerInfo{
 	Version:     "1.0",
-	Host:        "localhost:8000",
+	Host:        "120.92.153.221:5555",
 	BasePath:    "",
 	Schemes:     []string{},
 	Title:       "Sensible Browser",

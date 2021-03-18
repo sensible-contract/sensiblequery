@@ -15,7 +15,7 @@ import (
 // @Tags token NFT
 // @Produce  json
 // @Success 200 {object} model.Response{data=[]model.NFTInfoResp} "{"code": 0, "data": [{}], "msg": "ok"}"
-// @Router /nft/info [get]
+// @Router /nft/info/all [get]
 func ListAllNFTInfo(ctx *gin.Context) {
 	log.Printf("ListNFTInfo enter")
 
@@ -118,7 +118,7 @@ func ListNFTOwners(ctx *gin.Context) {
 // @Param size query int true "返回记录数量" default(10)
 // @Param address path string true "Address" default(17SkEw2md5avVNyYgj6RiXuQKNwkXaxFyQ)
 // @Success 200 {object} model.Response{data=[]model.NFTOwnerByAddressResp} "{"code": 0, "data": [{}], "msg": "ok"}"
-// @Router /ft/balance/all/{address} [get]
+// @Router /nft/summary/{address} [get]
 func ListAllNFTByOwner(ctx *gin.Context) {
 	log.Printf("ListAllNFTOwners enter")
 
@@ -146,7 +146,7 @@ func ListAllNFTByOwner(ctx *gin.Context) {
 // @Param genesis path string true "Genesis ID " default(74967a27ce3b46244e2e1fba60844c56bb99afc3)
 // @Param address path string true "Address" default(17SkEw2md5avVNyYgj6RiXuQKNwkXaxFyQ)
 // @Success 200 {object} model.Response{data=model.NFTOwnerResp} "{"code": 0, "data": [{}], "msg": "ok"}"
-// @Router /ft/balance/{codehash}/{genesis}/{address} [get]
+// @Router /nft/detail/{codehash}/{genesis}/{address} [get]
 func ListNFTBalanceByOwner(ctx *gin.Context) {
 	log.Printf("ListNFTOwners enter")
 

@@ -13,7 +13,7 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"github.com/swaggo/gin-swagger"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"github.com/swaggo/gin-swagger/swaggerFiles"
 )
 
@@ -33,7 +33,7 @@ var (
 // @license.name Apache 2.0
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
 
-// @host localhost:8000
+// @host 120.92.153.221:5555
 func main() {
 	router := gin.Default()
 	router.Use(cors.New(cors.Config{
@@ -48,7 +48,7 @@ func main() {
 		MaxAge: 12 * time.Hour,
 	}))
 
-	url := ginSwagger.URL("http://localhost:8000/swagger/doc.json")
+	url := ginSwagger.URL("http://120.92.153.221:5555/swagger/doc.json")
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
 
 	router.GET("/", controller.Satotx)

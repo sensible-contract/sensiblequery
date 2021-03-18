@@ -423,7 +423,7 @@ definitions:
       job:
         type: string
     type: object
-host: localhost:8000
+host: 120.92.153.221:5555
 info:
   contact:
     email: jiedohh@gmail.com
@@ -603,18 +603,6 @@ paths:
   /ft/balance/{codehash}/{genesis}/{address}:
     get:
       parameters:
-      - default: 0
-        description: 起始游标
-        in: query
-        name: cursor
-        required: true
-        type: integer
-      - default: 10
-        description: 返回记录数量
-        in: query
-        name: size
-        required: true
-        type: integer
       - default: 844c56bb99afc374967a27ce3b46244e2e1fba60
         description: Code Hash160
         in: path
@@ -643,11 +631,11 @@ paths:
             - $ref: '#/definitions/model.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/model.NFTOwnerResp'
+                  $ref: '#/definitions/model.FTOwnerBalanceResp'
               type: object
-      summary: 查询某人持有的某NFT Token的所有TokenId
+      summary: 查询某人持有的某FT Token的余额
       tags:
-      - token NFT
+      - token FT
   /ft/balance/all/{address}:
     get:
       parameters:
@@ -680,12 +668,12 @@ paths:
             - properties:
                 data:
                   items:
-                    $ref: '#/definitions/model.NFTOwnerByAddressResp'
+                    $ref: '#/definitions/model.FTOwnerByAddressResp'
                   type: array
               type: object
-      summary: 查询某人持有的所有NFT Token列表。获得持有的nft数量计数
+      summary: 查询某人持有的FT Token列表。获得每个token的余额
       tags:
-      - token NFT
+      - token FT
   /ft/history/{codehash}/{genesis}/{address}:
     get:
       parameters:
@@ -1163,6 +1151,54 @@ paths:
       summary: 通过交易txid和交易被打包的区块高度height获取交易所有输出信息列表
       tags:
       - Txout
+  /nft/detail/{codehash}/{genesis}/{address}:
+    get:
+      parameters:
+      - default: 0
+        description: 起始游标
+        in: query
+        name: cursor
+        required: true
+        type: integer
+      - default: 10
+        description: 返回记录数量
+        in: query
+        name: size
+        required: true
+        type: integer
+      - default: 844c56bb99afc374967a27ce3b46244e2e1fba60
+        description: Code Hash160
+        in: path
+        name: codehash
+        required: true
+        type: string
+      - default: 74967a27ce3b46244e2e1fba60844c56bb99afc3
+        description: 'Genesis ID '
+        in: path
+        name: genesis
+        required: true
+        type: string
+      - default: 17SkEw2md5avVNyYgj6RiXuQKNwkXaxFyQ
+        description: Address
+        in: path
+        name: address
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 0, "data": [{}], "msg": "ok"}'
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.NFTOwnerResp'
+              type: object
+      summary: 查询某人持有的某NFT Token的所有TokenId
+      tags:
+      - token NFT
   /nft/history/{codehash}/{genesis}/{address}:
     get:
       parameters:
@@ -1214,7 +1250,7 @@ paths:
       tags:
       - History
       - token NFT
-  /nft/info:
+  /nft/info/all:
     get:
       produces:
       - application/json
@@ -1275,6 +1311,44 @@ paths:
                   type: array
               type: object
       summary: 查询NFT Token的持有人。获得每个tokenId所属的地址
+      tags:
+      - token NFT
+  /nft/summary/{address}:
+    get:
+      parameters:
+      - default: 0
+        description: 起始游标
+        in: query
+        name: cursor
+        required: true
+        type: integer
+      - default: 10
+        description: 返回记录数量
+        in: query
+        name: size
+        required: true
+        type: integer
+      - default: 17SkEw2md5avVNyYgj6RiXuQKNwkXaxFyQ
+        description: Address
+        in: path
+        name: address
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 0, "data": [{}], "msg": "ok"}'
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/model.NFTOwnerByAddressResp'
+                  type: array
+              type: object
+      summary: 查询某人持有的所有NFT Token列表。获得持有的nft数量计数
       tags:
       - token NFT
   /nft/transfer-times:
