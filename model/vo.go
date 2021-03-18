@@ -10,103 +10,103 @@ type Welcome struct {
 ////////////////
 
 type BlockchainInfoResp struct {
-	Chain         string `json:"chain"`
-	Blocks        int    `json:"blocks"`
-	Headers       int    `json:"headers"`
-	BestBlockHash string `json:"bestBlockHash"`
+	Chain         string `json:"chain"`         // main/test
+	Blocks        int    `json:"blocks"`        // 最新区块总数
+	Headers       int    `json:"headers"`       // 最新区块头总数
+	BestBlockHash string `json:"bestBlockHash"` // 最新blockId
 	Difficulty    string `json:"difficulty"`
 	MedianTime    int    `json:"medianTime"`
 	Chainwork     string `json:"chainwork"`
 }
 
 type BlockInfoResp struct {
-	Height         int    `json:"height"`
-	BlockIdHex     string `json:"id"`
-	PrevBlockIdHex string `json:"prev"`
-	NextBlockIdHex string `json:"next"`
-	MerkleRootHex  string `json:"merkle"`
-	TxCount        int    `json:"ntx"`
-	InSatoshi      int    `json:"inSatoshi"`
-	OutSatoshi     int    `json:"outSatoshi"`
-	CoinbaseOut    int    `json:"coinbaseOut"`
-	BlockTime      int    `json:"timestamp"`
+	Height         int    `json:"height"`      // 当前区块高度
+	BlockIdHex     string `json:"id"`          // 当前区块ID
+	PrevBlockIdHex string `json:"prev"`        // 前一个区块ID
+	NextBlockIdHex string `json:"next"`        // 下一个区块ID
+	MerkleRootHex  string `json:"merkle"`      // Merkle Tree
+	TxCount        int    `json:"ntx"`         // 区块内包含的Tx数量
+	InSatoshi      int    `json:"inSatoshi"`   // 区块内输入额度总和，不包括区块reward
+	OutSatoshi     int    `json:"outSatoshi"`  // 区块内输出额度总和，不包括区块reward/fee
+	CoinbaseOut    int    `json:"coinbaseOut"` // 区块reward
+	BlockTime      int    `json:"timestamp"`   // 区块时间戳
 	Bits           int    `json:"bits"`
-	BlockSize      int    `json:"size"`
+	BlockSize      int    `json:"size"` // 区块字节数
 }
 
 type TxInfoResp struct {
 	TxIdHex    string `json:"txid"`
-	InCount    int    `json:"nIn"`
-	OutCount   int    `json:"nOut"`
-	TxSize     int    `json:"size"`
-	LockTime   int    `json:"locktime"`
-	InSatoshi  int    `json:"inSatoshi"`
-	OutSatoshi int    `json:"outSatoshi"`
-	BlockTime  int    `json:"timestamp"`
-	Height     int    `json:"height"`
-	BlockIdHex string `json:"blkid"`
-	Idx        int    `json:"idx"`
+	InCount    int    `json:"nIn"`        // Tx包括的输入条数
+	OutCount   int    `json:"nOut"`       // Tx包括的输出条数
+	TxSize     int    `json:"size"`       // Tx字节数
+	LockTime   int    `json:"locktime"`   // Tx Locktime
+	InSatoshi  int    `json:"inSatoshi"`  // Tx输入的satoshi总和
+	OutSatoshi int    `json:"outSatoshi"` // Tx输出的satoshi总和
+	BlockTime  int    `json:"timestamp"`  // Tx所在区块的时间戳
+	Height     int    `json:"height"`     // Tx所在区块的高度
+	BlockIdHex string `json:"blkid"`      // Tx所在区块的Id
+	Idx        int    `json:"idx"`        // Tx在区块中的顺序号
 }
 
 type TxInSpentResp struct {
-	Height   int    `json:"height"`
-	TxIdHex  string `json:"txid"`
-	Idx      int    `json:"idx"`
-	UtxIdHex string `json:"utxid"`
-	Vout     int    `json:"vout"`
+	Height   int    `json:"height"` // 输出被花费的区块高度
+	TxIdHex  string `json:"txid"`   // 输出被花费的txid
+	Idx      int    `json:"idx"`    // 输出被花费的txid所在区块内序号
+	UtxIdHex string `json:"utxid"`  // 输出txid参数
+	Vout     int    `json:"vout"`   // 输出index参数
 }
 
 type TxInResp struct {
-	Height       int    `json:"height"`
-	TxIdHex      string `json:"txid"`
-	Idx          int    `json:"idx"`
-	ScriptSigHex string `json:"scriptSig"`
-	Sequence     int    `json:"sequence"`
+	Height       int    `json:"height"`    // Tx所在区块的高度
+	TxIdHex      string `json:"txid"`      // Txid
+	Idx          int    `json:"idx"`       // 输入index
+	ScriptSigHex string `json:"scriptSig"` // scriptSig，Hex编码
+	Sequence     int    `json:"sequence"`  // Tx input的sequence
 
-	HeightTxo     int    `json:"heightTxo"`
-	UtxIdHex      string `json:"utxid"`
-	Vout          int    `json:"vout"`
-	Address       string `json:"address"`
-	GenesisHex    string `json:"genesis"`
-	Satoshi       int    `json:"satoshi"`
-	ScriptTypeHex string `json:"scriptType"`
-	ScriptPkHex   string `json:"scriptPk"`
+	HeightTxo     int    `json:"heightTxo"`  // 当前输入花费的utxo所属的区块高度，如果为0则未花费
+	UtxIdHex      string `json:"utxid"`      // 当前输入花费的outpoint的txid
+	Vout          int    `json:"vout"`       // 当前输入花费的outpoint的index
+	Address       string `json:"address"`    // 当前输入花费的outpoint的address
+	GenesisHex    string `json:"genesis"`    // 当前输入花费的outpoint的genesis，Hex编码
+	Satoshi       int    `json:"satoshi"`    // 当前输入花费的outpoint的satoshi
+	ScriptTypeHex string `json:"scriptType"` // 当前输入锁定脚本类型，Hex编码
+	ScriptPkHex   string `json:"scriptPk"`   // 当前输入锁定脚本，Hex编码
 }
 
 type TxOutResp struct {
-	TxIdHex       string `json:"txid"`
-	Vout          int    `json:"vout"`
-	Address       string `json:"address"`
-	GenesisHex    string `json:"genesis"`
-	Satoshi       int    `json:"satoshi"`
-	ScriptTypeHex string `json:"scriptType"`
-	ScriptPkHex   string `json:"scriptPk"`
-	Height        int    `json:"height"`
-	Idx           int    `json:"idx"`
+	TxIdHex       string `json:"txid"`       // 当前txid
+	Vout          int    `json:"vout"`       // 当前输出序号
+	Address       string `json:"address"`    // 当前输出的address
+	GenesisHex    string `json:"genesis"`    // 当前输出的genesis
+	Satoshi       int    `json:"satoshi"`    // 当前输出的satoshi
+	ScriptTypeHex string `json:"scriptType"` // 当前输出锁定脚本类型
+	ScriptPkHex   string `json:"scriptPk"`   // 当前输出锁定脚本
+	Height        int    `json:"height"`     // 当前交易被打包的区块高度
+	Idx           int    `json:"idx"`        // 输出被花费的txid所在区块内序号
 }
 
 type TxOutHistoryResp struct {
-	TxIdHex       string `json:"txid"`
-	Vout          int    `json:"vout"`
-	Address       string `json:"address"`
-	GenesisHex    string `json:"genesis"`
-	Satoshi       int    `json:"satoshi"`
-	ScriptTypeHex string `json:"scriptType"`
-	Height        int    `json:"height"`
-	Idx           int    `json:"idx"`
-	IOType        int    `json:"ioType"`
+	TxIdHex       string `json:"txid"`       // 当前txid
+	Vout          int    `json:"vout"`       // 当前输出序号
+	Address       string `json:"address"`    // 当前输出的address
+	GenesisHex    string `json:"genesis"`    // 当前输出的genesis
+	Satoshi       int    `json:"satoshi"`    // 当前输出的satoshi
+	ScriptTypeHex string `json:"scriptType"` // 当前输出锁定脚本类型
+	Height        int    `json:"height"`     // 当前交易所在区块的高度
+	Idx           int    `json:"idx"`        // 当前交易所在区块内的序号
+	IOType        int    `json:"ioType"`     // 1为输出包含(即收入)，0为输入包含(即花费)
 }
 
 type TxOutStatusResp struct {
-	TxIdHex       string `json:"txid"`
-	Vout          int    `json:"vout"`
-	Address       string `json:"address"`
-	GenesisHex    string `json:"genesis"`
-	Satoshi       int    `json:"satoshi"`
-	ScriptTypeHex string `json:"scriptType"`
-	ScriptPkHex   string `json:"scriptPk"`
-	Height        int    `json:"height"`
+	TxIdHex       string `json:"txid"`       // 当前txid
+	Vout          int    `json:"vout"`       // 当前输出序号
+	Address       string `json:"address"`    // 当前输出的address
+	GenesisHex    string `json:"genesis"`    // 当前输出的genesis
+	Satoshi       int    `json:"satoshi"`    // 当前输出的satoshi
+	ScriptTypeHex string `json:"scriptType"` // 当前输出锁定脚本类型
+	ScriptPkHex   string `json:"scriptPk"`   // 当前输出锁定脚本
+	Height        int    `json:"height"`     // 当前交易被打包的区块高度
 
-	TxIdSpentHex string `json:"txidSpent"`
-	HeightSpent  int    `json:"heightSpent"`
+	TxIdSpentHex string `json:"txidSpent"`   // 当前输出被花费的txid
+	HeightSpent  int    `json:"heightSpent"` // 当前输出被花费的区块高度，如果为0则未花费
 }

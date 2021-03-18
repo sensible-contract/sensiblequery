@@ -12,6 +12,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// GetBlocksByHeightRange
+// @Summary 获取指定高度范围内的区块概述列表
+// @Tags Block
+// @Produce  json
+// @Param start path int true "Start Block Height" default(0)
+// @Param end path int true "Start Block Height" default(3)
+// @Success 200 {object} model.Response{data=[]model.BlockInfoResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Router /blocks/{start}/{end} [get]
 func GetBlocksByHeightRange(ctx *gin.Context) {
 	log.Printf("GetBlocksByHeightRange enter")
 
@@ -51,6 +59,13 @@ func GetBlocksByHeightRange(ctx *gin.Context) {
 	})
 }
 
+// GetBlockByHeight
+// @Summary 通过区块height获取区块概述
+// @Tags Block
+// @Produce  json
+// @Param height path int true "Block Height" default(0)
+// @Success 200 {object} model.Response{data=model.BlockInfoResp} "{"code": 0, "data": {}, "msg": "ok"}"
+// @Router /height/{height}/block [get]
 func GetBlockByHeight(ctx *gin.Context) {
 	log.Printf("GetBlockByHeight enter")
 
@@ -77,6 +92,13 @@ func GetBlockByHeight(ctx *gin.Context) {
 	})
 }
 
+// GetBlockById
+// @Summary 通过区块blkid获取区块概述
+// @Tags Block
+// @Produce  json
+// @Param blkid path string true "BlockId" default(0000000082b5015589a3fdf2d4baff403e6f0be035a5d9742c1cae6295464449)
+// @Success 200 {object} model.Response{data=model.BlockInfoResp} "{"code": 0, "data": {}, "msg": "ok"}"
+// @Router /block/id/{blkid} [get]
 func GetBlockById(ctx *gin.Context) {
 	log.Printf("GetBlockById enter")
 

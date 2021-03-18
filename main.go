@@ -7,11 +7,14 @@ import (
 	"os"
 	"os/signal"
 	"satoblock/controller"
+	_ "satoblock/docs"
 	"syscall"
 	"time"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/swaggo/gin-swagger"
+	"github.com/swaggo/gin-swagger/swaggerFiles"
 )
 
 var (
@@ -19,6 +22,18 @@ var (
 	listen_address = os.Getenv("LISTEN")
 )
 
+// @title Sensible Browser
+// @version 1.0
+// @description Sensible 区块浏览器
+
+// @contact.name satoblock
+// @contact.url https://github.com/sensing-contract/satoblock
+// @contact.email jiedohh@gmail.com
+
+// @license.name Apache 2.0
+// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host localhost:8000
 func main() {
 	router := gin.Default()
 	router.Use(cors.New(cors.Config{
@@ -32,6 +47,9 @@ func main() {
 		},
 		MaxAge: 12 * time.Hour,
 	}))
+
+	url := ginSwagger.URL("http://localhost:8000/swagger/doc.json")
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
 
 	router.GET("/", controller.Satotx)
 

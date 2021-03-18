@@ -22,7 +22,6 @@ data包括字段为：
 - headers: 最新区块头总数
 - bestBlockHash: 最新blockId
 - medianTime: 最新区块时间戳
-- github: 项目地址
 
 - Body
 ```

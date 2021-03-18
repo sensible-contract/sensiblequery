@@ -11,6 +11,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// GetUtxoByAddress
+// @Summary 通过地址address获取相关utxo列表
+// @Tags UTXO
+// @Produce  json
+// @Param address path string true "Address" default(17SkEw2md5avVNyYgj6RiXuQKNwkXaxFyQ)
+// @Success 200 {object} model.Response{data=[]model.TxOutResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Router /address/{address}/utxo [get]
 func GetUtxoByAddress(ctx *gin.Context) {
 	log.Printf("GetUtxoByAddress enter")
 
@@ -37,6 +44,13 @@ func GetUtxoByAddress(ctx *gin.Context) {
 	})
 }
 
+// GetUtxoByGenesis
+// @Summary 通过溯源genesis获取相关utxo列表
+// @Tags UTXO
+// @Produce  json
+// @Param genesis path string true "Genesis" default(74967a27ce3b46244e2e1fba60844c56bb99afc3)
+// @Success 200 {object} model.Response{data=[]model.TxOutResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Router /genesis/{genesis}/utxo [get]
 func GetUtxoByGenesis(ctx *gin.Context) {
 	log.Printf("GetUtxoByGenesis enter")
 

@@ -10,6 +10,10 @@ import (
 )
 
 // Satotx
+// @Summary Welcome message
+// @Produce  json
+// @Success 200 {object} model.Response{data=model.Welcome} "{"code": 0, "data": {}, "msg": "ok"}"
+// @Router / [get]
 func Satotx(ctx *gin.Context) {
 	log.Printf("Satotx enter")
 
@@ -24,6 +28,11 @@ func Satotx(ctx *gin.Context) {
 	})
 }
 
+// GetBlockchainInfo 获取最新区块位置、同步状态等信息
+// @Summary 获取最新区块位置、同步状态等信息
+// @Produce  json
+// @Success 200 {object} model.Response{data=model.BlockchainInfoResp} "{"code": 0, "data": {}, "msg": "ok"}"
+// @Router /blockchain/info [get]
 func GetBlockchainInfo(ctx *gin.Context) {
 	log.Printf("GetBlockchainInfo enter")
 

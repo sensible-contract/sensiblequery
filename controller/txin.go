@@ -12,6 +12,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// GetTxInputsByTxId
+// @Summary 通过交易txid获取交易所有输入信息列表
+// @Tags Txin
+// @Produce  json
+// @Param txid path string true "TxId" default(f4184fc596403b9d638783cf57adfe4c75c605f6356fbc91338530e9831e9e16)
+// @Success 200 {object} model.Response{data=[]model.TxInResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Router /tx/{txid}/ins [get]
 func GetTxInputsByTxId(ctx *gin.Context) {
 	log.Printf("GetTxInputsByTxId enter")
 
@@ -39,6 +46,14 @@ func GetTxInputsByTxId(ctx *gin.Context) {
 	})
 }
 
+// GetTxInputsByTxIdInsideHeight
+// @Summary 通过交易txid和交易被打包的区块高度height获取交易所有输入信息列表
+// @Tags Txin
+// @Produce  json
+// @Param height path int true "Block Height" default(170)
+// @Param txid path string true "TxId" default(f4184fc596403b9d638783cf57adfe4c75c605f6356fbc91338530e9831e9e16)
+// @Success 200 {object} model.Response{data=[]model.TxInResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Router /height/{height}/tx/{txid}/ins [get]
 func GetTxInputsByTxIdInsideHeight(ctx *gin.Context) {
 	log.Printf("GetTxInputsByTxIdInsideHeight enter")
 
@@ -74,6 +89,14 @@ func GetTxInputsByTxIdInsideHeight(ctx *gin.Context) {
 	})
 }
 
+// GetTxInputByTxIdAndIdx
+// @Summary 通过交易txid和index获取指定交易输入信息
+// @Tags Txin
+// @Produce  json
+// @Param txid path string true "TxId" default(f4184fc596403b9d638783cf57adfe4c75c605f6356fbc91338530e9831e9e16)
+// @Param index path int true "input index" default(0)
+// @Success 200 {object} model.Response{data=model.TxInResp} "{"code": 0, "data": {}, "msg": "ok"}"
+// @Router /tx/{txid}/in/{index} [get]
 func GetTxInputByTxIdAndIdx(ctx *gin.Context) {
 	log.Printf("GetTxInputByTxIdAndIdx enter")
 
@@ -110,6 +133,15 @@ func GetTxInputByTxIdAndIdx(ctx *gin.Context) {
 	})
 }
 
+// GetTxInputByTxIdAndIdxInsideHeight
+// @Summary 通过交易txid和index和交易被打包的区块高度height获取指定交易输入信息
+// @Tags Txin
+// @Produce  json
+// @Param height path int true "Block Height" default(170)
+// @Param txid path string true "TxId" default(f4184fc596403b9d638783cf57adfe4c75c605f6356fbc91338530e9831e9e16)
+// @Param index path int true "input index" default(0)
+// @Success 200 {object} model.Response{data=model.TxInResp} "{"code": 0, "data": {}, "msg": "ok"}"
+// @Router /height/{height}/tx/{txid}/in/{index} [get]
 func GetTxInputByTxIdAndIdxInsideHeight(ctx *gin.Context) {
 	log.Printf("GetTxInputByTxIdAndIdxInsideHeight enter")
 

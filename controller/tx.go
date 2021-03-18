@@ -12,6 +12,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// GetBlockTxsByBlockHeight
+// @Summary 通过区块height获取区块包含的Tx概述列表
+// @Tags Tx
+// @Produce  json
+// @Param height path int true "Block Height" default(3)
+// @Success 200 {object} model.Response{data=[]model.TxInfoResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Router /height/{height}/block/txs [get]
 func GetBlockTxsByBlockHeight(ctx *gin.Context) {
 	log.Printf("GetBlockTxsByBlockHeight enter")
 
@@ -38,6 +45,13 @@ func GetBlockTxsByBlockHeight(ctx *gin.Context) {
 	})
 }
 
+// GetBlockTxsByBlockId
+// @Summary 通过区块blkid获取区块包含的Tx概述列表
+// @Tags Tx
+// @Produce  json
+// @Param blkid path string true "Block ID" default(0000000082b5015589a3fdf2d4baff403e6f0be035a5d9742c1cae6295464449)
+// @Success 200 {object} model.Response{data=[]model.TxInfoResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Router /block/txs/{blkid} [get]
 func GetBlockTxsByBlockId(ctx *gin.Context) {
 	log.Printf("GetBlockTxsByBlockId enter")
 
@@ -65,6 +79,13 @@ func GetBlockTxsByBlockId(ctx *gin.Context) {
 	})
 }
 
+// GetTxById
+// @Summary 通过交易txid获取交易概述
+// @Tags Tx
+// @Produce  json
+// @Param txid path string true "TxId" default(999e1c837c76a1b7fbb7e57baf87b309960f5ffefbf2a9b95dd890602272f644)
+// @Success 200 {object} model.Response{data=model.TxInfoResp} "{"code": 0, "data": {}, "msg": "ok"}"
+// @Router /tx/{txid} [get]
 func GetTxById(ctx *gin.Context) {
 	log.Printf("GetTxById enter")
 
@@ -92,6 +113,14 @@ func GetTxById(ctx *gin.Context) {
 	})
 }
 
+// GetTxByIdInsideHeight
+// @Summary 通过交易txid和交易被打包的区块高度height获取交易概述
+// @Tags Tx
+// @Produce  json
+// @Param height path int true "Block Height" default(3)
+// @Param txid path string true "TxId" default(999e1c837c76a1b7fbb7e57baf87b309960f5ffefbf2a9b95dd890602272f644)
+// @Success 200 {object} model.Response{data=model.TxInfoResp} "{"code": 0, "data": {}, "msg": "ok"}"
+// @Router /height/{height}/tx/{txid} [get]
 func GetTxByIdInsideHeight(ctx *gin.Context) {
 	log.Printf("GetTxByIdInsideHeight enter")
 

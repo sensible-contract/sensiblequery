@@ -12,6 +12,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// GetTxOutputsByTxId
+// @Summary 通过交易txid获取交易所有输出信息列表
+// @Tags Txout
+// @Produce  json
+// @Param txid path string true "TxId" default(f4184fc596403b9d638783cf57adfe4c75c605f6356fbc91338530e9831e9e16)
+// @Success 200 {object} model.Response{data=[]model.TxOutStatusResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Router /tx/{txid}/outs [get]
 func GetTxOutputsByTxId(ctx *gin.Context) {
 	log.Printf("GetTxOutputsByTxId enter")
 
@@ -39,6 +46,14 @@ func GetTxOutputsByTxId(ctx *gin.Context) {
 	})
 }
 
+// GetTxOutputsByTxIdInsideHeight
+// @Summary 通过交易txid和交易被打包的区块高度height获取交易所有输出信息列表
+// @Tags Txout
+// @Produce  json
+// @Param height path int true "Block Height" default(170)
+// @Param txid path string true "TxId" default(f4184fc596403b9d638783cf57adfe4c75c605f6356fbc91338530e9831e9e16)
+// @Success 200 {object} model.Response{data=[]model.TxOutStatusResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Router /height/{height}/tx/{txid}/outs [get]
 func GetTxOutputsByTxIdInsideHeight(ctx *gin.Context) {
 	log.Printf("GetTxOutputsByTxId enter")
 
@@ -74,6 +89,14 @@ func GetTxOutputsByTxIdInsideHeight(ctx *gin.Context) {
 	})
 }
 
+// GetTxOutputByTxIdAndIdx
+// @Summary 通过交易txid和index获取指定交易输出信息
+// @Tags Txout
+// @Produce  json
+// @Param txid path string true "TxId" default(f4184fc596403b9d638783cf57adfe4c75c605f6356fbc91338530e9831e9e16)
+// @Param index path int true "output index" default(0)
+// @Success 200 {object} model.Response{data=model.TxOutStatusResp} "{"code": 0, "data": {}, "msg": "ok"}"
+// @Router /tx/{txid}/out/{index} [get]
 func GetTxOutputByTxIdAndIdx(ctx *gin.Context) {
 	log.Printf("GetTxOutputByTxIdAndIdx enter")
 
@@ -110,6 +133,15 @@ func GetTxOutputByTxIdAndIdx(ctx *gin.Context) {
 	})
 }
 
+// GetTxOutputByTxIdAndIdxInsideHeight
+// @Summary 通过交易txid和index和交易被打包的区块高度height获取指定交易输出信息
+// @Tags Txout
+// @Produce  json
+// @Param height path int true "Block Height" default(170)
+// @Param txid path string true "TxId" default(f4184fc596403b9d638783cf57adfe4c75c605f6356fbc91338530e9831e9e16)
+// @Param index path int true "output index" default(0)
+// @Success 200 {object} model.Response{data=model.TxOutStatusResp} "{"code": 0, "data": {}, "msg": "ok"}"
+// @Router /height/{height}/tx/{txid}/out/{index} [get]
 func GetTxOutputByTxIdAndIdxInsideHeight(ctx *gin.Context) {
 	log.Printf("GetTxOutputByTxIdAndIdxInsideHeight enter")
 
@@ -154,6 +186,14 @@ func GetTxOutputByTxIdAndIdxInsideHeight(ctx *gin.Context) {
 	})
 }
 
+// GetTxOutputSpentStatusByTxIdAndIdx
+// @Summary 通过交易txid和index获取指定交易输出是否被花费状态
+// @Tags Txout
+// @Produce  json
+// @Param txid path string true "TxId" default(f4184fc596403b9d638783cf57adfe4c75c605f6356fbc91338530e9831e9e16)
+// @Param index path int true "output index" default(0)
+// @Success 200 {object} model.Response{data=model.TxInSpentResp} "{"code": 0, "data": {}, "msg": "ok"}"
+// @Router /tx/{txid}/out/{index}/spent [get]
 func GetTxOutputSpentStatusByTxIdAndIdx(ctx *gin.Context) {
 	log.Printf("GetTxOutputSpentStatusByTxIdAndIdx enter")
 
