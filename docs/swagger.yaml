@@ -1,13 +1,4 @@
 definitions:
-  controller._PushTxResp:
-    properties:
-      code:
-        type: integer
-      data:
-        type: string
-      msg:
-        type: string
-    type: object
   model.BlockInfoResp:
     properties:
       bits:
@@ -67,6 +58,129 @@ definitions:
       medianTime:
         type: integer
     type: object
+  model.FTInfoResp:
+    properties:
+      codehash:
+        description: FT合约hash160(CodePart)
+        type: string
+      decimal:
+        description: decimal
+        type: integer
+      desc:
+        description: FT 描述
+        type: string
+      genesis:
+        description: FT合约的genesis，Hex编码
+        type: string
+      icon:
+        description: FT icon url
+        type: string
+      name:
+        description: FT name
+        type: string
+      symbol:
+        description: FT symbol
+        type: string
+      website:
+        description: FT website url
+        type: string
+    type: object
+  model.FTOwnerBalanceResp:
+    properties:
+      address:
+        description: token持有人的address
+        type: string
+      balance:
+        description: 余额
+        type: integer
+    type: object
+  model.FTOwnerByAddressResp:
+    properties:
+      balance:
+        description: 余额
+        type: integer
+      codehash:
+        description: FT合约hash160(CodePart)
+        type: string
+      genesis:
+        description: FT合约的genesis，Hex编码
+        type: string
+      symbol:
+        description: FT symbol
+        type: string
+    type: object
+  model.FTTransferVolumeResp:
+    properties:
+      height:
+        description: 区块高度
+        type: integer
+      inVolume:
+        description: 输入数量
+        type: integer
+      outVolume:
+        description: 输出数量
+        type: integer
+    type: object
+  model.NFTInfoResp:
+    properties:
+      codehash:
+        description: FT合约hash160(CodePart)
+        type: string
+      desc:
+        description: FT 描述
+        type: string
+      genesis:
+        description: FT合约的genesis，Hex编码
+        type: string
+      icon:
+        description: FT icon url
+        type: string
+      name:
+        description: FT name
+        type: string
+      symbol:
+        description: FT symbol
+        type: string
+      website:
+        description: FT website url
+        type: string
+    type: object
+  model.NFTOwnerByAddressResp:
+    properties:
+      codehash:
+        description: NFT合约hash160(CodePart)
+        type: string
+      count:
+        description: 持有的当前NFT个数
+        type: integer
+      genesis:
+        description: NFT合约的genesis，Hex编码
+        type: string
+      symbol:
+        description: NFT symbol
+        type: string
+    type: object
+  model.NFTOwnerResp:
+    properties:
+      address:
+        description: token持有人的address
+        type: string
+      tokenId:
+        description: 持有的NFT id
+        type: integer
+    type: object
+  model.NFTTransferTimesResp:
+    properties:
+      height:
+        description: 区块高度
+        type: integer
+      inTimes:
+        description: 输入次数
+        type: integer
+      outTimes:
+        description: 输出次数
+        type: integer
+    type: object
   model.Response:
     properties:
       code:
@@ -80,6 +194,9 @@ definitions:
     properties:
       address:
         description: 当前输入花费的outpoint的address
+        type: string
+      codehash:
+        description: 合约hash160(CodePart)
         type: string
       genesis:
         description: 当前输入花费的outpoint的genesis，Hex编码
@@ -107,6 +224,12 @@ definitions:
         type: string
       sequence:
         description: Tx input的sequence
+        type: integer
+      tokenAmount:
+        description: 当前输入花费的outpoint的ft tokenAmount
+        type: integer
+      tokenId:
+        description: 当前输入的nft tokenId
         type: integer
       txid:
         description: Txid
@@ -176,6 +299,9 @@ definitions:
       address:
         description: 当前输出的address
         type: string
+      codehash:
+        description: 合约hash160(CodePart)
+        type: string
       genesis:
         description: 当前输出的genesis
         type: string
@@ -194,6 +320,12 @@ definitions:
       scriptType:
         description: 当前输出锁定脚本类型
         type: string
+      tokenAmount:
+        description: 当前输出的ft tokenAmount
+        type: integer
+      tokenId:
+        description: 当前输出的nft tokenId
+        type: integer
       txid:
         description: 当前txid
         type: string
@@ -205,6 +337,9 @@ definitions:
     properties:
       address:
         description: 当前输出的address
+        type: string
+      codehash:
+        description: 合约hash160(CodePart)
         type: string
       genesis:
         description: 当前输出的genesis
@@ -224,6 +359,12 @@ definitions:
       scriptType:
         description: 当前输出锁定脚本类型
         type: string
+      tokenAmount:
+        description: 当前输出的ft tokenAmount
+        type: integer
+      tokenId:
+        description: 当前输出的nft tokenId
+        type: integer
       txid:
         description: 当前txid
         type: string
@@ -235,6 +376,9 @@ definitions:
     properties:
       address:
         description: 当前输出的address
+        type: string
+      codehash:
+        description: 合约hash160(CodePart)
         type: string
       genesis:
         description: 当前输出的genesis
@@ -254,6 +398,12 @@ definitions:
       scriptType:
         description: 当前输出锁定脚本类型
         type: string
+      tokenAmount:
+        description: 当前输出的ft tokenAmount
+        type: integer
+      tokenId:
+        description: 当前输出的nft tokenId
+        type: integer
       txid:
         description: 当前txid
         type: string
@@ -324,7 +474,7 @@ paths:
                     $ref: '#/definitions/model.TxOutHistoryResp'
                   type: array
               type: object
-      summary: 通过地址address获取相关tx历史列表，详细返回输入/输出
+      summary: 通过地址address获取相关tx历史列表，返回详细输入/输出
       tags:
       - History
   /address/{address}/utxo:
@@ -450,6 +600,301 @@ paths:
       summary: 获取指定高度范围内的区块概述列表
       tags:
       - Block
+  /ft/balance/{codehash}/{genesis}/{address}:
+    get:
+      parameters:
+      - default: 0
+        description: 起始游标
+        in: query
+        name: cursor
+        required: true
+        type: integer
+      - default: 10
+        description: 返回记录数量
+        in: query
+        name: size
+        required: true
+        type: integer
+      - default: 844c56bb99afc374967a27ce3b46244e2e1fba60
+        description: Code Hash160
+        in: path
+        name: codehash
+        required: true
+        type: string
+      - default: 74967a27ce3b46244e2e1fba60844c56bb99afc3
+        description: 'Genesis ID '
+        in: path
+        name: genesis
+        required: true
+        type: string
+      - default: 17SkEw2md5avVNyYgj6RiXuQKNwkXaxFyQ
+        description: Address
+        in: path
+        name: address
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 0, "data": [{}], "msg": "ok"}'
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.NFTOwnerResp'
+              type: object
+      summary: 查询某人持有的某NFT Token的所有TokenId
+      tags:
+      - token NFT
+  /ft/balance/all/{address}:
+    get:
+      parameters:
+      - default: 0
+        description: 起始游标
+        in: query
+        name: cursor
+        required: true
+        type: integer
+      - default: 10
+        description: 返回记录数量
+        in: query
+        name: size
+        required: true
+        type: integer
+      - default: 17SkEw2md5avVNyYgj6RiXuQKNwkXaxFyQ
+        description: Address
+        in: path
+        name: address
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 0, "data": [{}], "msg": "ok"}'
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/model.NFTOwnerByAddressResp'
+                  type: array
+              type: object
+      summary: 查询某人持有的所有NFT Token列表。获得持有的nft数量计数
+      tags:
+      - token NFT
+  /ft/history/{codehash}/{genesis}/{address}:
+    get:
+      parameters:
+      - default: 0
+        description: 起始游标
+        in: query
+        name: cursor
+        required: true
+        type: integer
+      - default: 10
+        description: 返回记录数量
+        in: query
+        name: size
+        required: true
+        type: integer
+      - default: 844c56bb99afc374967a27ce3b46244e2e1fba60
+        description: Code Hash160
+        in: path
+        name: codehash
+        required: true
+        type: string
+      - default: 74967a27ce3b46244e2e1fba60844c56bb99afc3
+        description: 'Genesis ID '
+        in: path
+        name: genesis
+        required: true
+        type: string
+      - default: 17SkEw2md5avVNyYgj6RiXuQKNwkXaxFyQ
+        description: Address
+        in: path
+        name: address
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 0, "data": [{}], "msg": "ok"}'
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/model.TxOutHistoryResp'
+                  type: array
+              type: object
+      summary: 通过FT合约CodeHash+溯源genesis获取地址相关tx历史列表，返回详细输入/输出
+      tags:
+      - History
+      - token FT
+  /ft/info/all:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 0, "data": [{}], "msg": "ok"}'
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/model.FTInfoResp'
+                  type: array
+              type: object
+      summary: 查询所有FT Token简述
+      tags:
+      - token FT
+  /ft/owners/{codehash}/{genesis}:
+    get:
+      parameters:
+      - default: 0
+        description: 起始游标
+        in: query
+        name: cursor
+        required: true
+        type: integer
+      - default: 10
+        description: 返回记录数量
+        in: query
+        name: size
+        required: true
+        type: integer
+      - default: 844c56bb99afc374967a27ce3b46244e2e1fba60
+        description: Code Hash160
+        in: path
+        name: codehash
+        required: true
+        type: string
+      - default: 74967a27ce3b46244e2e1fba60844c56bb99afc3
+        description: 'Genesis ID '
+        in: path
+        name: genesis
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 0, "data": [{}], "msg": "ok"}'
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/model.FTOwnerBalanceResp'
+                  type: array
+              type: object
+      summary: 查询FT Token的持有人。获得每个地址的token余额
+      tags:
+      - token FT
+  /ft/transfer-volume:
+    get:
+      parameters:
+      - default: 0
+        description: Start Block Height
+        in: path
+        name: start
+        required: true
+        type: integer
+      - default: 3
+        description: Start Block Height
+        in: path
+        name: end
+        required: true
+        type: integer
+      - default: 844c56bb99afc374967a27ce3b46244e2e1fba60
+        description: Code Hash160
+        in: path
+        name: codehash
+        required: true
+        type: string
+      - default: 74967a27ce3b46244e2e1fba60844c56bb99afc3
+        description: 'Genesis ID '
+        in: path
+        name: genesis
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 0, "data": [{}], "msg": "ok"}'
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/model.FTTransferVolumeResp'
+                  type: array
+              type: object
+      summary: 查询FT Token在区块中的转移数量，以合约CodeHash+GenesisID来确认一种FT
+      tags:
+      - token FT
+  /ft/utxo/{codehash}/{genesis}/{address}:
+    get:
+      parameters:
+      - default: 0
+        description: 起始游标
+        in: query
+        name: cursor
+        required: true
+        type: integer
+      - default: 10
+        description: 返回记录数量
+        in: query
+        name: size
+        required: true
+        type: integer
+      - default: 844c56bb99afc374967a27ce3b46244e2e1fba60
+        description: Code Hash160
+        in: path
+        name: codehash
+        required: true
+        type: string
+      - default: 74967a27ce3b46244e2e1fba60844c56bb99afc3
+        description: 'Genesis ID '
+        in: path
+        name: genesis
+        required: true
+        type: string
+      - default: 17SkEw2md5avVNyYgj6RiXuQKNwkXaxFyQ
+        description: Address
+        in: path
+        name: address
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 0, "data": [{}], "msg": "ok"}'
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/model.TxOutResp'
+                  type: array
+              type: object
+      summary: 通过FT合约CodeHash+溯源genesis获取某地址的utxo列表
+      tags:
+      - UTXO
+      - token FT
   /genesis/{genesis}/history:
     get:
       parameters:
@@ -473,7 +918,7 @@ paths:
                     $ref: '#/definitions/model.TxOutHistoryResp'
                   type: array
               type: object
-      summary: 通过溯源genesis获取相关tx历史列表，详细返回输入/输出
+      summary: 通过溯源genesis获取相关tx历史列表，返回详细输入/输出
       tags:
       - History
   /genesis/{genesis}/utxo:
@@ -718,6 +1163,221 @@ paths:
       summary: 通过交易txid和交易被打包的区块高度height获取交易所有输出信息列表
       tags:
       - Txout
+  /nft/history/{codehash}/{genesis}/{address}:
+    get:
+      parameters:
+      - default: 0
+        description: 起始游标
+        in: query
+        name: cursor
+        required: true
+        type: integer
+      - default: 10
+        description: 返回记录数量
+        in: query
+        name: size
+        required: true
+        type: integer
+      - default: 844c56bb99afc374967a27ce3b46244e2e1fba60
+        description: Code Hash160
+        in: path
+        name: codehash
+        required: true
+        type: string
+      - default: 74967a27ce3b46244e2e1fba60844c56bb99afc3
+        description: 'Genesis ID '
+        in: path
+        name: genesis
+        required: true
+        type: string
+      - default: 17SkEw2md5avVNyYgj6RiXuQKNwkXaxFyQ
+        description: Address
+        in: path
+        name: address
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 0, "data": [{}], "msg": "ok"}'
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/model.TxOutHistoryResp'
+                  type: array
+              type: object
+      summary: 通过FT合约CodeHash+溯源genesis获取地址相关tx历史列表，返回详细输入/输出
+      tags:
+      - History
+      - token NFT
+  /nft/info:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 0, "data": [{}], "msg": "ok"}'
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/model.NFTInfoResp'
+                  type: array
+              type: object
+      summary: 查询所有NFT Token简述
+      tags:
+      - token NFT
+  /nft/owners/{codehash}/{genesis}/{cursor}/{size}:
+    get:
+      parameters:
+      - default: 0
+        description: 起始游标
+        in: path
+        name: cursor
+        required: true
+        type: integer
+      - default: 10
+        description: 返回记录数量
+        in: path
+        name: size
+        required: true
+        type: integer
+      - default: 844c56bb99afc374967a27ce3b46244e2e1fba60
+        description: Code Hash160
+        in: path
+        name: codehash
+        required: true
+        type: string
+      - default: 74967a27ce3b46244e2e1fba60844c56bb99afc3
+        description: 'Genesis ID '
+        in: path
+        name: genesis
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 0, "data": [{}], "msg": "ok"}'
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/model.NFTOwnerResp'
+                  type: array
+              type: object
+      summary: 查询NFT Token的持有人。获得每个tokenId所属的地址
+      tags:
+      - token NFT
+  /nft/transfer-times:
+    get:
+      parameters:
+      - default: 0
+        description: Start Block Height
+        in: path
+        name: start
+        required: true
+        type: integer
+      - default: 3
+        description: Start Block Height
+        in: path
+        name: end
+        required: true
+        type: integer
+      - default: 844c56bb99afc374967a27ce3b46244e2e1fba60
+        description: Code Hash160
+        in: path
+        name: codehash
+        required: true
+        type: string
+      - default: 74967a27ce3b46244e2e1fba60844c56bb99afc3
+        description: 'Genesis ID '
+        in: path
+        name: genesis
+        required: true
+        type: string
+      - default: 3
+        description: 'Token ID '
+        in: path
+        name: tokenid
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 0, "data": [{}], "msg": "ok"}'
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/model.NFTTransferTimesResp'
+                  type: array
+              type: object
+      summary: 查询NFT Token在区块中的转移次数，以合约CodeHash+GenesisID，和tokenId来确认一种NFT。
+      tags:
+      - token NFT
+  /nft/utxo/{codehash}/{genesis}/{address}:
+    get:
+      parameters:
+      - default: 0
+        description: 起始游标
+        in: query
+        name: cursor
+        required: true
+        type: integer
+      - default: 10
+        description: 返回记录数量
+        in: query
+        name: size
+        required: true
+        type: integer
+      - default: 844c56bb99afc374967a27ce3b46244e2e1fba60
+        description: Code Hash160
+        in: path
+        name: codehash
+        required: true
+        type: string
+      - default: 74967a27ce3b46244e2e1fba60844c56bb99afc3
+        description: 'Genesis ID '
+        in: path
+        name: genesis
+        required: true
+        type: string
+      - default: 17SkEw2md5avVNyYgj6RiXuQKNwkXaxFyQ
+        description: Address
+        in: path
+        name: address
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 0, "data": [{}], "msg": "ok"}'
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/model.TxOutResp'
+                  type: array
+              type: object
+      summary: 通过NFT合约CodeHash+溯源genesis获取某地址的utxo列表
+      tags:
+      - UTXO
+      - token NFT
   /pushtx:
     post:
       parameters:
@@ -732,7 +1392,12 @@ paths:
         "200":
           description: '{"code": 0, "data": "<txid>", "msg": "ok"}'
           schema:
-            $ref: '#/definitions/controller._PushTxResp'
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
       summary: Push Tx
   /tx/{txid}:
     get:

@@ -68,7 +68,7 @@ var doc = `{
                 "tags": [
                     "History"
                 ],
-                "summary": "通过地址address获取相关tx历史列表，详细返回输入/输出",
+                "summary": "通过地址address获取相关tx历史列表，返回详细输入/输出",
                 "parameters": [
                     {
                         "type": "string",
@@ -313,6 +313,463 @@ var doc = `{
                 }
             }
         },
+        "/ft/balance/all/{address}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "token NFT"
+                ],
+                "summary": "查询某人持有的所有NFT Token列表。获得持有的nft数量计数",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "起始游标",
+                        "name": "cursor",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "返回记录数量",
+                        "name": "size",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "17SkEw2md5avVNyYgj6RiXuQKNwkXaxFyQ",
+                        "description": "Address",
+                        "name": "address",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\": 0, \"data\": [{}], \"msg\": \"ok\"}",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/model.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/model.NFTOwnerByAddressResp"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/ft/balance/{codehash}/{genesis}/{address}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "token NFT"
+                ],
+                "summary": "查询某人持有的某NFT Token的所有TokenId",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "起始游标",
+                        "name": "cursor",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "返回记录数量",
+                        "name": "size",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "844c56bb99afc374967a27ce3b46244e2e1fba60",
+                        "description": "Code Hash160",
+                        "name": "codehash",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "74967a27ce3b46244e2e1fba60844c56bb99afc3",
+                        "description": "Genesis ID ",
+                        "name": "genesis",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "17SkEw2md5avVNyYgj6RiXuQKNwkXaxFyQ",
+                        "description": "Address",
+                        "name": "address",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\": 0, \"data\": [{}], \"msg\": \"ok\"}",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/model.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/model.NFTOwnerResp"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/ft/history/{codehash}/{genesis}/{address}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "History",
+                    "token FT"
+                ],
+                "summary": "通过FT合约CodeHash+溯源genesis获取地址相关tx历史列表，返回详细输入/输出",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "起始游标",
+                        "name": "cursor",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "返回记录数量",
+                        "name": "size",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "844c56bb99afc374967a27ce3b46244e2e1fba60",
+                        "description": "Code Hash160",
+                        "name": "codehash",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "74967a27ce3b46244e2e1fba60844c56bb99afc3",
+                        "description": "Genesis ID ",
+                        "name": "genesis",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "17SkEw2md5avVNyYgj6RiXuQKNwkXaxFyQ",
+                        "description": "Address",
+                        "name": "address",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\": 0, \"data\": [{}], \"msg\": \"ok\"}",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/model.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/model.TxOutHistoryResp"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/ft/info/all": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "token FT"
+                ],
+                "summary": "查询所有FT Token简述",
+                "responses": {
+                    "200": {
+                        "description": "{\"code\": 0, \"data\": [{}], \"msg\": \"ok\"}",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/model.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/model.FTInfoResp"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/ft/owners/{codehash}/{genesis}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "token FT"
+                ],
+                "summary": "查询FT Token的持有人。获得每个地址的token余额",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "起始游标",
+                        "name": "cursor",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "返回记录数量",
+                        "name": "size",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "844c56bb99afc374967a27ce3b46244e2e1fba60",
+                        "description": "Code Hash160",
+                        "name": "codehash",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "74967a27ce3b46244e2e1fba60844c56bb99afc3",
+                        "description": "Genesis ID ",
+                        "name": "genesis",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\": 0, \"data\": [{}], \"msg\": \"ok\"}",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/model.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/model.FTOwnerBalanceResp"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/ft/transfer-volume": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "token FT"
+                ],
+                "summary": "查询FT Token在区块中的转移数量，以合约CodeHash+GenesisID来确认一种FT",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "Start Block Height",
+                        "name": "start",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "default": 3,
+                        "description": "Start Block Height",
+                        "name": "end",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "844c56bb99afc374967a27ce3b46244e2e1fba60",
+                        "description": "Code Hash160",
+                        "name": "codehash",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "74967a27ce3b46244e2e1fba60844c56bb99afc3",
+                        "description": "Genesis ID ",
+                        "name": "genesis",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\": 0, \"data\": [{}], \"msg\": \"ok\"}",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/model.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/model.FTTransferVolumeResp"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/ft/utxo/{codehash}/{genesis}/{address}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "UTXO",
+                    "token FT"
+                ],
+                "summary": "通过FT合约CodeHash+溯源genesis获取某地址的utxo列表",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "起始游标",
+                        "name": "cursor",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "返回记录数量",
+                        "name": "size",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "844c56bb99afc374967a27ce3b46244e2e1fba60",
+                        "description": "Code Hash160",
+                        "name": "codehash",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "74967a27ce3b46244e2e1fba60844c56bb99afc3",
+                        "description": "Genesis ID ",
+                        "name": "genesis",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "17SkEw2md5avVNyYgj6RiXuQKNwkXaxFyQ",
+                        "description": "Address",
+                        "name": "address",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\": 0, \"data\": [{}], \"msg\": \"ok\"}",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/model.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/model.TxOutResp"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
         "/genesis/{genesis}/history": {
             "get": {
                 "produces": [
@@ -321,7 +778,7 @@ var doc = `{
                 "tags": [
                     "History"
                 ],
-                "summary": "通过溯源genesis获取相关tx历史列表，详细返回输入/输出",
+                "summary": "通过溯源genesis获取相关tx历史列表，返回详细输入/输出",
                 "parameters": [
                     {
                         "type": "string",
@@ -753,6 +1210,338 @@ var doc = `{
                 }
             }
         },
+        "/nft/history/{codehash}/{genesis}/{address}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "History",
+                    "token NFT"
+                ],
+                "summary": "通过FT合约CodeHash+溯源genesis获取地址相关tx历史列表，返回详细输入/输出",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "起始游标",
+                        "name": "cursor",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "返回记录数量",
+                        "name": "size",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "844c56bb99afc374967a27ce3b46244e2e1fba60",
+                        "description": "Code Hash160",
+                        "name": "codehash",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "74967a27ce3b46244e2e1fba60844c56bb99afc3",
+                        "description": "Genesis ID ",
+                        "name": "genesis",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "17SkEw2md5avVNyYgj6RiXuQKNwkXaxFyQ",
+                        "description": "Address",
+                        "name": "address",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\": 0, \"data\": [{}], \"msg\": \"ok\"}",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/model.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/model.TxOutHistoryResp"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/nft/info": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "token NFT"
+                ],
+                "summary": "查询所有NFT Token简述",
+                "responses": {
+                    "200": {
+                        "description": "{\"code\": 0, \"data\": [{}], \"msg\": \"ok\"}",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/model.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/model.NFTInfoResp"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/nft/owners/{codehash}/{genesis}/{cursor}/{size}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "token NFT"
+                ],
+                "summary": "查询NFT Token的持有人。获得每个tokenId所属的地址",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "起始游标",
+                        "name": "cursor",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "返回记录数量",
+                        "name": "size",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "844c56bb99afc374967a27ce3b46244e2e1fba60",
+                        "description": "Code Hash160",
+                        "name": "codehash",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "74967a27ce3b46244e2e1fba60844c56bb99afc3",
+                        "description": "Genesis ID ",
+                        "name": "genesis",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\": 0, \"data\": [{}], \"msg\": \"ok\"}",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/model.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/model.NFTOwnerResp"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/nft/transfer-times": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "token NFT"
+                ],
+                "summary": "查询NFT Token在区块中的转移次数，以合约CodeHash+GenesisID，和tokenId来确认一种NFT。",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "Start Block Height",
+                        "name": "start",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "default": 3,
+                        "description": "Start Block Height",
+                        "name": "end",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "844c56bb99afc374967a27ce3b46244e2e1fba60",
+                        "description": "Code Hash160",
+                        "name": "codehash",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "74967a27ce3b46244e2e1fba60844c56bb99afc3",
+                        "description": "Genesis ID ",
+                        "name": "genesis",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "default": 3,
+                        "description": "Token ID ",
+                        "name": "tokenid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\": 0, \"data\": [{}], \"msg\": \"ok\"}",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/model.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/model.NFTTransferTimesResp"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/nft/utxo/{codehash}/{genesis}/{address}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "UTXO",
+                    "token NFT"
+                ],
+                "summary": "通过NFT合约CodeHash+溯源genesis获取某地址的utxo列表",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "起始游标",
+                        "name": "cursor",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "返回记录数量",
+                        "name": "size",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "844c56bb99afc374967a27ce3b46244e2e1fba60",
+                        "description": "Code Hash160",
+                        "name": "codehash",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "74967a27ce3b46244e2e1fba60844c56bb99afc3",
+                        "description": "Genesis ID ",
+                        "name": "genesis",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "17SkEw2md5avVNyYgj6RiXuQKNwkXaxFyQ",
+                        "description": "Address",
+                        "name": "address",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\": 0, \"data\": [{}], \"msg\": \"ok\"}",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/model.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/model.TxOutResp"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
         "/pushtx": {
             "post": {
                 "produces": [
@@ -772,7 +1561,19 @@ var doc = `{
                     "200": {
                         "description": "{\"code\": 0, \"data\": \"\u003ctxid\u003e\", \"msg\": \"ok\"}",
                         "schema": {
-                            "$ref": "#/definitions/controller._PushTxResp"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/model.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     }
                 }
@@ -1056,20 +1857,6 @@ var doc = `{
         }
     },
     "definitions": {
-        "controller._PushTxResp": {
-            "type": "object",
-            "properties": {
-                "code": {
-                    "type": "integer"
-                },
-                "data": {
-                    "type": "string"
-                },
-                "msg": {
-                    "type": "string"
-                }
-            }
-        },
         "model.BlockInfoResp": {
             "type": "object",
             "properties": {
@@ -1152,6 +1939,178 @@ var doc = `{
                 }
             }
         },
+        "model.FTInfoResp": {
+            "type": "object",
+            "properties": {
+                "codehash": {
+                    "description": "FT合约hash160(CodePart)",
+                    "type": "string"
+                },
+                "decimal": {
+                    "description": "decimal",
+                    "type": "integer"
+                },
+                "desc": {
+                    "description": "FT 描述",
+                    "type": "string"
+                },
+                "genesis": {
+                    "description": "FT合约的genesis，Hex编码",
+                    "type": "string"
+                },
+                "icon": {
+                    "description": "FT icon url",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "FT name",
+                    "type": "string"
+                },
+                "symbol": {
+                    "description": "FT symbol",
+                    "type": "string"
+                },
+                "website": {
+                    "description": "FT website url",
+                    "type": "string"
+                }
+            }
+        },
+        "model.FTOwnerBalanceResp": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "description": "token持有人的address",
+                    "type": "string"
+                },
+                "balance": {
+                    "description": "余额",
+                    "type": "integer"
+                }
+            }
+        },
+        "model.FTOwnerByAddressResp": {
+            "type": "object",
+            "properties": {
+                "balance": {
+                    "description": "余额",
+                    "type": "integer"
+                },
+                "codehash": {
+                    "description": "FT合约hash160(CodePart)",
+                    "type": "string"
+                },
+                "genesis": {
+                    "description": "FT合约的genesis，Hex编码",
+                    "type": "string"
+                },
+                "symbol": {
+                    "description": "FT symbol",
+                    "type": "string"
+                }
+            }
+        },
+        "model.FTTransferVolumeResp": {
+            "type": "object",
+            "properties": {
+                "height": {
+                    "description": "区块高度",
+                    "type": "integer"
+                },
+                "inVolume": {
+                    "description": "输入数量",
+                    "type": "integer"
+                },
+                "outVolume": {
+                    "description": "输出数量",
+                    "type": "integer"
+                }
+            }
+        },
+        "model.NFTInfoResp": {
+            "type": "object",
+            "properties": {
+                "codehash": {
+                    "description": "FT合约hash160(CodePart)",
+                    "type": "string"
+                },
+                "desc": {
+                    "description": "FT 描述",
+                    "type": "string"
+                },
+                "genesis": {
+                    "description": "FT合约的genesis，Hex编码",
+                    "type": "string"
+                },
+                "icon": {
+                    "description": "FT icon url",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "FT name",
+                    "type": "string"
+                },
+                "symbol": {
+                    "description": "FT symbol",
+                    "type": "string"
+                },
+                "website": {
+                    "description": "FT website url",
+                    "type": "string"
+                }
+            }
+        },
+        "model.NFTOwnerByAddressResp": {
+            "type": "object",
+            "properties": {
+                "codehash": {
+                    "description": "NFT合约hash160(CodePart)",
+                    "type": "string"
+                },
+                "count": {
+                    "description": "持有的当前NFT个数",
+                    "type": "integer"
+                },
+                "genesis": {
+                    "description": "NFT合约的genesis，Hex编码",
+                    "type": "string"
+                },
+                "symbol": {
+                    "description": "NFT symbol",
+                    "type": "string"
+                }
+            }
+        },
+        "model.NFTOwnerResp": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "description": "token持有人的address",
+                    "type": "string"
+                },
+                "tokenId": {
+                    "description": "持有的NFT id",
+                    "type": "integer"
+                }
+            }
+        },
+        "model.NFTTransferTimesResp": {
+            "type": "object",
+            "properties": {
+                "height": {
+                    "description": "区块高度",
+                    "type": "integer"
+                },
+                "inTimes": {
+                    "description": "输入次数",
+                    "type": "integer"
+                },
+                "outTimes": {
+                    "description": "输出次数",
+                    "type": "integer"
+                }
+            }
+        },
         "model.Response": {
             "type": "object",
             "properties": {
@@ -1171,6 +2130,10 @@ var doc = `{
             "properties": {
                 "address": {
                     "description": "当前输入花费的outpoint的address",
+                    "type": "string"
+                },
+                "codehash": {
+                    "description": "合约hash160(CodePart)",
                     "type": "string"
                 },
                 "genesis": {
@@ -1207,6 +2170,14 @@ var doc = `{
                 },
                 "sequence": {
                     "description": "Tx input的sequence",
+                    "type": "integer"
+                },
+                "tokenAmount": {
+                    "description": "当前输入花费的outpoint的ft tokenAmount",
+                    "type": "integer"
+                },
+                "tokenId": {
+                    "description": "当前输入的nft tokenId",
                     "type": "integer"
                 },
                 "txid": {
@@ -1303,6 +2274,10 @@ var doc = `{
                     "description": "当前输出的address",
                     "type": "string"
                 },
+                "codehash": {
+                    "description": "合约hash160(CodePart)",
+                    "type": "string"
+                },
                 "genesis": {
                     "description": "当前输出的genesis",
                     "type": "string"
@@ -1327,6 +2302,14 @@ var doc = `{
                     "description": "当前输出锁定脚本类型",
                     "type": "string"
                 },
+                "tokenAmount": {
+                    "description": "当前输出的ft tokenAmount",
+                    "type": "integer"
+                },
+                "tokenId": {
+                    "description": "当前输出的nft tokenId",
+                    "type": "integer"
+                },
                 "txid": {
                     "description": "当前txid",
                     "type": "string"
@@ -1342,6 +2325,10 @@ var doc = `{
             "properties": {
                 "address": {
                     "description": "当前输出的address",
+                    "type": "string"
+                },
+                "codehash": {
+                    "description": "合约hash160(CodePart)",
                     "type": "string"
                 },
                 "genesis": {
@@ -1368,6 +2355,14 @@ var doc = `{
                     "description": "当前输出锁定脚本类型",
                     "type": "string"
                 },
+                "tokenAmount": {
+                    "description": "当前输出的ft tokenAmount",
+                    "type": "integer"
+                },
+                "tokenId": {
+                    "description": "当前输出的nft tokenId",
+                    "type": "integer"
+                },
                 "txid": {
                     "description": "当前txid",
                     "type": "string"
@@ -1383,6 +2378,10 @@ var doc = `{
             "properties": {
                 "address": {
                     "description": "当前输出的address",
+                    "type": "string"
+                },
+                "codehash": {
+                    "description": "合约hash160(CodePart)",
                     "type": "string"
                 },
                 "genesis": {
@@ -1408,6 +2407,14 @@ var doc = `{
                 "scriptType": {
                     "description": "当前输出锁定脚本类型",
                     "type": "string"
+                },
+                "tokenAmount": {
+                    "description": "当前输出的ft tokenAmount",
+                    "type": "integer"
+                },
+                "tokenId": {
+                    "description": "当前输出的nft tokenId",
+                    "type": "integer"
                 },
                 "txid": {
                     "description": "当前txid",
