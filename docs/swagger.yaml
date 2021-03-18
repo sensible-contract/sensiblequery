@@ -1,0 +1,903 @@
+definitions:
+  controller._PushTxResp:
+    properties:
+      code:
+        type: integer
+      data:
+        type: string
+      msg:
+        type: string
+    type: object
+  model.BlockInfoResp:
+    properties:
+      bits:
+        type: integer
+      coinbaseOut:
+        description: 区块reward
+        type: integer
+      height:
+        description: 当前区块高度
+        type: integer
+      id:
+        description: 当前区块ID
+        type: string
+      inSatoshi:
+        description: 区块内输入额度总和，不包括区块reward
+        type: integer
+      merkle:
+        description: Merkle Tree
+        type: string
+      next:
+        description: 下一个区块ID
+        type: string
+      ntx:
+        description: 区块内包含的Tx数量
+        type: integer
+      outSatoshi:
+        description: 区块内输出额度总和，不包括区块reward/fee
+        type: integer
+      prev:
+        description: 前一个区块ID
+        type: string
+      size:
+        description: 区块字节数
+        type: integer
+      timestamp:
+        description: 区块时间戳
+        type: integer
+    type: object
+  model.BlockchainInfoResp:
+    properties:
+      bestBlockHash:
+        description: 最新blockId
+        type: string
+      blocks:
+        description: 最新区块总数
+        type: integer
+      chain:
+        description: main/test
+        type: string
+      chainwork:
+        type: string
+      difficulty:
+        type: string
+      headers:
+        description: 最新区块头总数
+        type: integer
+      medianTime:
+        type: integer
+    type: object
+  model.Response:
+    properties:
+      code:
+        type: integer
+      data:
+        type: object
+      msg:
+        type: string
+    type: object
+  model.TxInResp:
+    properties:
+      address:
+        description: 当前输入花费的outpoint的address
+        type: string
+      genesis:
+        description: 当前输入花费的outpoint的genesis，Hex编码
+        type: string
+      height:
+        description: Tx所在区块的高度
+        type: integer
+      heightTxo:
+        description: 当前输入花费的utxo所属的区块高度，如果为0则未花费
+        type: integer
+      idx:
+        description: 输入index
+        type: integer
+      satoshi:
+        description: 当前输入花费的outpoint的satoshi
+        type: integer
+      scriptPk:
+        description: 当前输入锁定脚本，Hex编码
+        type: string
+      scriptSig:
+        description: scriptSig，Hex编码
+        type: string
+      scriptType:
+        description: 当前输入锁定脚本类型，Hex编码
+        type: string
+      sequence:
+        description: Tx input的sequence
+        type: integer
+      txid:
+        description: Txid
+        type: string
+      utxid:
+        description: 当前输入花费的outpoint的txid
+        type: string
+      vout:
+        description: 当前输入花费的outpoint的index
+        type: integer
+    type: object
+  model.TxInSpentResp:
+    properties:
+      height:
+        description: 输出被花费的区块高度
+        type: integer
+      idx:
+        description: 输出被花费的txid所在区块内序号
+        type: integer
+      txid:
+        description: 输出被花费的txid
+        type: string
+      utxid:
+        description: 输出txid参数
+        type: string
+      vout:
+        description: 输出index参数
+        type: integer
+    type: object
+  model.TxInfoResp:
+    properties:
+      blkid:
+        description: Tx所在区块的Id
+        type: string
+      height:
+        description: Tx所在区块的高度
+        type: integer
+      idx:
+        description: Tx在区块中的顺序号
+        type: integer
+      inSatoshi:
+        description: Tx输入的satoshi总和
+        type: integer
+      locktime:
+        description: Tx Locktime
+        type: integer
+      nIn:
+        description: Tx包括的输入条数
+        type: integer
+      nOut:
+        description: Tx包括的输出条数
+        type: integer
+      outSatoshi:
+        description: Tx输出的satoshi总和
+        type: integer
+      size:
+        description: Tx字节数
+        type: integer
+      timestamp:
+        description: Tx所在区块的时间戳
+        type: integer
+      txid:
+        type: string
+    type: object
+  model.TxOutHistoryResp:
+    properties:
+      address:
+        description: 当前输出的address
+        type: string
+      genesis:
+        description: 当前输出的genesis
+        type: string
+      height:
+        description: 当前交易所在区块的高度
+        type: integer
+      idx:
+        description: 当前交易所在区块内的序号
+        type: integer
+      ioType:
+        description: 1为输出包含(即收入)，0为输入包含(即花费)
+        type: integer
+      satoshi:
+        description: 当前输出的satoshi
+        type: integer
+      scriptType:
+        description: 当前输出锁定脚本类型
+        type: string
+      txid:
+        description: 当前txid
+        type: string
+      vout:
+        description: 当前输出序号
+        type: integer
+    type: object
+  model.TxOutResp:
+    properties:
+      address:
+        description: 当前输出的address
+        type: string
+      genesis:
+        description: 当前输出的genesis
+        type: string
+      height:
+        description: 当前交易被打包的区块高度
+        type: integer
+      idx:
+        description: 输出被花费的txid所在区块内序号
+        type: integer
+      satoshi:
+        description: 当前输出的satoshi
+        type: integer
+      scriptPk:
+        description: 当前输出锁定脚本
+        type: string
+      scriptType:
+        description: 当前输出锁定脚本类型
+        type: string
+      txid:
+        description: 当前txid
+        type: string
+      vout:
+        description: 当前输出序号
+        type: integer
+    type: object
+  model.TxOutStatusResp:
+    properties:
+      address:
+        description: 当前输出的address
+        type: string
+      genesis:
+        description: 当前输出的genesis
+        type: string
+      height:
+        description: 当前交易被打包的区块高度
+        type: integer
+      heightSpent:
+        description: 当前输出被花费的区块高度，如果为0则未花费
+        type: integer
+      satoshi:
+        description: 当前输出的satoshi
+        type: integer
+      scriptPk:
+        description: 当前输出锁定脚本
+        type: string
+      scriptType:
+        description: 当前输出锁定脚本类型
+        type: string
+      txid:
+        description: 当前txid
+        type: string
+      txidSpent:
+        description: 当前输出被花费的txid
+        type: string
+      vout:
+        description: 当前输出序号
+        type: integer
+    type: object
+  model.Welcome:
+    properties:
+      contact:
+        type: string
+      github:
+        type: string
+      job:
+        type: string
+    type: object
+host: localhost:8000
+info:
+  contact:
+    email: jiedohh@gmail.com
+    name: satoblock
+    url: https://github.com/sensing-contract/satoblock
+  description: Sensible 区块浏览器
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  title: Sensible Browser
+  version: "1.0"
+paths:
+  /:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 0, "data": {}, "msg": "ok"}'
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.Welcome'
+              type: object
+      summary: Welcome message
+  /address/{address}/history:
+    get:
+      parameters:
+      - default: 17SkEw2md5avVNyYgj6RiXuQKNwkXaxFyQ
+        description: Address
+        in: path
+        name: address
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 0, "data": [{}], "msg": "ok"}'
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/model.TxOutHistoryResp'
+                  type: array
+              type: object
+      summary: 通过地址address获取相关tx历史列表，详细返回输入/输出
+      tags:
+      - History
+  /address/{address}/utxo:
+    get:
+      parameters:
+      - default: 17SkEw2md5avVNyYgj6RiXuQKNwkXaxFyQ
+        description: Address
+        in: path
+        name: address
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 0, "data": [{}], "msg": "ok"}'
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/model.TxOutResp'
+                  type: array
+              type: object
+      summary: 通过地址address获取相关utxo列表
+      tags:
+      - UTXO
+  /block/id/{blkid}:
+    get:
+      parameters:
+      - default: 0000000082b5015589a3fdf2d4baff403e6f0be035a5d9742c1cae6295464449
+        description: BlockId
+        in: path
+        name: blkid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 0, "data": {}, "msg": "ok"}'
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.BlockInfoResp'
+              type: object
+      summary: 通过区块blkid获取区块概述
+      tags:
+      - Block
+  /block/txs/{blkid}:
+    get:
+      parameters:
+      - default: 0000000082b5015589a3fdf2d4baff403e6f0be035a5d9742c1cae6295464449
+        description: Block ID
+        in: path
+        name: blkid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 0, "data": [{}], "msg": "ok"}'
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/model.TxInfoResp'
+                  type: array
+              type: object
+      summary: 通过区块blkid获取区块包含的Tx概述列表
+      tags:
+      - Tx
+  /blockchain/info:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 0, "data": {}, "msg": "ok"}'
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.BlockchainInfoResp'
+              type: object
+      summary: 获取最新区块位置、同步状态等信息
+  /blocks/{start}/{end}:
+    get:
+      parameters:
+      - default: 0
+        description: Start Block Height
+        in: path
+        name: start
+        required: true
+        type: integer
+      - default: 3
+        description: Start Block Height
+        in: path
+        name: end
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 0, "data": [{}], "msg": "ok"}'
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/model.BlockInfoResp'
+                  type: array
+              type: object
+      summary: 获取指定高度范围内的区块概述列表
+      tags:
+      - Block
+  /genesis/{genesis}/history:
+    get:
+      parameters:
+      - default: 74967a27ce3b46244e2e1fba60844c56bb99afc3
+        description: Genesis
+        in: path
+        name: genesis
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 0, "data": [{}], "msg": "ok"}'
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/model.TxOutHistoryResp'
+                  type: array
+              type: object
+      summary: 通过溯源genesis获取相关tx历史列表，详细返回输入/输出
+      tags:
+      - History
+  /genesis/{genesis}/utxo:
+    get:
+      parameters:
+      - default: 74967a27ce3b46244e2e1fba60844c56bb99afc3
+        description: Genesis
+        in: path
+        name: genesis
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 0, "data": [{}], "msg": "ok"}'
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/model.TxOutResp'
+                  type: array
+              type: object
+      summary: 通过溯源genesis获取相关utxo列表
+      tags:
+      - UTXO
+  /height/{height}/block:
+    get:
+      parameters:
+      - default: 0
+        description: Block Height
+        in: path
+        name: height
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 0, "data": {}, "msg": "ok"}'
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.BlockInfoResp'
+              type: object
+      summary: 通过区块height获取区块概述
+      tags:
+      - Block
+  /height/{height}/block/txs:
+    get:
+      parameters:
+      - default: 3
+        description: Block Height
+        in: path
+        name: height
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 0, "data": [{}], "msg": "ok"}'
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/model.TxInfoResp'
+                  type: array
+              type: object
+      summary: 通过区块height获取区块包含的Tx概述列表
+      tags:
+      - Tx
+  /height/{height}/tx/{txid}:
+    get:
+      parameters:
+      - default: 3
+        description: Block Height
+        in: path
+        name: height
+        required: true
+        type: integer
+      - default: 999e1c837c76a1b7fbb7e57baf87b309960f5ffefbf2a9b95dd890602272f644
+        description: TxId
+        in: path
+        name: txid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 0, "data": {}, "msg": "ok"}'
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.TxInfoResp'
+              type: object
+      summary: 通过交易txid和交易被打包的区块高度height获取交易概述
+      tags:
+      - Tx
+  /height/{height}/tx/{txid}/in/{index}:
+    get:
+      parameters:
+      - default: 170
+        description: Block Height
+        in: path
+        name: height
+        required: true
+        type: integer
+      - default: f4184fc596403b9d638783cf57adfe4c75c605f6356fbc91338530e9831e9e16
+        description: TxId
+        in: path
+        name: txid
+        required: true
+        type: string
+      - default: 0
+        description: input index
+        in: path
+        name: index
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 0, "data": {}, "msg": "ok"}'
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.TxInResp'
+              type: object
+      summary: 通过交易txid和index和交易被打包的区块高度height获取指定交易输入信息
+      tags:
+      - Txin
+  /height/{height}/tx/{txid}/ins:
+    get:
+      parameters:
+      - default: 170
+        description: Block Height
+        in: path
+        name: height
+        required: true
+        type: integer
+      - default: f4184fc596403b9d638783cf57adfe4c75c605f6356fbc91338530e9831e9e16
+        description: TxId
+        in: path
+        name: txid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 0, "data": [{}], "msg": "ok"}'
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/model.TxInResp'
+                  type: array
+              type: object
+      summary: 通过交易txid和交易被打包的区块高度height获取交易所有输入信息列表
+      tags:
+      - Txin
+  /height/{height}/tx/{txid}/out/{index}:
+    get:
+      parameters:
+      - default: 170
+        description: Block Height
+        in: path
+        name: height
+        required: true
+        type: integer
+      - default: f4184fc596403b9d638783cf57adfe4c75c605f6356fbc91338530e9831e9e16
+        description: TxId
+        in: path
+        name: txid
+        required: true
+        type: string
+      - default: 0
+        description: output index
+        in: path
+        name: index
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 0, "data": {}, "msg": "ok"}'
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.TxOutStatusResp'
+              type: object
+      summary: 通过交易txid和index和交易被打包的区块高度height获取指定交易输出信息
+      tags:
+      - Txout
+  /height/{height}/tx/{txid}/outs:
+    get:
+      parameters:
+      - default: 170
+        description: Block Height
+        in: path
+        name: height
+        required: true
+        type: integer
+      - default: f4184fc596403b9d638783cf57adfe4c75c605f6356fbc91338530e9831e9e16
+        description: TxId
+        in: path
+        name: txid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 0, "data": [{}], "msg": "ok"}'
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/model.TxOutStatusResp'
+                  type: array
+              type: object
+      summary: 通过交易txid和交易被打包的区块高度height获取交易所有输出信息列表
+      tags:
+      - Txout
+  /pushtx:
+    post:
+      parameters:
+      - description: Name
+        in: query
+        name: txHex
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 0, "data": "<txid>", "msg": "ok"}'
+          schema:
+            $ref: '#/definitions/controller._PushTxResp'
+      summary: Push Tx
+  /tx/{txid}:
+    get:
+      parameters:
+      - default: 999e1c837c76a1b7fbb7e57baf87b309960f5ffefbf2a9b95dd890602272f644
+        description: TxId
+        in: path
+        name: txid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 0, "data": {}, "msg": "ok"}'
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.TxInfoResp'
+              type: object
+      summary: 通过交易txid获取交易概述
+      tags:
+      - Tx
+  /tx/{txid}/in/{index}:
+    get:
+      parameters:
+      - default: f4184fc596403b9d638783cf57adfe4c75c605f6356fbc91338530e9831e9e16
+        description: TxId
+        in: path
+        name: txid
+        required: true
+        type: string
+      - default: 0
+        description: input index
+        in: path
+        name: index
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 0, "data": {}, "msg": "ok"}'
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.TxInResp'
+              type: object
+      summary: 通过交易txid和index获取指定交易输入信息
+      tags:
+      - Txin
+  /tx/{txid}/ins:
+    get:
+      parameters:
+      - default: f4184fc596403b9d638783cf57adfe4c75c605f6356fbc91338530e9831e9e16
+        description: TxId
+        in: path
+        name: txid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 0, "data": [{}], "msg": "ok"}'
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/model.TxInResp'
+                  type: array
+              type: object
+      summary: 通过交易txid获取交易所有输入信息列表
+      tags:
+      - Txin
+  /tx/{txid}/out/{index}:
+    get:
+      parameters:
+      - default: f4184fc596403b9d638783cf57adfe4c75c605f6356fbc91338530e9831e9e16
+        description: TxId
+        in: path
+        name: txid
+        required: true
+        type: string
+      - default: 0
+        description: output index
+        in: path
+        name: index
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 0, "data": {}, "msg": "ok"}'
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.TxOutStatusResp'
+              type: object
+      summary: 通过交易txid和index获取指定交易输出信息
+      tags:
+      - Txout
+  /tx/{txid}/out/{index}/spent:
+    get:
+      parameters:
+      - default: f4184fc596403b9d638783cf57adfe4c75c605f6356fbc91338530e9831e9e16
+        description: TxId
+        in: path
+        name: txid
+        required: true
+        type: string
+      - default: 0
+        description: output index
+        in: path
+        name: index
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 0, "data": {}, "msg": "ok"}'
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.TxInSpentResp'
+              type: object
+      summary: 通过交易txid和index获取指定交易输出是否被花费状态
+      tags:
+      - Txout
+  /tx/{txid}/outs:
+    get:
+      parameters:
+      - default: f4184fc596403b9d638783cf57adfe4c75c605f6356fbc91338530e9831e9e16
+        description: TxId
+        in: path
+        name: txid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 0, "data": [{}], "msg": "ok"}'
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/model.TxOutStatusResp'
+                  type: array
+              type: object
+      summary: 通过交易txid获取交易所有输出信息列表
+      tags:
+      - Txout
+swagger: "2.0"
