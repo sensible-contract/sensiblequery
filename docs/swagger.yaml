@@ -1269,18 +1269,18 @@ paths:
       summary: 查询所有NFT Token简述
       tags:
       - token NFT
-  /nft/owners/{codehash}/{genesis}/{cursor}/{size}:
+  /nft/owners/{codehash}/{genesis}:
     get:
       parameters:
       - default: 0
         description: 起始游标
-        in: path
+        in: query
         name: cursor
         required: true
         type: integer
       - default: 10
         description: 返回记录数量
-        in: path
+        in: query
         name: size
         required: true
         type: integer

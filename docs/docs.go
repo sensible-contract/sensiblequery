@@ -1378,7 +1378,7 @@ var doc = `{
                 }
             }
         },
-        "/nft/owners/{codehash}/{genesis}/{cursor}/{size}": {
+        "/nft/owners/{codehash}/{genesis}": {
             "get": {
                 "produces": [
                     "application/json"
@@ -1393,7 +1393,7 @@ var doc = `{
                         "default": 0,
                         "description": "起始游标",
                         "name": "cursor",
-                        "in": "path",
+                        "in": "query",
                         "required": true
                     },
                     {
@@ -1401,7 +1401,7 @@ var doc = `{
                         "default": 10,
                         "description": "返回记录数量",
                         "name": "size",
-                        "in": "path",
+                        "in": "query",
                         "required": true
                     },
                     {

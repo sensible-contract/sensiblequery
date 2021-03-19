@@ -87,12 +87,12 @@ func GetNFTTransferTimesInBlockRange(ctx *gin.Context) {
 // @Summary 查询NFT Token的持有人。获得每个tokenId所属的地址
 // @Tags token NFT
 // @Produce  json
-// @Param cursor path int true "起始游标" default(0)
-// @Param size path int true "返回记录数量" default(10)
+// @Param cursor query int true "起始游标" default(0)
+// @Param size query int true "返回记录数量" default(10)
 // @Param codehash path string true "Code Hash160" default(844c56bb99afc374967a27ce3b46244e2e1fba60)
 // @Param genesis path string true "Genesis ID " default(74967a27ce3b46244e2e1fba60844c56bb99afc3)
 // @Success 200 {object} model.Response{data=[]model.NFTOwnerResp} "{"code": 0, "data": [{}], "msg": "ok"}"
-// @Router /nft/owners/{codehash}/{genesis}/{cursor}/{size} [get]
+// @Router /nft/owners/{codehash}/{genesis} [get]
 func ListNFTOwners(ctx *gin.Context) {
 	log.Printf("ListNFTOwners enter")
 
