@@ -25,18 +25,20 @@ func txResultSRF(rows *sql.Rows) (interface{}, error) {
 	return &ret, nil
 }
 
-func GetBlockTxsByBlockHeight(blkHeight int) (txsRsp []*model.TxInfoResp, err error) {
-	psql := fmt.Sprintf("SELECT %s FROM blktx_height WHERE height = %d ORDER BY txidx", SQL_FIELEDS_TX, blkHeight)
+func GetBlockTxsByBlockHeight(cursor, size, blkHeight int) (txsRsp []*model.TxInfoResp, err error) {
+	psql := fmt.Sprintf("SELECT %s FROM blktx_height WHERE height = %d AND txidx >= %d ORDER BY txidx LIMIT %d", SQL_FIELEDS_TX, blkHeight, cursor, size)
 	return GetBlockTxsBySql(psql)
 }
 
-func GetBlockTxsByBlockId(blkidHex string) (txsRsp []*model.TxInfoResp, err error) {
+func GetBlockTxsByBlockId(cursor, size int, blkidHex string) (txsRsp []*model.TxInfoResp, err error) {
 	psql := fmt.Sprintf(`
 SELECT %s FROM blktx_height
 WHERE height IN (
     SELECT height FROM blk
     WHERE blkid = unhex('%s') LIMIT 1
-)`, SQL_FIELEDS_TX, blkidHex)
+) AND txidx >= %d
+ORDER BY txidx
+LIMIT %d`, SQL_FIELEDS_TX, blkidHex, cursor, size)
 
 	return GetBlockTxsBySql(psql)
 }

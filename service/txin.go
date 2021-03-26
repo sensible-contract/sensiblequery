@@ -42,23 +42,29 @@ func txInResultSRF(rows *sql.Rows) (interface{}, error) {
 	return &ret, nil
 }
 
-func GetTxInputsByTxId(txidHex string) (txInsRsp []*model.TxInResp, err error) {
+func GetTxInputsByTxId(cursor, size int, txidHex string) (txInsRsp []*model.TxInResp, err error) {
 	psql := fmt.Sprintf(`
 SELECT %s FROM txin
 WHERE txid = unhex('%s') AND
-height IN (
-    SELECT height FROM tx_height
-    WHERE txid = unhex('%s')
-)`, SQL_FIELEDS_TXIN_WITHOUT_SCRIPT, txidHex, txidHex)
+    height IN (
+        SELECT height FROM tx_height
+        WHERE txid = unhex('%s')
+    ) AND
+      idx >= %d
+ORDER BY idx
+LIMIT %d`, SQL_FIELEDS_TXIN_WITHOUT_SCRIPT, txidHex, txidHex, cursor, size)
 
 	return GetTxInputsBySql(psql)
 }
 
-func GetTxInputsByTxIdInsideHeight(blkHeight int, txidHex string) (txInsRsp []*model.TxInResp, err error) {
+func GetTxInputsByTxIdInsideHeight(cursor, size, blkHeight int, txidHex string) (txInsRsp []*model.TxInResp, err error) {
 	psql := fmt.Sprintf(`
 SELECT %s FROM txin
 WHERE txid = unhex('%s') AND
-    height = %d`, SQL_FIELEDS_TXIN_WITHOUT_SCRIPT, txidHex, blkHeight)
+    height = %d AND
+      idx >= %d
+ORDER BY idx
+LIMIT %d`, SQL_FIELEDS_TXIN_WITHOUT_SCRIPT, txidHex, blkHeight, cursor, size)
 
 	return GetTxInputsBySql(psql)
 }

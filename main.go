@@ -57,7 +57,7 @@ func main() {
 
 	router.GET("/blockchain/info", controller.GetBlockchainInfo)
 
-	router.GET("/blocks/:start/:end", controller.GetBlocksByHeightRange)
+	router.GET("/blocks", controller.GetBlocksByHeightRange)
 
 	router.GET("/block/id/:blkid", controller.GetBlockById)
 	router.GET("/block/txs/:blkid", controller.GetBlockTxsByBlockId)
@@ -72,7 +72,21 @@ func main() {
 	router.GET("/tx/:txid/out/:index/spent", controller.GetTxOutputSpentStatusByTxIdAndIdx)
 
 	router.GET("/address/:address/utxo", controller.GetUtxoByAddress)
-	router.GET("/genesis/:genesis/utxo", controller.GetUtxoByGenesis)
+
+	router.GET("/ft/utxo/{codehash}/{genesis}/{address}", controller.GetFTUtxo)
+	router.GET("/nft/utxo/{codehash}/{genesis}/{address}", controller.GetNFTUtxo)
+
+	router.GET("/address/:address/balance", controller.GetBalanceByAddress)
+
+	router.GET("/ft/transfer-volume/{codehash}/{genesis}", controller.GetFTTransferVolumeInBlockRange)
+	router.GET("/ft/owners/{codehash}/{genesis}", controller.ListFTOwners)
+	router.GET("/ft/summary/{address}", controller.ListAllFTBalanceByOwner)
+	router.GET("/ft/balance/{codehash}/{genesis}/{address}", controller.GetFTBalanceByOwner)
+
+	router.GET("/nft/transfer-volume/{codehash}/{genesis}", controller.GetNFTTransferTimesInBlockRange)
+	router.GET("/nft/owners/{codehash}/{genesis}", controller.ListNFTOwners)
+	router.GET("/nft/summary/{address}", controller.ListAllNFTByOwner)
+	router.GET("/nft/detail/{codehash}/{genesis}/{address}", controller.ListNFTBalanceByOwner)
 
 	router.GET("/address/:address/history", controller.GetHistoryByAddress)
 	router.GET("/genesis/:genesis/history", controller.GetHistoryByGenesis)

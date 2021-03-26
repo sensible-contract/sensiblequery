@@ -21,6 +21,11 @@ type NFTOwnerResp struct {
 	TokenId int    `json:"tokenId"` // 持有的NFT id
 }
 
+type NFTSummaryResp struct {
+	Address string `json:"address"` // token持有人的address
+	Count   int    `json:"count"`   // 持有的当前NFT个数
+}
+
 type NFTOwnerByAddressResp struct {
 	CodeHashHex string `json:"codehash"` // NFT合约hash160(CodePart)
 	GenesisHex  string `json:"genesis"`  // NFT合约的genesis，Hex编码

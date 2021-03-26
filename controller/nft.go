@@ -1,8 +1,10 @@
 package controller
 
 import (
+	"encoding/hex"
 	"log"
 	"net/http"
+	"satoblock/lib/utils"
 	"satoblock/model"
 	"satoblock/service"
 	"strconv"
@@ -19,7 +21,7 @@ import (
 func ListAllNFTInfo(ctx *gin.Context) {
 	log.Printf("ListNFTInfo enter")
 
-	result, err := service.Dummy()
+	result, err := service.GetBestBlock()
 	if err != nil {
 		log.Printf("get dummy failed: %v", err)
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get dummy failed"})
@@ -37,25 +39,26 @@ func ListAllNFTInfo(ctx *gin.Context) {
 // @Summary 查询NFT Token在区块中的转移次数，以合约CodeHash+GenesisID，和tokenId来确认一种NFT。
 // @Tags token NFT
 // @Produce  json
-// @Param start path int true "Start Block Height" default(0)
-// @Param end path int true "Start Block Height" default(3)
+// @Param start query int true "Start Block Height" default(0)
+// @Param end query int true "Start Block Height" default(3)
 // @Param codehash path string true "Code Hash160" default(844c56bb99afc374967a27ce3b46244e2e1fba60)
 // @Param genesis path string true "Genesis ID " default(74967a27ce3b46244e2e1fba60844c56bb99afc3)
 // @Param tokenid path int true "Token ID " default(3)
-// @Success 200 {object} model.Response{data=[]model.NFTTransferTimesResp} "{"code": 0, "data": [{}], "msg": "ok"}"
-// @Router /nft/transfer-times [get]
+// @Success 200 {object} model.Response{data=[]model.BlockTokenVolumeResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Router /nft/transfer-volume/{codehash}/{genesis}/{tokenid} [get]
 func GetNFTTransferTimesInBlockRange(ctx *gin.Context) {
 	log.Printf("GetNFTTransferTimesInBlockRange enter")
 
 	// check height
-	blkStartHeightString := ctx.Param("start")
+	blkStartHeightString := ctx.DefaultQuery("start", "0")
 	blkStartHeight, err := strconv.Atoi(blkStartHeightString)
 	if err != nil || blkStartHeight < 0 {
 		log.Printf("blk start height invalid: %v", err)
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "blk start height invalid"})
 		return
 	}
-	blkEndHeightString := ctx.Param("end")
+
+	blkEndHeightString := ctx.DefaultQuery("end", "0")
 	blkEndHeight, err := strconv.Atoi(blkEndHeightString)
 	if err != nil || blkEndHeight < 0 {
 		log.Printf("blk end height invalid: %v", err)
@@ -69,10 +72,36 @@ func GetNFTTransferTimesInBlockRange(ctx *gin.Context) {
 		return
 	}
 
-	result, err := service.Dummy()
+	codeHashHex := ctx.Param("codehash")
+	// check
+	_, err = hex.DecodeString(codeHashHex)
 	if err != nil {
-		log.Printf("get dummy failed: %v", err)
-		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get dummy failed"})
+		log.Printf("codeHash invalid: %v", err)
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "codeHash invalid"})
+		return
+	}
+
+	genesisIdHex := ctx.Param("genesis")
+	// check
+	_, err = hex.DecodeString(genesisIdHex)
+	if err != nil {
+		log.Printf("genesisId invalid: %v", err)
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "genesisId invalid"})
+		return
+	}
+
+	tokenIdxString := ctx.Param("tokenid")
+	tokenIdx, err := strconv.Atoi(tokenIdxString)
+	if err != nil || tokenIdx < 0 {
+		log.Printf("tokenIdx invalid: %v", err)
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "tokenIdx invalid"})
+		return
+	}
+
+	result, err := service.GetTokenVolumesInBlocksByHeightRange(blkStartHeight, blkEndHeight, codeHashHex, genesisIdHex, 0, tokenIdx)
+	if err != nil {
+		log.Printf("GetNFTTransferTimesInBlockRange failed: %v", err)
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "data failed"})
 		return
 	}
 
@@ -96,10 +125,44 @@ func GetNFTTransferTimesInBlockRange(ctx *gin.Context) {
 func ListNFTOwners(ctx *gin.Context) {
 	log.Printf("ListNFTOwners enter")
 
-	result, err := service.Dummy()
+	// get cursor/size
+	cursorString := ctx.DefaultQuery("cursor", "0")
+	cursor, err := strconv.Atoi(cursorString)
+	if err != nil || cursor < 0 {
+		log.Printf("cursor invalid: %v", err)
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "cursor invalid"})
+		return
+	}
+	sizeString := ctx.DefaultQuery("size", "16")
+	size, err := strconv.Atoi(sizeString)
+	if err != nil || size < 0 {
+		log.Printf("size invalid: %v", err)
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "size invalid"})
+		return
+	}
+
+	codeHashHex := ctx.Param("codehash")
+	// check
+	codeHash, err := hex.DecodeString(codeHashHex)
 	if err != nil {
-		log.Printf("get dummy failed: %v", err)
-		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get dummy failed"})
+		log.Printf("codeHash invalid: %v", err)
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "codeHash invalid"})
+		return
+	}
+
+	genesisIdHex := ctx.Param("genesis")
+	// check
+	genesisId, err := hex.DecodeString(genesisIdHex)
+	if err != nil {
+		log.Printf("genesisId invalid: %v", err)
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "genesisId invalid"})
+		return
+	}
+
+	result, err := service.GetNFTOwnersByCodeHashGenesis(cursor, size, codeHash, genesisId)
+	if err != nil {
+		log.Printf("ListNFTOwners failed: %v", err)
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "ListNFTOwners failed"})
 		return
 	}
 
@@ -108,6 +171,7 @@ func ListNFTOwners(ctx *gin.Context) {
 		Msg:  "ok",
 		Data: result,
 	})
+	return
 }
 
 // ListAllNFTByOwner
@@ -122,10 +186,35 @@ func ListNFTOwners(ctx *gin.Context) {
 func ListAllNFTByOwner(ctx *gin.Context) {
 	log.Printf("ListAllNFTOwners enter")
 
-	result, err := service.Dummy()
+	// get cursor/size
+	cursorString := ctx.DefaultQuery("cursor", "0")
+	cursor, err := strconv.Atoi(cursorString)
+	if err != nil || cursor < 0 {
+		log.Printf("cursor invalid: %v", err)
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "cursor invalid"})
+		return
+	}
+	sizeString := ctx.DefaultQuery("size", "16")
+	size, err := strconv.Atoi(sizeString)
+	if err != nil || size < 0 {
+		log.Printf("size invalid: %v", err)
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "size invalid"})
+		return
+	}
+
+	address := ctx.Param("address")
+	// check
+	addressPkh, err := utils.DecodeAddress(address)
 	if err != nil {
-		log.Printf("get dummy failed: %v", err)
-		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get dummy failed"})
+		log.Printf("address invalid: %v", err)
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "address invalid"})
+		return
+	}
+
+	result, err := service.GetAllNFTBalanceByAddress(cursor, size, addressPkh)
+	if err != nil {
+		log.Printf("ListAllNFTByOwner failed: %v", err)
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "ListAllNFTByOwner failed"})
 		return
 	}
 
@@ -150,10 +239,37 @@ func ListAllNFTByOwner(ctx *gin.Context) {
 func ListNFTBalanceByOwner(ctx *gin.Context) {
 	log.Printf("ListNFTOwners enter")
 
-	result, err := service.Dummy()
+	codeHashHex := ctx.Param("codehash")
+	// check
+	codeHash, err := hex.DecodeString(codeHashHex)
 	if err != nil {
-		log.Printf("get dummy failed: %v", err)
-		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get dummy failed"})
+		log.Printf("codeHash invalid: %v", err)
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "codeHash invalid"})
+		return
+	}
+
+	genesisIdHex := ctx.Param("genesis")
+	// check
+	genesisId, err := hex.DecodeString(genesisIdHex)
+	if err != nil {
+		log.Printf("genesisId invalid: %v", err)
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "genesisId invalid"})
+		return
+	}
+
+	address := ctx.Param("address")
+	// check
+	addressPkh, err := utils.DecodeAddress(address)
+	if err != nil {
+		log.Printf("address invalid: %v", err)
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "address invalid"})
+		return
+	}
+
+	result, err := service.GetNFTBalanceByCodeHashGenesisAddress(codeHash, genesisId, addressPkh)
+	if err != nil {
+		log.Printf("ListNFTBalanceByOwner failed: %v", err)
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "ListNFTBalanceByOwner failed"})
 		return
 	}
 

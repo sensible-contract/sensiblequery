@@ -30,7 +30,7 @@ func txOutStatusResultSRF(rows *sql.Rows) (interface{}, error) {
 	return &ret, nil
 }
 
-func GetTxOutputsByTxId(txidHex string) (txOutsRsp []*model.TxOutStatusResp, err error) {
+func GetTxOutputsByTxId(cursor, size int, txidHex string) (txOutsRsp []*model.TxOutStatusResp, err error) {
 	psql := fmt.Sprintf(`
 SELECT %s FROM txout
 LEFT JOIN
@@ -39,19 +39,26 @@ LEFT JOIN
     WHERE utxid = unhex('%s') AND
          height IN (SELECT height FROM txout_spent_height
                     WHERE utxid = unhex('%s')
-                    )
+                    ) AND
+           vout >= %d
+    ORDER BY vout
+    LIMIT %d
 ) AS u USING (utxid, vout)
 WHERE utxid = unhex('%s') AND
-height IN (
-    SELECT height FROM tx_height
-    WHERE txid = unhex('%s')
-)
-`, SQL_FIELEDS_TXOUT_STATUS_WITHOUT_SCRIPT, txidHex, txidHex, txidHex, txidHex)
+     height IN (SELECT height FROM tx_height
+                WHERE txid = unhex('%s')
+               ) AND
+       vout >= %d
+ORDER BY vout
+LIMIT %d
+`, SQL_FIELEDS_TXOUT_STATUS_WITHOUT_SCRIPT,
+		txidHex, txidHex, cursor, size,
+		txidHex, txidHex, cursor, size)
 
 	return GetTxOutputsBySql(psql)
 }
 
-func GetTxOutputsByTxIdInsideHeight(blkHeight int, txidHex string) (txOutsRsp []*model.TxOutStatusResp, err error) {
+func GetTxOutputsByTxIdInsideHeight(cursor, size, blkHeight int, txidHex string) (txOutsRsp []*model.TxOutStatusResp, err error) {
 	psql := fmt.Sprintf(`
 SELECT %s FROM txout
 LEFT JOIN
@@ -60,11 +67,19 @@ LEFT JOIN
     WHERE utxid = unhex('%s') AND
          height IN (SELECT height FROM txout_spent_height
                     WHERE utxid = unhex('%s')
-                    )
+                    ) AND
+           vout >= %d
+    ORDER BY vout
+    LIMIT %d
 ) AS u USING (utxid, vout)
 WHERE utxid = unhex('%s') AND
-     height = %d
-`, SQL_FIELEDS_TXOUT_STATUS_WITHOUT_SCRIPT, txidHex, txidHex, txidHex, blkHeight)
+     height = %d AND
+      vout >= %d
+ORDER BY vout
+LIMIT %d
+`, SQL_FIELEDS_TXOUT_STATUS_WITHOUT_SCRIPT,
+		txidHex, txidHex, cursor, size,
+		txidHex, blkHeight, cursor, size)
 
 	return GetTxOutputsBySql(psql)
 }

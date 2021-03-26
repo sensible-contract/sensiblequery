@@ -3,10 +3,8 @@ package service
 import (
 	"encoding/binary"
 	"encoding/hex"
-	"errors"
 	"fmt"
 	"log"
-	"satoblock/dao/clickhouse"
 	"satoblock/lib/blkparser"
 	"satoblock/lib/script"
 	"satoblock/lib/utils"
@@ -46,11 +44,42 @@ func init() {
 	})
 }
 
-//////////////// address
-func GetUtxoByAddress(addressPkh []byte) (txOutsRsp []*model.TxOutResp, err error) {
-	vals, err := rdb.ZRange("a"+string(addressPkh), 0, 64).Result()
+func GetBalanceByAddress(addressPkh []byte) (balanceRsp *model.BalanceResp, err error) {
+	balanceRsp = &model.BalanceResp{
+		Address: utils.EncodeAddress(addressPkh, utils.PubKeyHashAddrIDMainNet),
+	}
+
+	balance, err := rdb.ZScore("balance", string(addressPkh)).Result()
+	if err == redis.Nil {
+		return balanceRsp, nil
+	} else if err != nil {
+		log.Printf("GetBalanceByAddress redis failed: %v", err)
+		return
+	}
+	balanceRsp.Satoshi = int(balance)
+	return balanceRsp, nil
+}
+
+//////////////// address utxo
+func GetUtxoByAddress(cursor, size int, addressPkh []byte) (txOutsRsp []*model.TxOutResp, err error) {
+	return getUtxoFromRedis(cursor, size, "au"+string(addressPkh))
+}
+
+//////////////// genesisId
+func GetUtxoByCodeHashGenesisAddress(cursor, size int, codeHash, genesisId, addressPkh []byte, isNFT bool) (txOutsRsp []*model.TxOutResp, err error) {
+	if isNFT {
+		return getUtxoFromRedis(cursor, size, "nu"+string(codeHash)+string(genesisId)+string(addressPkh))
+	} else {
+		return getUtxoFromRedis(cursor, size, "fu"+string(codeHash)+string(genesisId)+string(addressPkh))
+	}
+}
+
+////////////////
+func getUtxoFromRedis(cursor, size int, key string) (txOutsRsp []*model.TxOutResp, err error) {
+	vals, err := rdb.ZRange(key, int64(cursor), int64(cursor+size-1)).Result()
 	if err != nil {
-		panic(err)
+		log.Printf("GetUtxoByAddress redis failed: %v", err)
+		return
 	}
 
 	pipe := rdb.Pipeline()
@@ -97,41 +126,4 @@ func GetUtxoByAddress(addressPkh []byte) (txOutsRsp []*model.TxOutResp, err erro
 	}
 
 	return txOutsRsp, nil
-}
-
-//////////////// genesis
-func GetUtxoByGenesis(genesisHex string) (txOutsRsp []*model.TxOutResp, err error) {
-	psql := fmt.Sprintf(`
-SELECT %s FROM utxo_genesis
-WHERE genesis = unhex('%s')
-ORDER BY height DESC
-LIMIT 128
-`, SQL_FIELEDS_TXOUT, genesisHex)
-	return GetUtxoBySql(psql)
-}
-
-func GetUtxoBySql(psql string) (txOutsRsp []*model.TxOutResp, err error) {
-	txOutsRet, err := clickhouse.ScanAll(psql, txOutResultSRF)
-	if err != nil {
-		log.Printf("query utxo by sql failed: %v", err)
-		return nil, err
-	}
-	if txOutsRet == nil {
-		return nil, errors.New("not exist")
-	}
-	txOuts := txOutsRet.([]*model.TxOutDO)
-	for _, txout := range txOuts {
-		txOutsRsp = append(txOutsRsp, &model.TxOutResp{
-			TxIdHex: blkparser.HashString(txout.TxId),
-			Vout:    int(txout.Vout),
-			Address: utils.EncodeAddress(txout.Address, utils.PubKeyHashAddrIDMainNet),
-			Satoshi: int(txout.Satoshi),
-
-			GenesisHex:    hex.EncodeToString(txout.Genesis),
-			ScriptTypeHex: hex.EncodeToString(txout.ScriptType),
-			ScriptPkHex:   hex.EncodeToString(txout.ScriptPk),
-			Height:        int(txout.Height),
-		})
-	}
-	return
 }

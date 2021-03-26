@@ -16,11 +16,29 @@ import (
 // @Summary 通过交易txid获取交易所有输入信息列表
 // @Tags Txin
 // @Produce  json
+// @Param cursor query int true "起始游标" default(0)
+// @Param size query int true "返回记录数量" default(16)
 // @Param txid path string true "TxId" default(f4184fc596403b9d638783cf57adfe4c75c605f6356fbc91338530e9831e9e16)
 // @Success 200 {object} model.Response{data=[]model.TxInResp} "{"code": 0, "data": [{}], "msg": "ok"}"
 // @Router /tx/{txid}/ins [get]
 func GetTxInputsByTxId(ctx *gin.Context) {
 	log.Printf("GetTxInputsByTxId enter")
+
+	// get cursor/size
+	cursorString := ctx.DefaultQuery("cursor", "0")
+	cursor, err := strconv.Atoi(cursorString)
+	if err != nil || cursor < 0 {
+		log.Printf("cursor invalid: %v", err)
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "cursor invalid"})
+		return
+	}
+	sizeString := ctx.DefaultQuery("size", "16")
+	size, err := strconv.Atoi(sizeString)
+	if err != nil || size < 0 {
+		log.Printf("size invalid: %v", err)
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "size invalid"})
+		return
+	}
 
 	txIdHex := ctx.Param("txid")
 	// check
@@ -32,7 +50,7 @@ func GetTxInputsByTxId(ctx *gin.Context) {
 	}
 	txId := utils.ReverseBytes(txIdReverse)
 
-	result, err := service.GetTxInputsByTxId(hex.EncodeToString(txId))
+	result, err := service.GetTxInputsByTxId(cursor, size, hex.EncodeToString(txId))
 	if err != nil {
 		log.Printf("get block failed: %v", err)
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get txin failed"})
@@ -50,12 +68,30 @@ func GetTxInputsByTxId(ctx *gin.Context) {
 // @Summary 通过交易txid和交易被打包的区块高度height获取交易所有输入信息列表
 // @Tags Txin
 // @Produce  json
+// @Param cursor query int true "起始游标" default(0)
+// @Param size query int true "返回记录数量" default(16)
 // @Param height path int true "Block Height" default(170)
 // @Param txid path string true "TxId" default(f4184fc596403b9d638783cf57adfe4c75c605f6356fbc91338530e9831e9e16)
 // @Success 200 {object} model.Response{data=[]model.TxInResp} "{"code": 0, "data": [{}], "msg": "ok"}"
 // @Router /height/{height}/tx/{txid}/ins [get]
 func GetTxInputsByTxIdInsideHeight(ctx *gin.Context) {
 	log.Printf("GetTxInputsByTxIdInsideHeight enter")
+
+	// get cursor/size
+	cursorString := ctx.DefaultQuery("cursor", "0")
+	cursor, err := strconv.Atoi(cursorString)
+	if err != nil || cursor < 0 {
+		log.Printf("cursor invalid: %v", err)
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "cursor invalid"})
+		return
+	}
+	sizeString := ctx.DefaultQuery("size", "16")
+	size, err := strconv.Atoi(sizeString)
+	if err != nil || size < 0 {
+		log.Printf("size invalid: %v", err)
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "size invalid"})
+		return
+	}
 
 	blkHeightString := ctx.Param("height")
 	blkHeight, err := strconv.Atoi(blkHeightString)
@@ -75,7 +111,7 @@ func GetTxInputsByTxIdInsideHeight(ctx *gin.Context) {
 	}
 	txId := utils.ReverseBytes(txIdReverse)
 
-	result, err := service.GetTxInputsByTxIdInsideHeight(blkHeight, hex.EncodeToString(txId))
+	result, err := service.GetTxInputsByTxIdInsideHeight(cursor, size, blkHeight, hex.EncodeToString(txId))
 	if err != nil {
 		log.Printf("get block failed: %v", err)
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get txin failed"})

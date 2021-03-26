@@ -16,11 +16,29 @@ import (
 // @Summary 通过区块height获取区块包含的Tx概述列表
 // @Tags Tx
 // @Produce  json
+// @Param cursor query int true "起始游标" default(0)
+// @Param size query int true "返回记录数量" default(16)
 // @Param height path int true "Block Height" default(3)
 // @Success 200 {object} model.Response{data=[]model.TxInfoResp} "{"code": 0, "data": [{}], "msg": "ok"}"
 // @Router /height/{height}/block/txs [get]
 func GetBlockTxsByBlockHeight(ctx *gin.Context) {
 	log.Printf("GetBlockTxsByBlockHeight enter")
+
+	// get cursor/size
+	cursorString := ctx.DefaultQuery("cursor", "0")
+	cursor, err := strconv.Atoi(cursorString)
+	if err != nil || cursor < 0 {
+		log.Printf("cursor invalid: %v", err)
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "cursor invalid"})
+		return
+	}
+	sizeString := ctx.DefaultQuery("size", "16")
+	size, err := strconv.Atoi(sizeString)
+	if err != nil || size < 0 {
+		log.Printf("size invalid: %v", err)
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "size invalid"})
+		return
+	}
 
 	// check height
 	blkHeightString := ctx.Param("height")
@@ -31,7 +49,7 @@ func GetBlockTxsByBlockHeight(ctx *gin.Context) {
 		return
 	}
 
-	blkTxs, err := service.GetBlockTxsByBlockHeight(blkHeight)
+	blkTxs, err := service.GetBlockTxsByBlockHeight(cursor, size, blkHeight)
 	if err != nil {
 		log.Printf("get block txs failed: %v", err)
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get block txs failed"})
@@ -49,11 +67,29 @@ func GetBlockTxsByBlockHeight(ctx *gin.Context) {
 // @Summary 通过区块blkid获取区块包含的Tx概述列表
 // @Tags Tx
 // @Produce  json
+// @Param cursor query int true "起始游标" default(0)
+// @Param size query int true "返回记录数量" default(16)
 // @Param blkid path string true "Block ID" default(0000000082b5015589a3fdf2d4baff403e6f0be035a5d9742c1cae6295464449)
 // @Success 200 {object} model.Response{data=[]model.TxInfoResp} "{"code": 0, "data": [{}], "msg": "ok"}"
 // @Router /block/txs/{blkid} [get]
 func GetBlockTxsByBlockId(ctx *gin.Context) {
 	log.Printf("GetBlockTxsByBlockId enter")
+
+	// get cursor/size
+	cursorString := ctx.DefaultQuery("cursor", "0")
+	cursor, err := strconv.Atoi(cursorString)
+	if err != nil || cursor < 0 {
+		log.Printf("cursor invalid: %v", err)
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "cursor invalid"})
+		return
+	}
+	sizeString := ctx.DefaultQuery("size", "16")
+	size, err := strconv.Atoi(sizeString)
+	if err != nil || size < 0 {
+		log.Printf("size invalid: %v", err)
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "size invalid"})
+		return
+	}
 
 	blkIdHex := ctx.Param("blkid")
 	// check
@@ -65,7 +101,7 @@ func GetBlockTxsByBlockId(ctx *gin.Context) {
 	}
 	blkId := utils.ReverseBytes(blkIdReverse)
 
-	blkTxs, err := service.GetBlockTxsByBlockId(hex.EncodeToString(blkId))
+	blkTxs, err := service.GetBlockTxsByBlockId(cursor, size, hex.EncodeToString(blkId))
 	if err != nil {
 		log.Printf("get block txs failed: %v", err)
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get block txs failed"})

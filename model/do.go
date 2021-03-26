@@ -1,5 +1,18 @@
 package model
 
+type BlockTokenVolumeDO struct {
+	Height       uint32 `db:"height"` // 区块高度
+	CodeHash     []byte `db:"codehash"`
+	Genesis      []byte `db:"genesis"`
+	CodeType     uint8  `db:"code_type"`      // 合约类型 0: nft, 1: ft
+	NFTIdx       uint64 `db:"nft_idx"`        // nft tokenIdx
+	InDataValue  uint64 `db:"in_data_value"`  // 输入数量
+	OutDataValue uint64 `db:"out_data_value"` // 输出数量
+	InSatoshi    uint64 `db:"invalue"`
+	OutSatoshi   uint64 `db:"outvalue"`
+	BlockId      []byte `db:"blkid"`
+}
+
 ////////////////
 type BlockDO struct {
 	Height      uint32 `db:"height"`

@@ -16,22 +16,22 @@ import (
 // @Summary 获取指定高度范围内的区块概述列表
 // @Tags Block
 // @Produce  json
-// @Param start path int true "Start Block Height" default(0)
-// @Param end path int true "Start Block Height" default(3)
+// @Param start query int true "Start Block Height" default(0)
+// @Param end query int true "Start Block Height" default(3)
 // @Success 200 {object} model.Response{data=[]model.BlockInfoResp} "{"code": 0, "data": [{}], "msg": "ok"}"
-// @Router /blocks/{start}/{end} [get]
+// @Router /blocks [get]
 func GetBlocksByHeightRange(ctx *gin.Context) {
 	log.Printf("GetBlocksByHeightRange enter")
 
 	// check height
-	blkStartHeightString := ctx.Param("start")
+	blkStartHeightString := ctx.DefaultQuery("start", "0")
 	blkStartHeight, err := strconv.Atoi(blkStartHeightString)
 	if err != nil || blkStartHeight < 0 {
 		log.Printf("blk start height invalid: %v", err)
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "blk start height invalid"})
 		return
 	}
-	blkEndHeightString := ctx.Param("end")
+	blkEndHeightString := ctx.DefaultQuery("end", "0")
 	blkEndHeight, err := strconv.Atoi(blkEndHeightString)
 	if err != nil || blkEndHeight < 0 {
 		log.Printf("blk end height invalid: %v", err)

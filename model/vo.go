@@ -19,6 +19,19 @@ type BlockchainInfoResp struct {
 	Chainwork     string `json:"chainwork"`
 }
 
+type BlockTokenVolumeResp struct {
+	Height       int    `json:"height"` // 区块高度
+	CodeHashHex  string `json:"codehash"`
+	GenesisHex   string `json:"genesis"`
+	CodeType     int    `json:"codeType"`     // 合约类型 0: nft, 1: ft
+	NFTIdx       int    `json:"nftIdx"`       // nft tokenIdx
+	InDataValue  int    `json:"inDataValue"`  // 输入数量
+	OutDataValue int    `json:"outDataValue"` // 输出数量
+	InSatoshi    int    `json:"invalue"`
+	OutSatoshi   int    `json:"outvalue"`
+	BlockIdHex   string `json:"blkid"`
+}
+
 type BlockInfoResp struct {
 	Height         int    `json:"height"`      // 当前区块高度
 	BlockIdHex     string `json:"id"`          // 当前区块ID
@@ -121,4 +134,9 @@ type TxOutStatusResp struct {
 
 	TxIdSpentHex string `json:"txidSpent"`   // 当前输出被花费的txid
 	HeightSpent  int    `json:"heightSpent"` // 当前输出被花费的区块高度，如果为0则未花费
+}
+
+type BalanceResp struct {
+	Address string `json:"address"` // address
+	Satoshi int    `json:"satoshi"` // 余额satoshi
 }

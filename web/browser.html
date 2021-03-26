@@ -550,8 +550,12 @@
              this.blockStartHeight = 0
            }
 
-           axios.get(this.$root.apiPoint + "blocks/"+ this.blockStartHeight + "/" + this.blockEndHeight)
-                .then(
+           axios.get(this.$root.apiPoint + "blocks", {
+	       params: {
+		   start: this.blockStartHeight,
+		   end: this.blockEndHeight
+	       }
+	   }).then(
                   response => {
                     if (response.data.code == 0) {
                       this.Blocks = response.data.data.reverse()
