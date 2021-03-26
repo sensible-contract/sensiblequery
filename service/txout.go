@@ -16,7 +16,8 @@ const (
 	SQL_FIELEDS_TXOUT_WITHOUT_SCRIPT        = "utxid, vout, address, genesis, satoshi, script_type, '', height"
 	SQL_FIELEDS_TXOUT_STATUS_WITHOUT_SCRIPT = SQL_FIELEDS_TXOUT_WITHOUT_SCRIPT + ", u.txid, u.height"
 
-	SQL_FIELEDS_TXOUT = "utxid, vout, address, genesis, satoshi, script_type, script_pk, height"
+	SQL_FIELEDS_TXOUT        = "utxid, vout, address, genesis, satoshi, script_type, script_pk, height"
+	SQL_FIELEDS_TXOUT_STATUS = SQL_FIELEDS_TXOUT + ", u.txid, u.height"
 )
 
 //////////////// txout
@@ -51,7 +52,7 @@ WHERE utxid = unhex('%s') AND
        vout >= %d
 ORDER BY vout
 LIMIT %d
-`, SQL_FIELEDS_TXOUT_STATUS_WITHOUT_SCRIPT,
+`, SQL_FIELEDS_TXOUT_STATUS, // need without script?
 		txidHex, txidHex, cursor, size,
 		txidHex, txidHex, cursor, size)
 
@@ -77,7 +78,7 @@ WHERE utxid = unhex('%s') AND
       vout >= %d
 ORDER BY vout
 LIMIT %d
-`, SQL_FIELEDS_TXOUT_STATUS_WITHOUT_SCRIPT,
+`, SQL_FIELEDS_TXOUT_STATUS, // need without script?
 		txidHex, txidHex, cursor, size,
 		txidHex, blkHeight, cursor, size)
 
@@ -94,24 +95,24 @@ func GetTxOutputsBySql(psql string) (txOutsRsp []*model.TxOutStatusResp, err err
 		return nil, errors.New("not exist")
 	}
 	txOuts := txOutsRet.([]*model.TxOutStatusDO)
-	for _, txout := range txOuts {
+	for _, txOut := range txOuts {
 		address := "-"
-		if len(txout.Address) == 20 {
-			address = utils.EncodeAddress(txout.Address, utils.PubKeyHashAddrIDMainNet) // fixme
+		if len(txOut.Address) == 20 {
+			address = utils.EncodeAddress(txOut.Address, utils.PubKeyHashAddrIDMainNet)
 		}
 		txOutsRsp = append(txOutsRsp, &model.TxOutStatusResp{
-			TxIdHex: blkparser.HashString(txout.TxId),
-			Vout:    int(txout.Vout),
+			TxIdHex: blkparser.HashString(txOut.TxId),
+			Vout:    int(txOut.Vout),
 			Address: address,
-			Satoshi: int(txout.Satoshi),
+			Satoshi: int(txOut.Satoshi),
 
-			GenesisHex:    hex.EncodeToString(txout.Genesis),
-			ScriptTypeHex: hex.EncodeToString(txout.ScriptType),
-			ScriptPkHex:   hex.EncodeToString(txout.ScriptPk),
-			Height:        int(txout.Height),
+			GenesisHex:    hex.EncodeToString(txOut.Genesis),
+			ScriptTypeHex: hex.EncodeToString(txOut.ScriptType),
+			ScriptPkHex:   hex.EncodeToString(txOut.ScriptPk),
+			Height:        int(txOut.Height),
 
-			TxIdSpentHex: blkparser.HashString(txout.TxIdSpent),
-			HeightSpent:  int(txout.HeightSpent),
+			TxIdSpentHex: blkparser.HashString(txOut.TxIdSpent),
+			HeightSpent:  int(txOut.HeightSpent),
 		})
 	}
 	return
@@ -160,10 +161,14 @@ func GetTxOutputBySql(psql string) (txOutRsp *model.TxOutResp, err error) {
 		return nil, errors.New("not exist")
 	}
 	txOut := txOutRet.(*model.TxOutDO)
+	address := "-"
+	if len(txOut.Address) == 20 {
+		address = utils.EncodeAddress(txOut.Address, utils.PubKeyHashAddrIDMainNet)
+	}
 	txOutRsp = &model.TxOutResp{
 		TxIdHex: blkparser.HashString(txOut.TxId),
 		Vout:    int(txOut.Vout),
-		Address: utils.EncodeAddress(txOut.Address, utils.PubKeyHashAddrIDMainNet),
+		Address: address,
 		Satoshi: int(txOut.Satoshi),
 
 		GenesisHex:    hex.EncodeToString(txOut.Genesis),

@@ -60,6 +60,47 @@ var doc = `{
                 }
             }
         },
+        "/address/{address}/balance": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "UTXO"
+                ],
+                "summary": "通过地址address获取balance",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "17SkEw2md5avVNyYgj6RiXuQKNwkXaxFyQ",
+                        "description": "Address",
+                        "name": "address",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\": 0, \"data\": {}, \"msg\": \"ok\"}",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/model.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/model.BalanceResp"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
         "/address/{address}/history": {
             "get": {
                 "produces": [
@@ -114,6 +155,22 @@ var doc = `{
                 ],
                 "summary": "通过地址address获取相关utxo列表",
                 "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "起始游标",
+                        "name": "cursor",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "default": 16,
+                        "description": "返回记录数量",
+                        "name": "size",
+                        "in": "query",
+                        "required": true
+                    },
                     {
                         "type": "string",
                         "default": "17SkEw2md5avVNyYgj6RiXuQKNwkXaxFyQ",
@@ -200,6 +257,22 @@ var doc = `{
                 "summary": "通过区块blkid获取区块包含的Tx概述列表",
                 "parameters": [
                     {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "起始游标",
+                        "name": "cursor",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "default": 16,
+                        "description": "返回记录数量",
+                        "name": "size",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
                         "type": "string",
                         "default": "0000000082b5015589a3fdf2d4baff403e6f0be035a5d9742c1cae6295464449",
                         "description": "Block ID",
@@ -261,7 +334,7 @@ var doc = `{
                 }
             }
         },
-        "/blocks/{start}/{end}": {
+        "/blocks": {
             "get": {
                 "produces": [
                     "application/json"
@@ -276,7 +349,7 @@ var doc = `{
                         "default": 0,
                         "description": "Start Block Height",
                         "name": "start",
-                        "in": "path",
+                        "in": "query",
                         "required": true
                     },
                     {
@@ -284,7 +357,7 @@ var doc = `{
                         "default": 3,
                         "description": "Start Block Height",
                         "name": "end",
-                        "in": "path",
+                        "in": "query",
                         "required": true
                     }
                 ],
@@ -313,15 +386,15 @@ var doc = `{
                 }
             }
         },
-        "/ft/balance/all/{address}": {
+        "/contract/history/{codehash}/{genesis}/{address}": {
             "get": {
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "token FT"
+                    "History"
                 ],
-                "summary": "查询某人持有的FT Token列表。获得每个token的余额",
+                "summary": "通过溯源genesis获取相关tx历史列表，返回详细输入/输出",
                 "parameters": [
                     {
                         "type": "integer",
@@ -337,6 +410,22 @@ var doc = `{
                         "description": "返回记录数量",
                         "name": "size",
                         "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "844c56bb99afc374967a27ce3b46244e2e1fba60",
+                        "description": "Code Hash160",
+                        "name": "codehash",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "74967a27ce3b46244e2e1fba60844c56bb99afc3",
+                        "description": "Genesis ID ",
+                        "name": "genesis",
+                        "in": "path",
                         "required": true
                     },
                     {
@@ -362,7 +451,7 @@ var doc = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/model.FTOwnerByAddressResp"
+                                                "$ref": "#/definitions/model.TxOutHistoryResp"
                                             }
                                         }
                                     }
@@ -609,7 +698,67 @@ var doc = `{
                 }
             }
         },
-        "/ft/transfer-volume": {
+        "/ft/summary/{address}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "token FT"
+                ],
+                "summary": "查询某人持有的FT Token列表。获得每个token的余额",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "起始游标",
+                        "name": "cursor",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "返回记录数量",
+                        "name": "size",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "17SkEw2md5avVNyYgj6RiXuQKNwkXaxFyQ",
+                        "description": "Address",
+                        "name": "address",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\": 0, \"data\": [{}], \"msg\": \"ok\"}",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/model.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/model.FTOwnerByAddressResp"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/ft/transfer-volume/{codehash}/{genesis}": {
             "get": {
                 "produces": [
                     "application/json"
@@ -624,7 +773,7 @@ var doc = `{
                         "default": 0,
                         "description": "Start Block Height",
                         "name": "start",
-                        "in": "path",
+                        "in": "query",
                         "required": true
                     },
                     {
@@ -632,7 +781,7 @@ var doc = `{
                         "default": 3,
                         "description": "Start Block Height",
                         "name": "end",
-                        "in": "path",
+                        "in": "query",
                         "required": true
                     },
                     {
@@ -666,7 +815,7 @@ var doc = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/model.FTTransferVolumeResp"
+                                                "$ref": "#/definitions/model.BlockTokenVolumeResp"
                                             }
                                         }
                                     }
@@ -754,94 +903,6 @@ var doc = `{
                 }
             }
         },
-        "/genesis/{genesis}/history": {
-            "get": {
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "History"
-                ],
-                "summary": "通过溯源genesis获取相关tx历史列表，返回详细输入/输出",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "default": "74967a27ce3b46244e2e1fba60844c56bb99afc3",
-                        "description": "Genesis",
-                        "name": "genesis",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "{\"code\": 0, \"data\": [{}], \"msg\": \"ok\"}",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/model.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/definitions/model.TxOutHistoryResp"
-                                            }
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    }
-                }
-            }
-        },
-        "/genesis/{genesis}/utxo": {
-            "get": {
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "UTXO"
-                ],
-                "summary": "通过溯源genesis获取相关utxo列表",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "default": "74967a27ce3b46244e2e1fba60844c56bb99afc3",
-                        "description": "Genesis",
-                        "name": "genesis",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "{\"code\": 0, \"data\": [{}], \"msg\": \"ok\"}",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/model.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/definitions/model.TxOutResp"
-                                            }
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    }
-                }
-            }
-        },
         "/height/{height}/block": {
             "get": {
                 "produces": [
@@ -893,6 +954,22 @@ var doc = `{
                 ],
                 "summary": "通过区块height获取区块包含的Tx概述列表",
                 "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "起始游标",
+                        "name": "cursor",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "default": 16,
+                        "description": "返回记录数量",
+                        "name": "size",
+                        "in": "query",
+                        "required": true
+                    },
                     {
                         "type": "integer",
                         "default": 3,
@@ -1045,6 +1122,22 @@ var doc = `{
                 "parameters": [
                     {
                         "type": "integer",
+                        "default": 0,
+                        "description": "起始游标",
+                        "name": "cursor",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "default": 16,
+                        "description": "返回记录数量",
+                        "name": "size",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
                         "default": 170,
                         "description": "Block Height",
                         "name": "height",
@@ -1152,6 +1245,22 @@ var doc = `{
                 ],
                 "summary": "通过交易txid和交易被打包的区块高度height获取交易所有输出信息列表",
                 "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "起始游标",
+                        "name": "cursor",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "default": 16,
+                        "description": "返回记录数量",
+                        "name": "size",
+                        "in": "query",
+                        "required": true
+                    },
                     {
                         "type": "integer",
                         "default": 170,
@@ -1506,7 +1615,7 @@ var doc = `{
                 }
             }
         },
-        "/nft/transfer-times": {
+        "/nft/transfer-volume/{codehash}/{genesis}/{tokenid}": {
             "get": {
                 "produces": [
                     "application/json"
@@ -1521,7 +1630,7 @@ var doc = `{
                         "default": 0,
                         "description": "Start Block Height",
                         "name": "start",
-                        "in": "path",
+                        "in": "query",
                         "required": true
                     },
                     {
@@ -1529,7 +1638,7 @@ var doc = `{
                         "default": 3,
                         "description": "Start Block Height",
                         "name": "end",
-                        "in": "path",
+                        "in": "query",
                         "required": true
                     },
                     {
@@ -1571,7 +1680,7 @@ var doc = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/model.NFTTransferTimesResp"
+                                                "$ref": "#/definitions/model.BlockTokenVolumeResp"
                                             }
                                         }
                                     }
@@ -1797,6 +1906,22 @@ var doc = `{
                 "summary": "通过交易txid获取交易所有输入信息列表",
                 "parameters": [
                     {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "起始游标",
+                        "name": "cursor",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "default": 16,
+                        "description": "返回记录数量",
+                        "name": "size",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
                         "type": "string",
                         "default": "f4184fc596403b9d638783cf57adfe4c75c605f6356fbc91338530e9831e9e16",
                         "description": "TxId",
@@ -1939,6 +2064,22 @@ var doc = `{
                 "summary": "通过交易txid获取交易所有输出信息列表",
                 "parameters": [
                     {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "起始游标",
+                        "name": "cursor",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "default": 16,
+                        "description": "返回记录数量",
+                        "name": "size",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
                         "type": "string",
                         "default": "f4184fc596403b9d638783cf57adfe4c75c605f6356fbc91338530e9831e9e16",
                         "description": "TxId",
@@ -1974,6 +2115,19 @@ var doc = `{
         }
     },
     "definitions": {
+        "model.BalanceResp": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "description": "address",
+                    "type": "string"
+                },
+                "satoshi": {
+                    "description": "余额satoshi",
+                    "type": "integer"
+                }
+            }
+        },
         "model.BlockInfoResp": {
             "type": "object",
             "properties": {
@@ -2026,6 +2180,46 @@ var doc = `{
                 }
             }
         },
+        "model.BlockTokenVolumeResp": {
+            "type": "object",
+            "properties": {
+                "blkid": {
+                    "type": "string"
+                },
+                "codeType": {
+                    "description": "合约类型 0: nft, 1: ft",
+                    "type": "integer"
+                },
+                "codehash": {
+                    "type": "string"
+                },
+                "genesis": {
+                    "type": "string"
+                },
+                "height": {
+                    "description": "区块高度",
+                    "type": "integer"
+                },
+                "inDataValue": {
+                    "description": "输入数量",
+                    "type": "integer"
+                },
+                "invalue": {
+                    "type": "integer"
+                },
+                "nftIdx": {
+                    "description": "nft tokenIdx",
+                    "type": "integer"
+                },
+                "outDataValue": {
+                    "description": "输出数量",
+                    "type": "integer"
+                },
+                "outvalue": {
+                    "type": "integer"
+                }
+            }
+        },
         "model.BlockchainInfoResp": {
             "type": "object",
             "properties": {
@@ -2063,6 +2257,10 @@ var doc = `{
                     "description": "FT合约hash160(CodePart)",
                     "type": "string"
                 },
+                "count": {
+                    "description": "出现此ft合约的区块次数",
+                    "type": "integer"
+                },
                 "decimal": {
                     "description": "decimal",
                     "type": "integer"
@@ -2079,9 +2277,23 @@ var doc = `{
                     "description": "FT icon url",
                     "type": "string"
                 },
+                "inSatoshi": {
+                    "type": "integer"
+                },
+                "inVolume": {
+                    "description": "输入数量",
+                    "type": "integer"
+                },
                 "name": {
                     "description": "FT name",
                     "type": "string"
+                },
+                "outSatoshi": {
+                    "type": "integer"
+                },
+                "outVolume": {
+                    "description": "输出数量",
+                    "type": "integer"
                 },
                 "symbol": {
                     "description": "FT symbol",
@@ -2127,29 +2339,16 @@ var doc = `{
                 }
             }
         },
-        "model.FTTransferVolumeResp": {
-            "type": "object",
-            "properties": {
-                "height": {
-                    "description": "区块高度",
-                    "type": "integer"
-                },
-                "inVolume": {
-                    "description": "输入数量",
-                    "type": "integer"
-                },
-                "outVolume": {
-                    "description": "输出数量",
-                    "type": "integer"
-                }
-            }
-        },
         "model.NFTInfoResp": {
             "type": "object",
             "properties": {
                 "codehash": {
                     "description": "NFT合约hash160(CodePart)",
                     "type": "string"
+                },
+                "count": {
+                    "description": "当前NFT个数",
+                    "type": "integer"
                 },
                 "desc": {
                     "description": "NFT 描述",
@@ -2163,9 +2362,23 @@ var doc = `{
                     "description": "NFT icon url",
                     "type": "string"
                 },
+                "inSatoshi": {
+                    "type": "integer"
+                },
+                "inTimes": {
+                    "description": "总输入次数",
+                    "type": "integer"
+                },
                 "name": {
                     "description": "NFT name",
                     "type": "string"
+                },
+                "outSatoshi": {
+                    "type": "integer"
+                },
+                "outTimes": {
+                    "description": "总输出次数",
+                    "type": "integer"
                 },
                 "symbol": {
                     "description": "NFT symbol",
@@ -2207,23 +2420,6 @@ var doc = `{
                 },
                 "tokenId": {
                     "description": "持有的NFT id",
-                    "type": "integer"
-                }
-            }
-        },
-        "model.NFTTransferTimesResp": {
-            "type": "object",
-            "properties": {
-                "height": {
-                    "description": "区块高度",
-                    "type": "integer"
-                },
-                "inTimes": {
-                    "description": "输入次数",
-                    "type": "integer"
-                },
-                "outTimes": {
-                    "description": "输出次数",
                     "type": "integer"
                 }
             }

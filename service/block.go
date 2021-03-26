@@ -17,6 +17,15 @@ const (
 	SQL_FIELEDS_BLOCK_VOLUME = "height, codehash, genesis, code_type, nft_idx, in_data_value, out_data_value, invalue, outvalue, blkid"
 )
 
+func blockTokenVolumeResultSRF(rows *sql.Rows) (interface{}, error) {
+	var ret model.BlockTokenVolumeDO
+	err := rows.Scan(&ret.Height, &ret.CodeHash, &ret.Genesis, &ret.CodeType, &ret.NFTIdx, &ret.InDataValue, &ret.OutDataValue, &ret.InSatoshi, &ret.OutSatoshi, &ret.BlockId)
+	if err != nil {
+		return nil, err
+	}
+	return &ret, nil
+}
+
 func blockResultSRF(rows *sql.Rows) (interface{}, error) {
 	var ret model.BlockDO
 	err := rows.Scan(&ret.Height, &ret.BlockId, &ret.PrevBlockId, &ret.NextBlockId, &ret.MerkleRoot, &ret.TxCount, &ret.InSatoshi, &ret.OutSatoshi, &ret.CoinbaseOut, &ret.BlockTime, &ret.Bits, &ret.BlockSize)
@@ -38,7 +47,7 @@ ORDER BY height ASC
 LIMIT %d`,
 		SQL_FIELEDS_BLOCK_VOLUME, blkStartHeight, blkEndHeight, codeHashHex, genesisHex, codeType, nftIdx, blkEndHeight-blkStartHeight)
 
-	blksRet, err := clickhouse.ScanAll(psql, blockResultSRF)
+	blksRet, err := clickhouse.ScanAll(psql, blockTokenVolumeResultSRF)
 	if err != nil {
 		log.Printf("query blk failed: %v", err)
 		return nil, err

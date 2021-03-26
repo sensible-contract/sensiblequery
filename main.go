@@ -73,23 +73,23 @@ func main() {
 
 	router.GET("/address/:address/utxo", controller.GetUtxoByAddress)
 
-	router.GET("/ft/utxo/{codehash}/{genesis}/{address}", controller.GetFTUtxo)
-	router.GET("/nft/utxo/{codehash}/{genesis}/{address}", controller.GetNFTUtxo)
+	router.GET("/ft/utxo/:codehash/:genesis/:address", controller.GetFTUtxo)
+	router.GET("/nft/utxo/:codehash/:genesis/:address", controller.GetNFTUtxo)
 
 	router.GET("/address/:address/balance", controller.GetBalanceByAddress)
 
-	router.GET("/ft/transfer-volume/{codehash}/{genesis}", controller.GetFTTransferVolumeInBlockRange)
-	router.GET("/ft/owners/{codehash}/{genesis}", controller.ListFTOwners)
-	router.GET("/ft/summary/{address}", controller.ListAllFTBalanceByOwner)
-	router.GET("/ft/balance/{codehash}/{genesis}/{address}", controller.GetFTBalanceByOwner)
+	router.GET("/ft/transfer-volume/:codehash/:genesis", controller.GetFTTransferVolumeInBlockRange)
+	router.GET("/ft/owners/:codehash/:genesis", controller.ListFTOwners)
+	router.GET("/ft/summary/:address", controller.ListAllFTBalanceByOwner)
+	router.GET("/ft/balance/:codehash/:genesis/:address", controller.GetFTBalanceByOwner)
 
-	router.GET("/nft/transfer-volume/{codehash}/{genesis}", controller.GetNFTTransferTimesInBlockRange)
-	router.GET("/nft/owners/{codehash}/{genesis}", controller.ListNFTOwners)
-	router.GET("/nft/summary/{address}", controller.ListAllNFTByOwner)
-	router.GET("/nft/detail/{codehash}/{genesis}/{address}", controller.ListNFTBalanceByOwner)
+	router.GET("/nft/transfer-volume/:codehash/:genesis/:tokenid", controller.GetNFTTransferTimesInBlockRange)
+	router.GET("/nft/owners/:codehash/:genesis", controller.ListNFTOwners)
+	router.GET("/nft/summary/:address", controller.ListAllNFTByOwner)
+	router.GET("/nft/detail/:codehash/:genesis/:address", controller.ListNFTBalanceByOwner)
 
 	router.GET("/address/:address/history", controller.GetHistoryByAddress)
-	router.GET("/genesis/:genesis/history", controller.GetHistoryByGenesis)
+	router.GET("/contract/history/:codehash/:genesis/:address", controller.GetHistoryByGenesis)
 
 	heightAPI := router.Group("/height/:height")
 	{

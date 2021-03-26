@@ -8,6 +8,11 @@ type NFTInfoResp struct {
 	Desc        string `json:"desc"`     // NFT 描述
 	Icon        string `json:"icon"`     // NFT icon url
 	Website     string `json:"website"`  // NFT website url
+	Count       int    `json:"count"`    // 当前NFT个数
+	InTimes     int    `json:"inTimes"`  // 总输入次数
+	OutTimes    int    `json:"outTimes"` // 总输出次数
+	InSatoshi   int    `json:"inSatoshi"`
+	OutSatoshi  int    `json:"outSatoshi"`
 }
 
 type NFTTransferTimesResp struct {

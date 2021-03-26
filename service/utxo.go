@@ -76,7 +76,7 @@ func GetUtxoByCodeHashGenesisAddress(cursor, size int, codeHash, genesisId, addr
 
 ////////////////
 func getUtxoFromRedis(cursor, size int, key string) (txOutsRsp []*model.TxOutResp, err error) {
-	vals, err := rdb.ZRange(key, int64(cursor), int64(cursor+size-1)).Result()
+	vals, err := rdb.ZRevRange(key, int64(cursor), int64(cursor+size-1)).Result()
 	if err != nil {
 		log.Printf("GetUtxoByAddress redis failed: %v", err)
 		return

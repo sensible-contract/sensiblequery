@@ -21,7 +21,7 @@ import (
 func ListAllNFTInfo(ctx *gin.Context) {
 	log.Printf("ListNFTInfo enter")
 
-	result, err := service.GetBestBlock()
+	result, err := service.GetNFTInfo()
 	if err != nil {
 		log.Printf("get dummy failed: %v", err)
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get dummy failed"})

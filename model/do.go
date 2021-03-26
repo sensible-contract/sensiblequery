@@ -1,5 +1,36 @@
 package model
 
+type NFTInfoDO struct {
+	CodeHash   []byte `db:"codehash"`  // NFT合约hash160(CodePart)
+	Genesis    []byte `db:"genesis"`   // NFT合约的genesis，Hex编码
+	Name       string `db:"name"`      // NFT name
+	Symbol     string `db:"symbol"`    // NFT symbol
+	Desc       string `db:"desc"`      // NFT 描述
+	Icon       string `db:"icon"`      // NFT icon url
+	Website    string `db:"website"`   // NFT website url
+	Count      uint64 `db:"count"`     // 当前NFT个数
+	InTimes    uint64 `db:"in_times"`  // 总输入次数
+	OutTimes   uint64 `db:"out_times"` // 总输出次数
+	InSatoshi  uint64 `db:"invalue"`
+	OutSatoshi uint64 `db:"outvalue"`
+}
+
+type FTInfoDO struct {
+	CodeHash   []byte `json:"codehash"`  // FT合约hash160(CodePart)
+	Genesis    []byte `json:"genesis"`   // FT合约的genesis，Hex编码
+	Name       string `json:"name"`      // FT name
+	Symbol     string `json:"symbol"`    // FT symbol
+	Decimal    int    `json:"decimal"`   // decimal
+	Desc       string `json:"desc"`      // FT 描述
+	Icon       string `json:"icon"`      // FT icon url
+	Website    string `json:"website"`   // FT website url
+	Count      uint64 `json:"count"`     // 出现此合约的区块次数
+	InVolume   uint64 `json:"inVolume"`  // 输入数量
+	OutVolume  uint64 `json:"outVolume"` // 输出数量
+	InSatoshi  uint64 `json:"inSatoshi"`
+	OutSatoshi uint64 `json:"outSatoshi"`
+}
+
 type BlockTokenVolumeDO struct {
 	Height       uint32 `db:"height"` // 区块高度
 	CodeHash     []byte `db:"codehash"`

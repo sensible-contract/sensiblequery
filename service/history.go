@@ -56,14 +56,16 @@ LIMIT 128
 }
 
 //////////////// genesis
-func GetHistoryByGenesis(genesisHex string) (txOutsRsp []*model.TxOutHistoryResp, err error) {
+func GetHistoryByGenesis(cursor, size int, codeHashHex, genesisHex, addressHex string) (txOutsRsp []*model.TxOutHistoryResp, err error) {
 	psql := fmt.Sprintf(`
 SELECT txid, idx, address, genesis, satoshi, script_type, height, txidx, io_type FROM
 (
 SELECT utxid AS txid, vout AS idx, address, genesis, satoshi, script_type, height, utxidx AS txidx, 1 AS io_type FROM txout
 WHERE (utxid, vout, height) in (
     SELECT utxid, vout, height FROM txout_genesis_height
-    WHERE genesis = unhex('%s')
+    WHERE codehash = unhex('%s') AND
+          genesis = unhex('%s') AND
+          address = unhex('%s')
     ORDER BY height DESC
     LIMIT 64
 )
@@ -73,14 +75,17 @@ UNION ALL
 SELECT txid, idx, address, genesis, satoshi, script_type, height, txidx, 0 AS io_type FROM txin
 WHERE (txid, idx, height) in (
     SELECT txid, idx, height FROM txin_genesis_height
-    WHERE genesis = unhex('%s')
+    WHERE codehash = unhex('%s') AND
+          genesis = unhex('%s') AND
+          address = unhex('%s')
     ORDER BY height DESC
     LIMIT 64
 )
 )
 ORDER BY height DESC, txidx DESC
 LIMIT 128
-`, genesisHex, genesisHex)
+`, codeHashHex, genesisHex, addressHex,
+		codeHashHex, genesisHex, addressHex)
 	return GetHistoryBySql(psql)
 }
 

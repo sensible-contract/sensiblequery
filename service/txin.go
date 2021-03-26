@@ -52,7 +52,7 @@ WHERE txid = unhex('%s') AND
     ) AND
       idx >= %d
 ORDER BY idx
-LIMIT %d`, SQL_FIELEDS_TXIN_WITHOUT_SCRIPT, txidHex, txidHex, cursor, size)
+LIMIT %d`, SQL_FIELEDS_TXIN, txidHex, txidHex, cursor, size)
 
 	return GetTxInputsBySql(psql)
 }
@@ -64,7 +64,7 @@ WHERE txid = unhex('%s') AND
     height = %d AND
       idx >= %d
 ORDER BY idx
-LIMIT %d`, SQL_FIELEDS_TXIN_WITHOUT_SCRIPT, txidHex, blkHeight, cursor, size)
+LIMIT %d`, SQL_FIELEDS_TXIN, txidHex, blkHeight, cursor, size)
 
 	return GetTxInputsBySql(psql)
 }
@@ -82,7 +82,7 @@ func GetTxInputsBySql(psql string) (txInsRsp []*model.TxInResp, err error) {
 	for _, txin := range txIns {
 		address := "-"
 		if len(txin.Address) == 20 {
-			address = utils.EncodeAddress(txin.Address, utils.PubKeyHashAddrIDMainNet) // fixme
+			address = utils.EncodeAddress(txin.Address, utils.PubKeyHashAddrIDMainNet)
 		}
 
 		txInsRsp = append(txInsRsp, &model.TxInResp{
@@ -140,6 +140,12 @@ func GetTxInputBySql(psql string) (txInRsp *model.TxInResp, err error) {
 		return nil, errors.New("not exist")
 	}
 	txin := txInRet.(*model.TxInDO)
+
+	address := "-"
+	if len(txin.Address) == 20 {
+		address = utils.EncodeAddress(txin.Address, utils.PubKeyHashAddrIDMainNet)
+	}
+
 	txInRsp = &model.TxInResp{
 		Height:       int(txin.Height),
 		TxIdHex:      blkparser.HashString(txin.TxId),
@@ -149,7 +155,7 @@ func GetTxInputBySql(psql string) (txInRsp *model.TxInResp, err error) {
 		HeightTxo:     int(txin.HeightTxo),
 		UtxIdHex:      blkparser.HashString(txin.UtxId),
 		Vout:          int(txin.Vout),
-		Address:       utils.EncodeAddress(txin.Address, utils.PubKeyHashAddrIDMainNet), // fixme
+		Address:       address,
 		GenesisHex:    hex.EncodeToString(txin.Genesis),
 		Satoshi:       int(txin.Satoshi),
 		ScriptTypeHex: hex.EncodeToString(txin.ScriptType),
