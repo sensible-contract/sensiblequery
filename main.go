@@ -48,6 +48,7 @@ func main() {
 		MaxAge: 12 * time.Hour,
 	}))
 
+	// go get -u github.com/swaggo/swag/cmd/swag@v1.6.7
 	url := ginSwagger.URL("http://120.92.153.221:5555/swagger/doc.json")
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
 
