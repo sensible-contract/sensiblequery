@@ -12,6 +12,29 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// ListAllNFTCodeHash
+// @Summary 查询所有NFT CodeHash简述
+// @Tags token NFT
+// @Produce  json
+// @Success 200 {object} model.Response{data=[]model.TokenCodeHashResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Router /nft/codehash/all [get]
+func ListAllNFTCodeHash(ctx *gin.Context) {
+	log.Printf("ListAllNFTCodeHash enter")
+
+	result, err := service.GetTokenCodeHash(0)
+	if err != nil {
+		log.Printf("get dummy failed: %v", err)
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get dummy failed"})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, model.Response{
+		Code: 0,
+		Msg:  "ok",
+		Data: result,
+	})
+}
+
 // ListAllNFTInfo
 // @Summary 查询所有NFT Token简述
 // @Tags token NFT
@@ -22,6 +45,39 @@ func ListAllNFTInfo(ctx *gin.Context) {
 	log.Printf("ListNFTInfo enter")
 
 	result, err := service.GetNFTInfo()
+	if err != nil {
+		log.Printf("get dummy failed: %v", err)
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get dummy failed"})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, model.Response{
+		Code: 0,
+		Msg:  "ok",
+		Data: result,
+	})
+}
+
+// ListNFTSummary
+// @Summary 查询使用某codehash的NFT Token简述
+// @Tags token NFT
+// @Produce  json
+// @Param codehash path string true "Code Hash160" default(844c56bb99afc374967a27ce3b46244e2e1fba60)
+// @Success 200 {object} model.Response{data=[]model.NFTInfoResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Router /nft/codehash-info/{codehash} [get]
+func ListNFTSummary(ctx *gin.Context) {
+	log.Printf("ListNFTSummary enter")
+
+	codeHashHex := ctx.Param("codehash")
+	// check
+	_, err := hex.DecodeString(codeHashHex)
+	if err != nil {
+		log.Printf("codeHash invalid: %v", err)
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "codeHash invalid"})
+		return
+	}
+
+	result, err := service.GetNFTSummary(codeHashHex)
 	if err != nil {
 		log.Printf("get dummy failed: %v", err)
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get dummy failed"})

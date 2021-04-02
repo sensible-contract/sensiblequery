@@ -234,6 +234,21 @@ definitions:
       msg:
         type: string
     type: object
+  model.TokenCodeHashResp:
+    properties:
+      codehash:
+        description: FT合约hash160(CodePart)
+        type: string
+      count:
+        description: 采用当前合约的Token种类数，NFT包括具体NFT数量；FT只包括种类数量
+        type: integer
+      inTimes:
+        description: 总输入次数
+        type: integer
+      outTimes:
+        description: 总输出次数
+        type: integer
+    type: object
   model.TokenInfoResp:
     properties:
       countCode:
@@ -810,6 +825,51 @@ paths:
       summary: 查询某人持有的某FT Token的余额
       tags:
       - token FT
+  /ft/codehash-info/{codehash}:
+    get:
+      parameters:
+      - default: 844c56bb99afc374967a27ce3b46244e2e1fba60
+        description: Code Hash160
+        in: path
+        name: codehash
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 0, "data": [{}], "msg": "ok"}'
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/model.FTInfoResp'
+                  type: array
+              type: object
+      summary: 查询使用某codehash的FT Token简述
+      tags:
+      - token FT
+  /ft/codehash/all:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 0, "data": [{}], "msg": "ok"}'
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/model.TokenCodeHashResp'
+                  type: array
+              type: object
+      summary: 查询所有FT codehash简述
+      tags:
+      - token FT
   /ft/history/{codehash}/{genesis}/{address}:
     get:
       parameters:
@@ -1309,6 +1369,51 @@ paths:
       summary: 通过交易txid和交易被打包的区块高度height获取交易所有输出信息列表
       tags:
       - Txout
+  /nft/codehash-info/{codehash}:
+    get:
+      parameters:
+      - default: 844c56bb99afc374967a27ce3b46244e2e1fba60
+        description: Code Hash160
+        in: path
+        name: codehash
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 0, "data": [{}], "msg": "ok"}'
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/model.NFTInfoResp'
+                  type: array
+              type: object
+      summary: 查询使用某codehash的NFT Token简述
+      tags:
+      - token NFT
+  /nft/codehash/all:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 0, "data": [{}], "msg": "ok"}'
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/model.TokenCodeHashResp'
+                  type: array
+              type: object
+      summary: 查询所有NFT CodeHash简述
+      tags:
+      - token NFT
   /nft/detail/{codehash}/{genesis}/{address}:
     get:
       parameters:

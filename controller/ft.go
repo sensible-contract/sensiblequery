@@ -12,6 +12,29 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// ListAllFTCodeHash
+// @Summary 查询所有FT codehash简述
+// @Tags token FT
+// @Produce  json
+// @Success 200 {object} model.Response{data=[]model.TokenCodeHashResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Router /ft/codehash/all [get]
+func ListAllFTCodeHash(ctx *gin.Context) {
+	log.Printf("ListAllFTCodeHash enter")
+
+	result, err := service.GetTokenCodeHash(1)
+	if err != nil {
+		log.Printf("get dummy failed: %v", err)
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get dummy failed"})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, model.Response{
+		Code: 0,
+		Msg:  "ok",
+		Data: result,
+	})
+}
+
 // ListAllFTInfo
 // @Summary 查询所有FT Token简述
 // @Tags token FT
@@ -22,6 +45,39 @@ func ListAllFTInfo(ctx *gin.Context) {
 	log.Printf("ListFTInfo enter")
 
 	result, err := service.GetFTInfo()
+	if err != nil {
+		log.Printf("get dummy failed: %v", err)
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get dummy failed"})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, model.Response{
+		Code: 0,
+		Msg:  "ok",
+		Data: result,
+	})
+}
+
+// ListFTSummary
+// @Summary 查询使用某codehash的FT Token简述
+// @Tags token FT
+// @Produce  json
+// @Param codehash path string true "Code Hash160" default(844c56bb99afc374967a27ce3b46244e2e1fba60)
+// @Success 200 {object} model.Response{data=[]model.FTInfoResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Router /ft/codehash-info/{codehash} [get]
+func ListFTSummary(ctx *gin.Context) {
+	log.Printf("ListFTSummary enter")
+
+	codeHashHex := ctx.Param("codehash")
+	// check
+	_, err := hex.DecodeString(codeHashHex)
+	if err != nil {
+		log.Printf("codeHash invalid: %v", err)
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "codeHash invalid"})
+		return
+	}
+
+	result, err := service.GetFTSummary(codeHashHex)
 	if err != nil {
 		log.Printf("get dummy failed: %v", err)
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get dummy failed"})

@@ -15,6 +15,13 @@ type TokenInfoDO struct {
 	OutSatoshi uint64 `db:"outvalue"`
 }
 
+type TokenCodeHashDO struct {
+	CodeHash []byte `db:"codehash"`  // Token合约hash160(CodePart)
+	Count    uint64 `db:"count"`     // 采用当前合约的Token种类数，NFT包括具体NFT数量；FT只包括种类数量
+	InTimes  uint64 `db:"in_times"`  // 总输入次数
+	OutTimes uint64 `db:"out_times"` // 总输出次数
+}
+
 type NFTInfoDO struct {
 	CodeHash   []byte `db:"codehash"`  // NFT合约hash160(CodePart)
 	Genesis    []byte `db:"genesis"`   // NFT合约的genesis，Hex编码

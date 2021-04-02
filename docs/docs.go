@@ -519,6 +519,84 @@ var doc = `{
                 }
             }
         },
+        "/ft/codehash-info/{codehash}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "token FT"
+                ],
+                "summary": "查询使用某codehash的FT Token简述",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "844c56bb99afc374967a27ce3b46244e2e1fba60",
+                        "description": "Code Hash160",
+                        "name": "codehash",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\": 0, \"data\": [{}], \"msg\": \"ok\"}",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/model.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/model.FTInfoResp"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/ft/codehash/all": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "token FT"
+                ],
+                "summary": "查询所有FT codehash简述",
+                "responses": {
+                    "200": {
+                        "description": "{\"code\": 0, \"data\": [{}], \"msg\": \"ok\"}",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/model.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/model.TokenCodeHashResp"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
         "/ft/history/{codehash}/{genesis}/{address}": {
             "get": {
                 "produces": [
@@ -1293,6 +1371,84 @@ var doc = `{
                                             "type": "array",
                                             "items": {
                                                 "$ref": "#/definitions/model.TxOutStatusResp"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/nft/codehash-info/{codehash}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "token NFT"
+                ],
+                "summary": "查询使用某codehash的NFT Token简述",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "844c56bb99afc374967a27ce3b46244e2e1fba60",
+                        "description": "Code Hash160",
+                        "name": "codehash",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\": 0, \"data\": [{}], \"msg\": \"ok\"}",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/model.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/model.NFTInfoResp"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/nft/codehash/all": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "token NFT"
+                ],
+                "summary": "查询所有NFT CodeHash简述",
+                "responses": {
+                    "200": {
+                        "description": "{\"code\": 0, \"data\": [{}], \"msg\": \"ok\"}",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/model.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/model.TokenCodeHashResp"
                                             }
                                         }
                                     }
@@ -2476,6 +2632,27 @@ var doc = `{
                 },
                 "msg": {
                     "type": "string"
+                }
+            }
+        },
+        "model.TokenCodeHashResp": {
+            "type": "object",
+            "properties": {
+                "codehash": {
+                    "description": "FT合约hash160(CodePart)",
+                    "type": "string"
+                },
+                "count": {
+                    "description": "采用当前合约的Token种类数，NFT包括具体NFT数量；FT只包括种类数量",
+                    "type": "integer"
+                },
+                "inTimes": {
+                    "description": "总输入次数",
+                    "type": "integer"
+                },
+                "outTimes": {
+                    "description": "总输出次数",
+                    "type": "integer"
                 }
             }
         },
