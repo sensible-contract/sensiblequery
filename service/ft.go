@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/hex"
 	"errors"
+	"fmt"
 	"log"
 	"satoblock/dao/clickhouse"
 	"satoblock/model"
@@ -22,6 +23,18 @@ func ftInfoResultSRF(rows *sql.Rows) (interface{}, error) {
 	return &ret, nil
 }
 
+func GetFTSummary(codeHashHex string) (blksRsp []*model.FTInfoResp, err error) {
+	psql := fmt.Sprintf(`
+SELECT codehash, genesis, count(1),
+       sum(in_data_value) AS in_volume , sum(out_data_value) AS out_volume,
+       sum(invalue) AS in_satoshi , sum(outvalue) AS out_satoshi FROM blk_codehash_height
+WHERE code_type = 1 AND codehash = unhex('%s')
+GROUP BY codehash, genesis
+ORDER BY count(1) DESC
+`, codeHashHex)
+	return GetFTInfoBySQL(psql)
+}
+
 func GetFTInfo() (blksRsp []*model.FTInfoResp, err error) {
 	psql := `
 SELECT codehash, genesis, count(1),
@@ -29,8 +42,12 @@ SELECT codehash, genesis, count(1),
        sum(invalue) AS in_satoshi , sum(outvalue) AS out_satoshi FROM blk_codehash_height
 WHERE code_type = 1
 GROUP BY codehash, genesis
+ORDER BY count(1) DESC
 `
+	return GetFTInfoBySQL(psql)
+}
 
+func GetFTInfoBySQL(psql string) (blksRsp []*model.FTInfoResp, err error) {
 	blksRet, err := clickhouse.ScanAll(psql, ftInfoResultSRF)
 	if err != nil {
 		log.Printf("query blk failed: %v", err)
