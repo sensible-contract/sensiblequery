@@ -1,5 +1,20 @@
 package model
 
+type TokenInfoDO struct {
+	CodeHash   []byte `db:"codehash"`  // Token合约hash160(CodePart)
+	Genesis    []byte `db:"genesis"`   // Token合约的genesis，Hex编码
+	Name       string `db:"name"`      // Token name
+	Symbol     string `db:"symbol"`    // Token symbol
+	Desc       string `db:"desc"`      // Token 描述
+	Icon       string `db:"icon"`      // Token icon url
+	Website    string `db:"website"`   // Token website url
+	Count      uint64 `db:"count"`     // 当前Token个数
+	InTimes    uint64 `db:"in_times"`  // 总输入次数
+	OutTimes   uint64 `db:"out_times"` // 总输出次数
+	InSatoshi  uint64 `db:"invalue"`
+	OutSatoshi uint64 `db:"outvalue"`
+}
+
 type NFTInfoDO struct {
 	CodeHash   []byte `db:"codehash"`  // NFT合约hash160(CodePart)
 	Genesis    []byte `db:"genesis"`   // NFT合约的genesis，Hex编码

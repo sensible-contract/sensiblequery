@@ -1776,11 +1776,13 @@ var doc = `{
                 "summary": "Push Tx",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "Name",
-                        "name": "txHex",
-                        "in": "query",
-                        "required": true
+                        "description": "txHex",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controller.TxRequest"
+                        }
                     }
                 ],
                 "responses": {
@@ -1796,6 +1798,37 @@ var doc = `{
                                     "properties": {
                                         "data": {
                                             "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/token/info": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "token"
+                ],
+                "summary": "查询Token简述",
+                "responses": {
+                    "200": {
+                        "description": "{\"code\": 0, \"data\": {}, \"msg\": \"ok\"}",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/model.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/model.TokenInfoResp"
                                         }
                                     }
                                 }
@@ -2115,6 +2148,14 @@ var doc = `{
         }
     },
     "definitions": {
+        "controller.TxRequest": {
+            "type": "object",
+            "properties": {
+                "txHex": {
+                    "type": "string"
+                }
+            }
+        },
         "model.BalanceResp": {
             "type": "object",
             "properties": {
@@ -2435,6 +2476,51 @@ var doc = `{
                 },
                 "msg": {
                     "type": "string"
+                }
+            }
+        },
+        "model.TokenInfoResp": {
+            "type": "object",
+            "properties": {
+                "countCode": {
+                    "description": "当前合约代码种类数",
+                    "type": "integer"
+                },
+                "countFT": {
+                    "description": "当前FT总数",
+                    "type": "integer"
+                },
+                "countNFT": {
+                    "description": "当前NFT总数",
+                    "type": "integer"
+                },
+                "countNFTID": {
+                    "description": "当前NFTID总数",
+                    "type": "integer"
+                },
+                "countOwnerFT": {
+                    "description": "当前持有FT人数",
+                    "type": "integer"
+                },
+                "countOwnerNFT": {
+                    "description": "当前持有NFT人数",
+                    "type": "integer"
+                },
+                "inTimesFT": {
+                    "description": "FT总输入次数",
+                    "type": "integer"
+                },
+                "inTimesNFT": {
+                    "description": "NFT总输入次数",
+                    "type": "integer"
+                },
+                "outTimesFT": {
+                    "description": "FT总输出次数",
+                    "type": "integer"
+                },
+                "outTimesNFT": {
+                    "description": "NFT总输出次数",
+                    "type": "integer"
                 }
             }
         },
@@ -2772,7 +2858,7 @@ type swaggerInfo struct {
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = swaggerInfo{
 	Version:     "1.0",
-	Host:        "120.92.153.221:5555",
+	Host:        "",
 	BasePath:    "",
 	Schemes:     []string{},
 	Title:       "Sensible Browser",

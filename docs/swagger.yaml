@@ -1,4 +1,9 @@
 definitions:
+  controller.TxRequest:
+    properties:
+      txHex:
+        type: string
+    type: object
   model.BalanceResp:
     properties:
       address:
@@ -228,6 +233,39 @@ definitions:
         type: object
       msg:
         type: string
+    type: object
+  model.TokenInfoResp:
+    properties:
+      countCode:
+        description: 当前合约代码种类数
+        type: integer
+      countFT:
+        description: 当前FT总数
+        type: integer
+      countNFT:
+        description: 当前NFT总数
+        type: integer
+      countNFTID:
+        description: 当前NFTID总数
+        type: integer
+      countOwnerFT:
+        description: 当前持有FT人数
+        type: integer
+      countOwnerNFT:
+        description: 当前持有NFT人数
+        type: integer
+      inTimesFT:
+        description: FT总输入次数
+        type: integer
+      inTimesNFT:
+        description: NFT总输入次数
+        type: integer
+      outTimesFT:
+        description: FT总输出次数
+        type: integer
+      outTimesNFT:
+        description: NFT总输出次数
+        type: integer
     type: object
   model.TxInResp:
     properties:
@@ -462,7 +500,6 @@ definitions:
       job:
         type: string
     type: object
-host: 120.92.153.221:5555
 info:
   contact:
     email: jiedohh@gmail.com
@@ -1576,11 +1613,12 @@ paths:
   /pushtx:
     post:
       parameters:
-      - description: Name
-        in: query
-        name: txHex
+      - description: txHex
+        in: body
+        name: body
         required: true
-        type: string
+        schema:
+          $ref: '#/definitions/controller.TxRequest'
       produces:
       - application/json
       responses:
@@ -1594,6 +1632,23 @@ paths:
                   type: string
               type: object
       summary: Push Tx
+  /token/info:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 0, "data": {}, "msg": "ok"}'
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.TokenInfoResp'
+              type: object
+      summary: 查询Token简述
+      tags:
+      - token
   /tx/{txid}:
     get:
       parameters:

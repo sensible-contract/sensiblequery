@@ -18,7 +18,7 @@ type TxRequest struct {
 // Pushtx
 // @Summary Push Tx
 // @Produce json
-// @Param txHex query string true "Name"
+// @Param body body TxRequest true "txHex"
 // @Success 200 {object} model.Response{data=string} "{"code": 0, "data": "<txid>", "msg": "ok"}"
 // @Router /pushtx [post]
 func PushTx(ctx *gin.Context) {

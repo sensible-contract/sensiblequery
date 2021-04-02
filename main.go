@@ -32,8 +32,6 @@ var (
 
 // @license.name Apache 2.0
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
-
-// @host 120.92.153.221:5555
 func main() {
 	router := gin.Default()
 	router.Use(cors.New(cors.Config{
@@ -49,7 +47,7 @@ func main() {
 	}))
 
 	// go get -u github.com/swaggo/swag/cmd/swag@v1.6.7
-	url := ginSwagger.URL("http://120.92.153.221:5555/swagger/doc.json")
+	url := ginSwagger.URL("/swagger/doc.json")
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
 
 	router.GET("/", controller.Satotx)
@@ -93,6 +91,8 @@ func main() {
 
 	router.GET("/address/:address/history", controller.GetHistoryByAddress)
 	router.GET("/contract/history/:codehash/:genesis/:address", controller.GetHistoryByGenesis)
+
+	router.GET("/token/info", controller.ListAllTokenInfo)
 
 	heightAPI := router.Group("/height/:height")
 	{
