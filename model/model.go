@@ -36,16 +36,20 @@ type TxoData struct {
 	BlockHeight uint32
 	TxIdx       uint64
 	AddressPkh  []byte
+	IsNFT       bool
+	CodeHash    []byte
 	GenesisId   []byte
-	Value       uint64
+	DataValue   uint64 // ft amount / nft tokenIdx
+	Decimal     uint64 // ft decimal
+	Satoshi     uint64
 	ScriptType  []byte
 	Script      []byte
 }
 
 func (d *TxoData) Marshal(buf []byte) {
-	binary.LittleEndian.PutUint32(buf, d.BlockHeight) // 4
-	binary.LittleEndian.PutUint64(buf[4:], d.TxIdx)   // 8
-	binary.LittleEndian.PutUint64(buf[12:], d.Value)  // 8
+	binary.LittleEndian.PutUint32(buf, d.BlockHeight)  // 4
+	binary.LittleEndian.PutUint64(buf[4:], d.TxIdx)    // 8
+	binary.LittleEndian.PutUint64(buf[12:], d.Satoshi) // 8
 	// copy(buf[12:], d.AddressPkh)                      // 20
 	// copy(buf[32:], d.GenesisId)                       // 20
 	// copy(buf[60:], d.ScriptType)                      // 32
@@ -55,7 +59,7 @@ func (d *TxoData) Marshal(buf []byte) {
 func (d *TxoData) Unmarshal(buf []byte) {
 	d.BlockHeight = binary.LittleEndian.Uint32(buf[:4]) // 4
 	d.TxIdx = binary.LittleEndian.Uint64(buf[4:12])     // 8
-	d.Value = binary.LittleEndian.Uint64(buf[12:20])    // 8
+	d.Satoshi = binary.LittleEndian.Uint64(buf[12:20])  // 8
 	// copy(d.AddressPkh, buf[12:32])                      // 20
 	// copy(d.GenesisId, buf[32:52])                       // 20
 	// copy(d.ScriptType, buf[60:92])                      // 32

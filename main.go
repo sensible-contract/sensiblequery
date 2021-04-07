@@ -91,7 +91,7 @@ func main() {
 	router.GET("/nft/transfer-volume/:codehash/:genesis/:tokenid", controller.GetNFTTransferTimesInBlockRange)
 	router.GET("/nft/owners/:codehash/:genesis", controller.ListNFTOwners)
 	router.GET("/nft/summary/:address", controller.ListAllNFTByOwner)
-	router.GET("/nft/detail/:codehash/:genesis/:address", controller.ListNFTBalanceByOwner)
+	router.GET("/nft/detail/:codehash/:genesis/:address", controller.ListNFTCountByOwner)
 
 	router.GET("/address/:address/history", controller.GetHistoryByAddress)
 	router.GET("/contract/history/:codehash/:genesis/:address", controller.GetHistoryByGenesis)

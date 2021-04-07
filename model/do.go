@@ -115,6 +115,7 @@ type TxInDO struct {
 	UtxId      []byte `db:"utxid"`
 	Vout       uint32 `db:"vout"`
 	Address    []byte `db:"address"`
+	CodeHash   []byte `db:"codehash"`
 	Genesis    []byte `db:"genesis"`
 	Satoshi    uint64 `db:"satoshi"`
 	ScriptType []byte `db:"script_type"`
@@ -125,6 +126,7 @@ type TxOutDO struct {
 	TxId       []byte `db:"txid"`
 	Vout       uint32 `db:"vout"`
 	Address    []byte `db:"address"`
+	CodeHash   []byte `db:"codehash"`
 	Genesis    []byte `db:"genesis"`
 	Satoshi    uint64 `db:"satoshi"`
 	ScriptType []byte `db:"script_type"`
@@ -148,6 +150,7 @@ type TxOutStatusDO struct {
 	TxId       []byte `db:"txid"`
 	Vout       uint32 `db:"vout"`
 	Address    []byte `db:"address"`
+	CodeHash   []byte `db:"codehash"`
 	Genesis    []byte `db:"genesis"`
 	Satoshi    uint64 `db:"satoshi"`
 	ScriptType []byte `db:"script_type"`

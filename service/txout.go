@@ -8,6 +8,7 @@ import (
 	"log"
 	"satoblock/dao/clickhouse"
 	"satoblock/lib/blkparser"
+	"satoblock/lib/script"
 	"satoblock/lib/utils"
 	"satoblock/model"
 )
@@ -16,14 +17,14 @@ const (
 	SQL_FIELEDS_TXOUT_WITHOUT_SCRIPT        = "utxid, vout, address, genesis, satoshi, script_type, '', height"
 	SQL_FIELEDS_TXOUT_STATUS_WITHOUT_SCRIPT = SQL_FIELEDS_TXOUT_WITHOUT_SCRIPT + ", u.txid, u.height"
 
-	SQL_FIELEDS_TXOUT        = "utxid, vout, address, genesis, satoshi, script_type, script_pk, height"
+	SQL_FIELEDS_TXOUT        = "utxid, vout, address, codehash, genesis, satoshi, script_type, script_pk, height"
 	SQL_FIELEDS_TXOUT_STATUS = SQL_FIELEDS_TXOUT + ", u.txid, u.height"
 )
 
 //////////////// txout
 func txOutStatusResultSRF(rows *sql.Rows) (interface{}, error) {
 	var ret model.TxOutStatusDO
-	err := rows.Scan(&ret.TxId, &ret.Vout, &ret.Address, &ret.Genesis, &ret.Satoshi, &ret.ScriptType, &ret.ScriptPk, &ret.Height,
+	err := rows.Scan(&ret.TxId, &ret.Vout, &ret.Address, &ret.CodeHash, &ret.Genesis, &ret.Satoshi, &ret.ScriptType, &ret.ScriptPk, &ret.Height,
 		&ret.TxIdSpent, &ret.HeightSpent)
 	if err != nil {
 		return nil, err
@@ -100,12 +101,18 @@ func GetTxOutputsBySql(psql string) (txOutsRsp []*model.TxOutStatusResp, err err
 		if len(txOut.Address) == 20 {
 			address = utils.EncodeAddress(txOut.Address, utils.PubKeyHashAddrIDMainNet)
 		}
+		isNFT, _, _, _, dataValue, decimal := script.ExtractPkScriptForTxo(txOut.ScriptPk, txOut.ScriptType)
 		txOutsRsp = append(txOutsRsp, &model.TxOutStatusResp{
 			TxIdHex: blkparser.HashString(txOut.TxId),
 			Vout:    int(txOut.Vout),
 			Address: address,
 			Satoshi: int(txOut.Satoshi),
 
+			IsNFT:         isNFT,
+			TokenId:       int(dataValue),
+			TokenAmount:   int(dataValue),
+			TokenDecimal:  int(decimal),
+			CodeHashHex:   hex.EncodeToString(txOut.CodeHash),
 			GenesisHex:    hex.EncodeToString(txOut.Genesis),
 			ScriptTypeHex: hex.EncodeToString(txOut.ScriptType),
 			ScriptPkHex:   hex.EncodeToString(txOut.ScriptPk),
@@ -144,7 +151,7 @@ LIMIT 1`, SQL_FIELEDS_TXOUT, txidHex, index, blkHeight)
 
 func txOutResultSRF(rows *sql.Rows) (interface{}, error) {
 	var ret model.TxOutDO
-	err := rows.Scan(&ret.TxId, &ret.Vout, &ret.Address, &ret.Genesis, &ret.Satoshi, &ret.ScriptType, &ret.ScriptPk, &ret.Height)
+	err := rows.Scan(&ret.TxId, &ret.Vout, &ret.Address, &ret.CodeHash, &ret.Genesis, &ret.Satoshi, &ret.ScriptType, &ret.ScriptPk, &ret.Height)
 	if err != nil {
 		return nil, err
 	}
@@ -165,12 +172,19 @@ func GetTxOutputBySql(psql string) (txOutRsp *model.TxOutResp, err error) {
 	if len(txOut.Address) == 20 {
 		address = utils.EncodeAddress(txOut.Address, utils.PubKeyHashAddrIDMainNet)
 	}
+
+	isNFT, _, _, _, dataValue, decimal := script.ExtractPkScriptForTxo(txOut.ScriptPk, txOut.ScriptType)
 	txOutRsp = &model.TxOutResp{
 		TxIdHex: blkparser.HashString(txOut.TxId),
 		Vout:    int(txOut.Vout),
 		Address: address,
 		Satoshi: int(txOut.Satoshi),
 
+		IsNFT:         isNFT,
+		TokenId:       int(dataValue),
+		TokenAmount:   int(dataValue),
+		TokenDecimal:  int(decimal),
+		CodeHashHex:   hex.EncodeToString(txOut.CodeHash),
 		GenesisHex:    hex.EncodeToString(txOut.Genesis),
 		ScriptTypeHex: hex.EncodeToString(txOut.ScriptType),
 		ScriptPkHex:   hex.EncodeToString(txOut.ScriptPk),

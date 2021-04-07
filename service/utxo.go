@@ -82,10 +82,11 @@ func getUtxoFromRedis(cursor, size int, key string) (txOutsRsp []*model.TxOutRes
 		return
 	}
 
+	log.Printf("getUtxoFromRedis redis: %d", len(vals))
 	pipe := rdb.Pipeline()
 	m := map[string]*redis.StringCmd{}
 	for _, key := range vals {
-		m[key] = pipe.Get(key)
+		m[key] = pipe.Get(key[:36])
 	}
 	_, err = pipe.Exec()
 	if err != nil && err != redis.Nil {
@@ -95,6 +96,7 @@ func getUtxoFromRedis(cursor, size int, key string) (txOutsRsp []*model.TxOutRes
 	for key, v := range m {
 		res, err := v.Result()
 		if err == redis.Nil {
+			log.Printf("redis not found key: %s", hex.EncodeToString([]byte(key)))
 			continue
 		} else if err != nil {
 			panic(err)
@@ -103,20 +105,22 @@ func getUtxoFromRedis(cursor, size int, key string) (txOutsRsp []*model.TxOutRes
 		txout.Unmarshal([]byte(res))
 
 		// 补充数据
-		txout.UTxid = []byte(key[:32])                            // 32
-		txout.Vout = binary.LittleEndian.Uint32([]byte(key[32:])) // 4
+		txout.UTxid = []byte(key[:32])                              // 32
+		txout.Vout = binary.LittleEndian.Uint32([]byte(key[32:36])) // 4
 		txout.ScriptType = script.GetLockingScriptType(txout.Script)
-		txout.GenesisId, txout.AddressPkh = script.ExtractPkScriptAddressPkh(txout.Script, txout.ScriptType)
-		if txout.AddressPkh == nil {
-			txout.GenesisId, txout.AddressPkh = script.ExtractPkScriptGenesisIdAndAddressPkh(txout.Script)
-		}
+		txout.IsNFT, txout.CodeHash, txout.GenesisId, txout.AddressPkh, txout.DataValue, txout.Decimal = script.ExtractPkScriptForTxo(txout.Script, txout.ScriptType)
 
 		txOutsRsp = append(txOutsRsp, &model.TxOutResp{
 			TxIdHex: blkparser.HashString(txout.UTxid),
 			Vout:    int(txout.Vout),
 			Address: utils.EncodeAddress(txout.AddressPkh, utils.PubKeyHashAddrIDMainNet),
-			Satoshi: int(txout.Value),
+			Satoshi: int(txout.Satoshi),
 
+			IsNFT:         txout.IsNFT,
+			TokenId:       int(txout.DataValue),
+			TokenAmount:   int(txout.DataValue),
+			TokenDecimal:  int(txout.Decimal),
+			CodeHashHex:   hex.EncodeToString(txout.CodeHash),
 			GenesisHex:    hex.EncodeToString(txout.GenesisId),
 			ScriptTypeHex: hex.EncodeToString(txout.ScriptType),
 			ScriptPkHex:   hex.EncodeToString(txout.Script),

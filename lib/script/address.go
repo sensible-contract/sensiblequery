@@ -2,21 +2,28 @@ package script
 
 import utils "satoblock/lib/blkparser"
 
-func ExtractPkScriptAddressPkh(Pkscript, scriptType []byte) (genesisId, addressPkh []byte) {
-	// if isPubkey(scriptType) {
-	// 	return Pkscript[3:23]
-	// }
-
+func ExtractPkScriptForTxo(Pkscript, scriptType []byte) (isNFT bool, codeHash, genesisId, addressPkh []byte, value, decimal uint64) {
 	if isPubkeyHash(scriptType) {
 		addressPkh = make([]byte, 20)
 		copy(addressPkh, Pkscript[3:23])
-		return empty, addressPkh
+		return false, empty, empty, addressPkh, 0, 0
+	}
+
+	if isPayToScriptHash(scriptType) {
+		addressPkh = utils.GetHash160(Pkscript[2 : len(Pkscript)-1])
+		return false, empty, empty, addressPkh, 0, 0
+	}
+
+	if isPubkey(scriptType) {
+		addressPkh = utils.GetHash160(Pkscript[1 : len(Pkscript)-1])
+		return false, empty, empty, addressPkh, 0, 0
 	}
 
 	// if isMultiSig(scriptType) {
 	// 	return Pkscript[:]
 	// }
-	return
+
+	return ExtractPkScriptGenesisIdAndAddressPkh(Pkscript)
 }
 
 func GetLockingScriptType(pkscript []byte) (scriptType []byte) {

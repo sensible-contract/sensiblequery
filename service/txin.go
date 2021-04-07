@@ -8,6 +8,7 @@ import (
 	"log"
 	"satoblock/dao/clickhouse"
 	"satoblock/lib/blkparser"
+	"satoblock/lib/script"
 	"satoblock/lib/utils"
 	"satoblock/model"
 )
@@ -17,7 +18,7 @@ const (
        height_txo, utxid, vout, address, genesis, satoshi, script_type, ''`
 
 	SQL_FIELEDS_TXIN = `height, txid, idx, script_sig, nsequence,
-       height_txo, utxid, vout, address, genesis, satoshi, script_type, script_pk`
+       height_txo, utxid, vout, address, codehash, genesis, satoshi, script_type, script_pk`
 	SQL_FIELEDS_TXIN_SPENT = "height, txid, idx, utxid, vout"
 )
 
@@ -35,7 +36,7 @@ func txInResultSRF(rows *sql.Rows) (interface{}, error) {
 	var ret model.TxInDO
 	err := rows.Scan(
 		&ret.Height, &ret.TxId, &ret.Idx, &ret.ScriptSig, &ret.Sequence,
-		&ret.HeightTxo, &ret.UtxId, &ret.Vout, &ret.Address, &ret.Genesis, &ret.Satoshi, &ret.ScriptType, &ret.ScriptPk)
+		&ret.HeightTxo, &ret.UtxId, &ret.Vout, &ret.Address, &ret.CodeHash, &ret.Genesis, &ret.Satoshi, &ret.ScriptType, &ret.ScriptPk)
 	if err != nil {
 		return nil, err
 	}
@@ -84,7 +85,7 @@ func GetTxInputsBySql(psql string) (txInsRsp []*model.TxInResp, err error) {
 		if len(txin.Address) == 20 {
 			address = utils.EncodeAddress(txin.Address, utils.PubKeyHashAddrIDMainNet)
 		}
-
+		isNFT, _, _, _, dataValue, decimal := script.ExtractPkScriptForTxo(txin.ScriptPk, txin.ScriptType)
 		txInsRsp = append(txInsRsp, &model.TxInResp{
 			Height:       int(txin.Height),
 			TxIdHex:      blkparser.HashString(txin.TxId),
@@ -96,6 +97,11 @@ func GetTxInputsBySql(psql string) (txInsRsp []*model.TxInResp, err error) {
 			UtxIdHex:      blkparser.HashString(txin.UtxId),
 			Vout:          int(txin.Vout),
 			Address:       address,
+			IsNFT:         isNFT,
+			TokenId:       int(dataValue),
+			TokenAmount:   int(dataValue),
+			TokenDecimal:  int(decimal),
+			CodeHashHex:   hex.EncodeToString(txin.CodeHash),
 			GenesisHex:    hex.EncodeToString(txin.Genesis),
 			Satoshi:       int(txin.Satoshi),
 			ScriptTypeHex: hex.EncodeToString(txin.ScriptType),
@@ -145,7 +151,7 @@ func GetTxInputBySql(psql string) (txInRsp *model.TxInResp, err error) {
 	if len(txin.Address) == 20 {
 		address = utils.EncodeAddress(txin.Address, utils.PubKeyHashAddrIDMainNet)
 	}
-
+	isNFT, _, _, _, dataValue, decimal := script.ExtractPkScriptForTxo(txin.ScriptPk, txin.ScriptType)
 	txInRsp = &model.TxInResp{
 		Height:       int(txin.Height),
 		TxIdHex:      blkparser.HashString(txin.TxId),
@@ -156,6 +162,11 @@ func GetTxInputBySql(psql string) (txInRsp *model.TxInResp, err error) {
 		UtxIdHex:      blkparser.HashString(txin.UtxId),
 		Vout:          int(txin.Vout),
 		Address:       address,
+		IsNFT:         isNFT,
+		TokenId:       int(dataValue),
+		TokenAmount:   int(dataValue),
+		TokenDecimal:  int(decimal),
+		CodeHashHex:   hex.EncodeToString(txin.CodeHash),
 		GenesisHex:    hex.EncodeToString(txin.Genesis),
 		Satoshi:       int(txin.Satoshi),
 		ScriptTypeHex: hex.EncodeToString(txin.ScriptType),

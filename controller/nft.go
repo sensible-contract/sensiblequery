@@ -169,14 +169,14 @@ func GetNFTTransferTimesInBlockRange(ctx *gin.Context) {
 }
 
 // ListNFTOwners
-// @Summary 查询NFT Token的持有人。获得每个tokenId所属的地址
+// @Summary 查询NFT Token的持有人。获得每个人持有的NFT数量
 // @Tags token NFT
 // @Produce  json
 // @Param cursor query int true "起始游标" default(0)
 // @Param size query int true "返回记录数量" default(10)
 // @Param codehash path string true "Code Hash160" default(844c56bb99afc374967a27ce3b46244e2e1fba60)
 // @Param genesis path string true "Genesis ID " default(74967a27ce3b46244e2e1fba60844c56bb99afc3)
-// @Success 200 {object} model.Response{data=[]model.NFTOwnerResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Success 200 {object} model.Response{data=[]model.NFTSummaryResp} "{"code": 0, "data": [{}], "msg": "ok"}"
 // @Router /nft/owners/{codehash}/{genesis} [get]
 func ListNFTOwners(ctx *gin.Context) {
 	log.Printf("ListNFTOwners enter")
@@ -281,8 +281,8 @@ func ListAllNFTByOwner(ctx *gin.Context) {
 	})
 }
 
-// ListNFTBalanceByOwner
-// @Summary 查询某人持有的某NFT Token的所有TokenId
+// ListNFTCountByOwner
+// @Summary 查询某人持有的某NFT Token的所持有的NFT数量
 // @Tags token NFT
 // @Produce  json
 // @Param cursor query int true "起始游标" default(0)
@@ -290,10 +290,10 @@ func ListAllNFTByOwner(ctx *gin.Context) {
 // @Param codehash path string true "Code Hash160" default(844c56bb99afc374967a27ce3b46244e2e1fba60)
 // @Param genesis path string true "Genesis ID " default(74967a27ce3b46244e2e1fba60844c56bb99afc3)
 // @Param address path string true "Address" default(17SkEw2md5avVNyYgj6RiXuQKNwkXaxFyQ)
-// @Success 200 {object} model.Response{data=model.NFTOwnerResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Success 200 {object} model.Response{data=model.NFTSummaryResp} "{"code": 0, "data": [{}], "msg": "ok"}"
 // @Router /nft/detail/{codehash}/{genesis}/{address} [get]
-func ListNFTBalanceByOwner(ctx *gin.Context) {
-	log.Printf("ListNFTOwners enter")
+func ListNFTCountByOwner(ctx *gin.Context) {
+	log.Printf("ListNFTCountByOwner enter")
 
 	codeHashHex := ctx.Param("codehash")
 	// check
@@ -322,10 +322,10 @@ func ListNFTBalanceByOwner(ctx *gin.Context) {
 		return
 	}
 
-	result, err := service.GetNFTBalanceByCodeHashGenesisAddress(codeHash, genesisId, addressPkh)
+	result, err := service.GetNFTCountByCodeHashGenesisAddress(codeHash, genesisId, addressPkh)
 	if err != nil {
-		log.Printf("ListNFTBalanceByOwner failed: %v", err)
-		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "ListNFTBalanceByOwner failed"})
+		log.Printf("ListNFTCountByOwner failed: %v", err)
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "ListNFTCountByOwner failed"})
 		return
 	}
 

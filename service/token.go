@@ -18,7 +18,7 @@ func GetTokenOwnersByCodeHashGenesis(cursor, size int, codeHash, genesisId []byt
 
 	for _, val := range vals {
 		ftOwnersRsp = append(ftOwnersRsp, &model.FTOwnerBalanceResp{
-			Address: utils.EncodeAddress(val.Member.([]byte), utils.PubKeyHashAddrIDMainNet),
+			Address: utils.EncodeAddress([]byte(val.Member.(string)), utils.PubKeyHashAddrIDMainNet),
 			Balance: int(val.Score),
 		})
 	}
@@ -35,8 +35,8 @@ func GetAllTokenBalanceByAddress(cursor, size int, addressPkh []byte) (ftOwnersR
 
 	for _, val := range vals {
 		ftOwnersRsp = append(ftOwnersRsp, &model.FTOwnerByAddressResp{
-			CodeHashHex: hex.EncodeToString(val.Member.([]byte)[:20]),
-			GenesisHex:  hex.EncodeToString(val.Member.([]byte)[20:]),
+			CodeHashHex: hex.EncodeToString([]byte(val.Member.(string))[:20]),
+			GenesisHex:  hex.EncodeToString([]byte(val.Member.(string))[20:]),
 			Balance:     int(val.Score),
 		})
 	}
@@ -69,7 +69,7 @@ func GetNFTOwnersByCodeHashGenesis(cursor, size int, codeHash, genesisId []byte)
 
 	for _, val := range vals {
 		ownersRsp = append(ownersRsp, &model.NFTSummaryResp{
-			Address: utils.EncodeAddress(val.Member.([]byte), utils.PubKeyHashAddrIDMainNet),
+			Address: utils.EncodeAddress([]byte(val.Member.(string)), utils.PubKeyHashAddrIDMainNet),
 			Count:   int(val.Score),
 		})
 	}
@@ -86,8 +86,8 @@ func GetAllNFTBalanceByAddress(cursor, size int, addressPkh []byte) (ftOwnersRsp
 
 	for _, val := range vals {
 		ftOwnersRsp = append(ftOwnersRsp, &model.FTOwnerByAddressResp{
-			CodeHashHex: hex.EncodeToString(val.Member.([]byte)[:20]),
-			GenesisHex:  hex.EncodeToString(val.Member.([]byte)[20:]),
+			CodeHashHex: hex.EncodeToString([]byte(val.Member.(string))[:20]),
+			GenesisHex:  hex.EncodeToString([]byte(val.Member.(string))[20:]),
 			Balance:     int(val.Score),
 		})
 	}
@@ -95,16 +95,16 @@ func GetAllNFTBalanceByAddress(cursor, size int, addressPkh []byte) (ftOwnersRsp
 	return ftOwnersRsp, nil
 }
 
-func GetNFTBalanceByCodeHashGenesisAddress(codeHash, genesisId, addressPkh []byte) (balanceRsp *model.FTOwnerBalanceResp, err error) {
+func GetNFTCountByCodeHashGenesisAddress(codeHash, genesisId, addressPkh []byte) (balanceRsp *model.NFTSummaryResp, err error) {
 	score, err := rdb.ZScore("no"+string(codeHash)+string(genesisId), string(addressPkh)).Result()
 	if err != nil {
 		log.Printf("GetFTOwnersByCodeHashGenesis redis failed: %v", err)
 		return
 	}
 
-	balanceRsp = &model.FTOwnerBalanceResp{
+	balanceRsp = &model.NFTSummaryResp{
 		Address: utils.EncodeAddress(addressPkh, utils.PubKeyHashAddrIDMainNet),
-		Balance: int(score),
+		Count:   int(score),
 	}
 	return balanceRsp, nil
 }
