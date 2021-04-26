@@ -1467,7 +1467,7 @@ var doc = `{
                 "tags": [
                     "token NFT"
                 ],
-                "summary": "查询某人持有的某NFT Token的所有TokenId",
+                "summary": "查询某人持有的某NFT Token的所持有的NFT数量",
                 "parameters": [
                     {
                         "type": "integer",
@@ -1522,7 +1522,7 @@ var doc = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/model.NFTOwnerResp"
+                                            "$ref": "#/definitions/model.NFTSummaryResp"
                                         }
                                     }
                                 }
@@ -1651,7 +1651,7 @@ var doc = `{
                 "tags": [
                     "token NFT"
                 ],
-                "summary": "查询NFT Token的持有人。获得每个tokenId所属的地址",
+                "summary": "查询NFT Token的持有人。获得每个人持有的NFT数量",
                 "parameters": [
                     {
                         "type": "integer",
@@ -1700,7 +1700,7 @@ var doc = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/model.NFTOwnerResp"
+                                                "$ref": "#/definitions/model.NFTSummaryResp"
                                             }
                                         }
                                     }
@@ -2608,15 +2608,15 @@ var doc = `{
                 }
             }
         },
-        "model.NFTOwnerResp": {
+        "model.NFTSummaryResp": {
             "type": "object",
             "properties": {
                 "address": {
                     "description": "token持有人的address",
                     "type": "string"
                 },
-                "tokenId": {
-                    "description": "持有的NFT id",
+                "count": {
+                    "description": "持有的当前NFT个数",
                     "type": "integer"
                 }
             }
@@ -2728,6 +2728,10 @@ var doc = `{
                     "description": "输入index",
                     "type": "integer"
                 },
+                "isNFT": {
+                    "description": "当前输入花费是否为NFT",
+                    "type": "boolean"
+                },
                 "satoshi": {
                     "description": "当前输入花费的outpoint的satoshi",
                     "type": "integer"
@@ -2750,6 +2754,10 @@ var doc = `{
                 },
                 "tokenAmount": {
                     "description": "当前输入花费的outpoint的ft tokenAmount",
+                    "type": "integer"
+                },
+                "tokenDecimal": {
+                    "description": "当前输入花费的outpoint的ft decimal",
                     "type": "integer"
                 },
                 "tokenId": {
@@ -2870,6 +2878,10 @@ var doc = `{
                     "description": "1为输出包含(即收入)，0为输入包含(即花费)",
                     "type": "integer"
                 },
+                "isNFT": {
+                    "description": "当前输出是否为NFT",
+                    "type": "boolean"
+                },
                 "satoshi": {
                     "description": "当前输出的satoshi",
                     "type": "integer"
@@ -2880,6 +2892,10 @@ var doc = `{
                 },
                 "tokenAmount": {
                     "description": "当前输出的ft tokenAmount",
+                    "type": "integer"
+                },
+                "tokenDecimal": {
+                    "description": "当前输入花费的outpoint的ft decimal",
                     "type": "integer"
                 },
                 "tokenId": {
@@ -2919,6 +2935,10 @@ var doc = `{
                     "description": "输出被花费的txid所在区块内序号",
                     "type": "integer"
                 },
+                "isNFT": {
+                    "description": "当前输出是否为NFT",
+                    "type": "boolean"
+                },
                 "satoshi": {
                     "description": "当前输出的satoshi",
                     "type": "integer"
@@ -2933,6 +2953,10 @@ var doc = `{
                 },
                 "tokenAmount": {
                     "description": "当前输出的ft tokenAmount",
+                    "type": "integer"
+                },
+                "tokenDecimal": {
+                    "description": "当前输入花费的outpoint的ft decimal",
                     "type": "integer"
                 },
                 "tokenId": {
@@ -2972,6 +2996,10 @@ var doc = `{
                     "description": "当前输出被花费的区块高度，如果为0则未花费",
                     "type": "integer"
                 },
+                "isNFT": {
+                    "description": "当前输出是否为NFT",
+                    "type": "boolean"
+                },
                 "satoshi": {
                     "description": "当前输出的satoshi",
                     "type": "integer"
@@ -2986,6 +3014,10 @@ var doc = `{
                 },
                 "tokenAmount": {
                     "description": "当前输出的ft tokenAmount",
+                    "type": "integer"
+                },
+                "tokenDecimal": {
+                    "description": "当前输入花费的outpoint的ft decimal",
                     "type": "integer"
                 },
                 "tokenId": {

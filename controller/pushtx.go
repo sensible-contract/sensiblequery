@@ -3,13 +3,31 @@ package controller
 import (
 	"encoding/base64"
 	"encoding/hex"
+	"fmt"
 	"log"
 	"net/http"
 	"satoblock/model"
 
 	"github.com/gin-gonic/gin"
+	"github.com/spf13/viper"
 	"github.com/ybbus/jsonrpc/v2"
 )
+
+var rpcAddress string
+
+func init() {
+	viper.SetConfigFile("conf/chain.yaml")
+	if err := viper.ReadInConfig(); err != nil {
+		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
+			panic(fmt.Errorf("Fatal error config file: %s \n", err))
+		} else {
+			panic(fmt.Errorf("Fatal error config file: %s \n", err))
+		}
+	}
+
+	rpcAddress = viper.GetString("rpc")
+
+}
 
 type TxRequest struct {
 	TxHex string `json:"txHex"`
@@ -39,7 +57,7 @@ func PushTx(ctx *gin.Context) {
 		return
 	}
 
-	rpcClient := jsonrpc.NewClientWithOpts("http://localhost:16332", &jsonrpc.RPCClientOpts{
+	rpcClient := jsonrpc.NewClientWithOpts(rpcAddress, &jsonrpc.RPCClientOpts{
 		CustomHeaders: map[string]string{
 			"Authorization": "Basic " + base64.StdEncoding.EncodeToString([]byte("jie"+":"+"jIang_jIe1234567")),
 		},

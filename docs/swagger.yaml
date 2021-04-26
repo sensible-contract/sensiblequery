@@ -216,13 +216,13 @@ definitions:
         description: NFT symbol
         type: string
     type: object
-  model.NFTOwnerResp:
+  model.NFTSummaryResp:
     properties:
       address:
         description: token持有人的address
         type: string
-      tokenId:
-        description: 持有的NFT id
+      count:
+        description: 持有的当前NFT个数
         type: integer
     type: object
   model.Response:
@@ -302,6 +302,9 @@ definitions:
       idx:
         description: 输入index
         type: integer
+      isNFT:
+        description: 当前输入花费是否为NFT
+        type: boolean
       satoshi:
         description: 当前输入花费的outpoint的satoshi
         type: integer
@@ -319,6 +322,9 @@ definitions:
         type: integer
       tokenAmount:
         description: 当前输入花费的outpoint的ft tokenAmount
+        type: integer
+      tokenDecimal:
+        description: 当前输入花费的outpoint的ft decimal
         type: integer
       tokenId:
         description: 当前输入的nft tokenId
@@ -406,6 +412,9 @@ definitions:
       ioType:
         description: 1为输出包含(即收入)，0为输入包含(即花费)
         type: integer
+      isNFT:
+        description: 当前输出是否为NFT
+        type: boolean
       satoshi:
         description: 当前输出的satoshi
         type: integer
@@ -414,6 +423,9 @@ definitions:
         type: string
       tokenAmount:
         description: 当前输出的ft tokenAmount
+        type: integer
+      tokenDecimal:
+        description: 当前输入花费的outpoint的ft decimal
         type: integer
       tokenId:
         description: 当前输出的nft tokenId
@@ -442,6 +454,9 @@ definitions:
       idx:
         description: 输出被花费的txid所在区块内序号
         type: integer
+      isNFT:
+        description: 当前输出是否为NFT
+        type: boolean
       satoshi:
         description: 当前输出的satoshi
         type: integer
@@ -453,6 +468,9 @@ definitions:
         type: string
       tokenAmount:
         description: 当前输出的ft tokenAmount
+        type: integer
+      tokenDecimal:
+        description: 当前输入花费的outpoint的ft decimal
         type: integer
       tokenId:
         description: 当前输出的nft tokenId
@@ -481,6 +499,9 @@ definitions:
       heightSpent:
         description: 当前输出被花费的区块高度，如果为0则未花费
         type: integer
+      isNFT:
+        description: 当前输出是否为NFT
+        type: boolean
       satoshi:
         description: 当前输出的satoshi
         type: integer
@@ -492,6 +513,9 @@ definitions:
         type: string
       tokenAmount:
         description: 当前输出的ft tokenAmount
+        type: integer
+      tokenDecimal:
+        description: 当前输入花费的outpoint的ft decimal
         type: integer
       tokenId:
         description: 当前输出的nft tokenId
@@ -1457,9 +1481,9 @@ paths:
             - $ref: '#/definitions/model.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/model.NFTOwnerResp'
+                  $ref: '#/definitions/model.NFTSummaryResp'
               type: object
-      summary: 查询某人持有的某NFT Token的所有TokenId
+      summary: 查询某人持有的某NFT Token的所持有的NFT数量
       tags:
       - token NFT
   /nft/history/{codehash}/{genesis}/{address}:
@@ -1570,10 +1594,10 @@ paths:
             - properties:
                 data:
                   items:
-                    $ref: '#/definitions/model.NFTOwnerResp'
+                    $ref: '#/definitions/model.NFTSummaryResp'
                   type: array
               type: object
-      summary: 查询NFT Token的持有人。获得每个tokenId所属的地址
+      summary: 查询NFT Token的持有人。获得每个人持有的NFT数量
       tags:
       - token NFT
   /nft/summary/{address}:
