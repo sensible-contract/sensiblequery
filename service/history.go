@@ -103,7 +103,7 @@ func GetHistoryBySql(psql string) (txOutsRsp []*model.TxOutHistoryResp, err erro
 		txOutsRsp = append(txOutsRsp, &model.TxOutHistoryResp{
 			TxIdHex: blkparser.HashString(txout.TxId),
 			Vout:    int(txout.Vout),
-			Address: utils.EncodeAddress(txout.Address, utils.PubKeyHashAddrIDMainNet),
+			Address: utils.EncodeAddress(txout.Address, utils.PubKeyHashAddrID),
 			Satoshi: int(txout.Satoshi),
 
 			GenesisHex:    hex.EncodeToString(txout.Genesis),

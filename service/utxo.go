@@ -46,7 +46,7 @@ func init() {
 
 func GetBalanceByAddress(addressPkh []byte) (balanceRsp *model.BalanceResp, err error) {
 	balanceRsp = &model.BalanceResp{
-		Address: utils.EncodeAddress(addressPkh, utils.PubKeyHashAddrIDMainNet),
+		Address: utils.EncodeAddress(addressPkh, utils.PubKeyHashAddrID),
 	}
 
 	balance, err := rdb.ZScore("balance", string(addressPkh)).Result()
@@ -113,7 +113,7 @@ func getUtxoFromRedis(cursor, size int, key string) (txOutsRsp []*model.TxOutRes
 		txOutsRsp = append(txOutsRsp, &model.TxOutResp{
 			TxIdHex: blkparser.HashString(txout.UTxid),
 			Vout:    int(txout.Vout),
-			Address: utils.EncodeAddress(txout.AddressPkh, utils.PubKeyHashAddrIDMainNet),
+			Address: utils.EncodeAddress(txout.AddressPkh, utils.PubKeyHashAddrID),
 			Satoshi: int(txout.Satoshi),
 
 			IsNFT:         txout.IsNFT,

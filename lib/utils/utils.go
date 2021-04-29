@@ -2,6 +2,7 @@ package utils
 
 import (
 	"errors"
+	"os"
 	"satoblock/lib/base58"
 
 	"golang.org/x/crypto/ripemd160"
@@ -15,11 +16,19 @@ func ReverseBytes(data []byte) (result []byte) {
 }
 
 var (
+	is_testnet              = os.Getenv("TESTNET")
 	PubKeyHashAddrIDMainNet = byte(0x00) // starts with 1
 	PubKeyHashAddrIDTestNet = byte(0x6f) // starts with m or n
+	PubKeyHashAddrID        = byte(0x00)
 	ErrChecksumMismatch     = errors.New("checksum mismatch")
 	empty                   = make([]byte, ripemd160.Size)
 )
+
+func init() {
+	if is_testnet != "" {
+		PubKeyHashAddrID = PubKeyHashAddrIDTestNet
+	}
+}
 
 // encodeAddress returns a human-readable payment address given a ripemd160 hash
 // and netID which encodes the bitcoin network and address type.  It is used

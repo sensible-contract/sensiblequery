@@ -9,11 +9,13 @@
             "email": "jiedohh@gmail.com"
         },
         "license": {
-            "name": "Apache 2.0",
-            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+            "name": "MIT License",
+            "url": "https://opensource.org/licenses/MIT"
         },
         "version": "1.0"
     },
+    "host": "https://api.sensiblequery.com",
+    "basePath": "/test",
     "paths": {
         "/": {
             "get": {

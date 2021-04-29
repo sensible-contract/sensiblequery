@@ -39,23 +39,26 @@ LEFT JOIN
 (
     SELECT utxid, vout, txid, height FROM txin_spent
     WHERE utxid = unhex('%s') AND
+           vout >= %d AND
          height IN (SELECT height FROM txout_spent_height
-                    WHERE utxid = unhex('%s')
-                    ) AND
-           vout >= %d
+                    WHERE utxid = unhex('%s') AND
+                           vout >= %d
+                    ORDER BY vout
+                    LIMIT %d
+                    )
     ORDER BY vout
     LIMIT %d
 ) AS u USING (utxid, vout)
 WHERE utxid = unhex('%s') AND
+       vout >= %d AND
      height IN (SELECT height FROM tx_height
                 WHERE txid = unhex('%s')
-               ) AND
-       vout >= %d
+               )
 ORDER BY vout
 LIMIT %d
 `, SQL_FIELEDS_TXOUT_STATUS, // need without script?
-		txidHex, txidHex, cursor, size,
-		txidHex, txidHex, cursor, size)
+		txidHex, cursor, txidHex, cursor, size, size,
+		txidHex, cursor, txidHex, size)
 
 	return GetTxOutputsBySql(psql)
 }
@@ -67,21 +70,24 @@ LEFT JOIN
 (
     SELECT utxid, vout, txid, height FROM txin_spent
     WHERE utxid = unhex('%s') AND
+           vout >= %d AND
          height IN (SELECT height FROM txout_spent_height
-                    WHERE utxid = unhex('%s')
-                    ) AND
-           vout >= %d
+                    WHERE utxid = unhex('%s') AND
+                           vout >= %d
+                    ORDER BY vout
+                    LIMIT %d
+                    )
     ORDER BY vout
     LIMIT %d
 ) AS u USING (utxid, vout)
-WHERE utxid = unhex('%s') AND
-     height = %d AND
+WHERE height = %d AND
+     utxid = unhex('%s') AND
       vout >= %d
 ORDER BY vout
 LIMIT %d
 `, SQL_FIELEDS_TXOUT_STATUS, // need without script?
-		txidHex, txidHex, cursor, size,
-		txidHex, blkHeight, cursor, size)
+		txidHex, cursor, txidHex, cursor, size, size,
+		blkHeight, txidHex, cursor, size)
 
 	return GetTxOutputsBySql(psql)
 }
@@ -99,7 +105,7 @@ func GetTxOutputsBySql(psql string) (txOutsRsp []*model.TxOutStatusResp, err err
 	for _, txOut := range txOuts {
 		address := "-"
 		if len(txOut.Address) == 20 {
-			address = utils.EncodeAddress(txOut.Address, utils.PubKeyHashAddrIDMainNet)
+			address = utils.EncodeAddress(txOut.Address, utils.PubKeyHashAddrID)
 		}
 		isNFT, _, _, _, dataValue, decimal := script.ExtractPkScriptForTxo(txOut.ScriptPk, txOut.ScriptType)
 		txOutsRsp = append(txOutsRsp, &model.TxOutStatusResp{
@@ -170,7 +176,7 @@ func GetTxOutputBySql(psql string) (txOutRsp *model.TxOutResp, err error) {
 	txOut := txOutRet.(*model.TxOutDO)
 	address := "-"
 	if len(txOut.Address) == 20 {
-		address = utils.EncodeAddress(txOut.Address, utils.PubKeyHashAddrIDMainNet)
+		address = utils.EncodeAddress(txOut.Address, utils.PubKeyHashAddrID)
 	}
 
 	isNFT, _, _, _, dataValue, decimal := script.ExtractPkScriptForTxo(txOut.ScriptPk, txOut.ScriptType)

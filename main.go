@@ -20,6 +20,7 @@ import (
 var (
 	// 0.0.0.0:8000
 	listen_address = os.Getenv("LISTEN")
+	is_testnet     = os.Getenv("TESTNET")
 )
 
 // @title Sensible Browser
@@ -30,8 +31,11 @@ var (
 // @contact.url https://github.com/sensing-contract/satoblock
 // @contact.email jiedohh@gmail.com
 
-// @license.name Apache 2.0
-// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
+// @license.name MIT License
+// @license.url https://opensource.org/licenses/MIT
+
+// @host https://api.sensiblequery.com
+// @basepath /test
 func main() {
 	router := gin.Default()
 	router.Use(cors.New(cors.Config{
@@ -48,6 +52,10 @@ func main() {
 
 	// go get -u github.com/swaggo/swag/cmd/swag@v1.6.7
 	url := ginSwagger.URL("/swagger/doc.json")
+	if is_testnet != "" {
+		url = ginSwagger.URL("/test/swagger/doc.json")
+	}
+
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
 
 	router.GET("/", controller.Satotx)

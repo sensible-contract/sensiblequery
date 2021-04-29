@@ -18,7 +18,7 @@ func GetTokenOwnersByCodeHashGenesis(cursor, size int, codeHash, genesisId []byt
 
 	for _, val := range vals {
 		ftOwnersRsp = append(ftOwnersRsp, &model.FTOwnerBalanceResp{
-			Address: utils.EncodeAddress([]byte(val.Member.(string)), utils.PubKeyHashAddrIDMainNet),
+			Address: utils.EncodeAddress([]byte(val.Member.(string)), utils.PubKeyHashAddrID),
 			Balance: int(val.Score),
 		})
 	}
@@ -52,7 +52,7 @@ func GetTokenBalanceByCodeHashGenesisAddress(codeHash, genesisId, addressPkh []b
 	}
 
 	balanceRsp = &model.FTOwnerBalanceResp{
-		Address: utils.EncodeAddress(addressPkh, utils.PubKeyHashAddrIDMainNet),
+		Address: utils.EncodeAddress(addressPkh, utils.PubKeyHashAddrID),
 		Balance: int(score),
 	}
 	return balanceRsp, nil
@@ -69,7 +69,7 @@ func GetNFTOwnersByCodeHashGenesis(cursor, size int, codeHash, genesisId []byte)
 
 	for _, val := range vals {
 		ownersRsp = append(ownersRsp, &model.NFTSummaryResp{
-			Address: utils.EncodeAddress([]byte(val.Member.(string)), utils.PubKeyHashAddrIDMainNet),
+			Address: utils.EncodeAddress([]byte(val.Member.(string)), utils.PubKeyHashAddrID),
 			Count:   int(val.Score),
 		})
 	}
@@ -103,7 +103,7 @@ func GetNFTCountByCodeHashGenesisAddress(codeHash, genesisId, addressPkh []byte)
 	}
 
 	balanceRsp = &model.NFTSummaryResp{
-		Address: utils.EncodeAddress(addressPkh, utils.PubKeyHashAddrIDMainNet),
+		Address: utils.EncodeAddress(addressPkh, utils.PubKeyHashAddrID),
 		Count:   int(score),
 	}
 	return balanceRsp, nil

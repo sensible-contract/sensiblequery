@@ -83,7 +83,7 @@ func GetTxInputsBySql(psql string) (txInsRsp []*model.TxInResp, err error) {
 	for _, txin := range txIns {
 		address := "-"
 		if len(txin.Address) == 20 {
-			address = utils.EncodeAddress(txin.Address, utils.PubKeyHashAddrIDMainNet)
+			address = utils.EncodeAddress(txin.Address, utils.PubKeyHashAddrID)
 		}
 		isNFT, _, _, _, dataValue, decimal := script.ExtractPkScriptForTxo(txin.ScriptPk, txin.ScriptType)
 		txInsRsp = append(txInsRsp, &model.TxInResp{
@@ -149,7 +149,7 @@ func GetTxInputBySql(psql string) (txInRsp *model.TxInResp, err error) {
 
 	address := "-"
 	if len(txin.Address) == 20 {
-		address = utils.EncodeAddress(txin.Address, utils.PubKeyHashAddrIDMainNet)
+		address = utils.EncodeAddress(txin.Address, utils.PubKeyHashAddrID)
 	}
 	isNFT, _, _, _, dataValue, decimal := script.ExtractPkScriptForTxo(txin.ScriptPk, txin.ScriptType)
 	txInRsp = &model.TxInResp{

@@ -24,8 +24,8 @@ var doc = `{
             "email": "jiedohh@gmail.com"
         },
         "license": {
-            "name": "Apache 2.0",
-            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+            "name": "MIT License",
+            "url": "https://opensource.org/licenses/MIT"
         },
         "version": "{{.Version}}"
     },
@@ -3067,8 +3067,8 @@ type swaggerInfo struct {
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = swaggerInfo{
 	Version:     "1.0",
-	Host:        "",
-	BasePath:    "",
+	Host:        "https://api.sensiblequery.com",
+	BasePath:    "/test",
 	Schemes:     []string{},
 	Title:       "Sensible Browser",
 	Description: "Sensible 区块浏览器",
