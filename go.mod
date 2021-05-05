@@ -1,4 +1,4 @@
-module satoblock
+module satosensible
 
 go 1.15
 

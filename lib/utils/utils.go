@@ -3,7 +3,7 @@ package utils
 import (
 	"errors"
 	"os"
-	"satoblock/lib/base58"
+	"satosensible/lib/base58"
 
 	"golang.org/x/crypto/ripemd160"
 )

@@ -1,6 +1,6 @@
 package script
 
-import utils "satoblock/lib/blkparser"
+import utils "satosensible/lib/blkparser"
 
 func ExtractPkScriptForTxo(Pkscript, scriptType []byte) (isNFT bool, codeHash, genesisId, addressPkh []byte, value, decimal uint64) {
 	if isPubkeyHash(scriptType) {

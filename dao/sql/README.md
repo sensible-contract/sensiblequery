@@ -1,6 +1,6 @@
-区块浏览器包括2个组件，一个是区块数据导出工具(blkparser)，一个是数据API server(satoblock)。使用clickhouse作为数据计算存储引擎。
+区块浏览器包括2个组件，一个是区块数据导出工具(satoblock)，一个是数据API server(satosensible)。使用clickhouse作为数据计算存储引擎。
 
-blkparser 通过访问全节点的区块文件夹来导出区块数据(默认在`~/.bitcoin/blocks/`)，导出的数据保存在clickhouse中，以供satoblock查询使用。
+satoblock 通过访问全节点的区块文件夹来导出区块数据(默认在`~/.bitcoin/blocks/`)，导出的数据保存在clickhouse中，以供satosensible查询使用。
 
 后续会增加监听zmq，不完全基于区块文件导出，并使用MongoDB/Redis辅助做mempool的数据同步。
 
@@ -11,11 +11,11 @@ blkparser 通过访问全节点的区块文件夹来导出区块数据(默认在
 
 首次导出区块时执行全量导出，后续则使用增量导出来补充新区块数据。
 
-blkparser支持指定起始/终止高度来导出一定范围内的区块数据，导出高度包括start但不包括end。全量导出时起始高度参数为0：
+satoblock支持指定起始/终止高度来导出一定范围内的区块数据，导出高度包括start但不包括end。全量导出时起始高度参数为0：
 
 ```
-./blkparser -start 0 -end 674936
-./blkparser -start 674936 -end 674940
+./satoblock -start 0 -end 674936
+./satoblock -start 674936 -end 674940
 ```
 
 导出数据文件有4种：
@@ -42,9 +42,9 @@ cat /data/txout.ch | clickhouse-client -h DBHOST --database="bsv" --query="INSER
 
 全量导入的SQL处理语句详见`prepare_all.sql`。
 
-其中表txin_full的全量生成对数据库压力很大，可以直接使用blkparser导出全量基础数据：
+其中表txin_full的全量生成对数据库压力很大，可以直接使用satoblock导出全量基础数据：
 
-    $ ./blkparser -start 0 -end 674936 -full
+    $ ./satoblock -start 0 -end 674936 -full
 
 将导出的txin.ch直接导入到txin_full表中即可，不需要对txin/txout表进行join运算：
 

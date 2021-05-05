@@ -3,8 +3,8 @@ package controller
 import (
 	"log"
 	"net/http"
-	"satoblock/model"
-	"satoblock/service"
+	"satosensible/model"
+	"satosensible/service"
 
 	"github.com/gin-gonic/gin"
 )

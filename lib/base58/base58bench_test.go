@@ -8,7 +8,7 @@ import (
 	"bytes"
 	"testing"
 
-	"satoblock/lib/base58"
+	"satosensible/lib/base58"
 )
 
 func BenchmarkBase58Encode(b *testing.B) {

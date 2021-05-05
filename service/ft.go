@@ -6,8 +6,8 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"satoblock/dao/clickhouse"
-	"satoblock/model"
+	"satosensible/dao/clickhouse"
+	"satosensible/model"
 )
 
 const (

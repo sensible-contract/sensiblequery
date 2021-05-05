@@ -1,4 +1,4 @@
-basePath: /test
+basePath: /
 definitions:
   controller.TxRequest:
     properties:
@@ -540,12 +540,12 @@ definitions:
       job:
         type: string
     type: object
-host: https://api.sensiblequery.com
+host: api.sensiblequery.com
 info:
   contact:
     email: jiedohh@gmail.com
-    name: satoblock
-    url: https://github.com/sensing-contract/satoblock
+    name: satosensible
+    url: https://github.com/sensing-contract/satosensible
   description: Sensible 区块浏览器
   license:
     name: MIT License

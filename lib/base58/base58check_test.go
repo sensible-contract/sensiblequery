@@ -7,7 +7,7 @@ package base58_test
 import (
 	"testing"
 
-	"satoblock/lib/base58"
+	"satosensible/lib/base58"
 )
 
 var checkEncodingStringTests = []struct {

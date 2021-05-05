@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"satoblock/controller"
-	_ "satoblock/docs"
+	"satosensible/controller"
+	_ "satosensible/docs"
 	"syscall"
 	"time"
 
@@ -27,15 +27,15 @@ var (
 // @version 1.0
 // @description Sensible 区块浏览器
 
-// @contact.name satoblock
-// @contact.url https://github.com/sensing-contract/satoblock
+// @contact.name satosensible
+// @contact.url https://github.com/sensing-contract/satosensible
 // @contact.email jiedohh@gmail.com
 
 // @license.name MIT License
 // @license.url https://opensource.org/licenses/MIT
 
-// @host https://api.sensiblequery.com
-// @basepath /test
+// @host api.sensiblequery.com
+// @basepath /
 func main() {
 	router := gin.Default()
 	router.Use(cors.New(cors.Config{

@@ -5,9 +5,9 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"satoblock/dao/clickhouse"
-	"satoblock/lib/blkparser"
-	"satoblock/model"
+	"satosensible/dao/clickhouse"
+	"satosensible/lib/blkparser"
+	"satosensible/model"
 )
 
 const (

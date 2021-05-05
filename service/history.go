@@ -6,10 +6,10 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"satoblock/dao/clickhouse"
-	"satoblock/lib/blkparser"
-	"satoblock/lib/utils"
-	"satoblock/model"
+	"satosensible/dao/clickhouse"
+	"satosensible/lib/blkparser"
+	"satosensible/lib/utils"
+	"satosensible/model"
 )
 
 const (

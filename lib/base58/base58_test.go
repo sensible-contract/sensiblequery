@@ -9,7 +9,7 @@ import (
 	"encoding/hex"
 	"testing"
 
-	"satoblock/lib/base58"
+	"satosensible/lib/base58"
 )
 
 var stringTests = []struct {

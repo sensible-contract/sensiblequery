@@ -3,7 +3,7 @@ package script
 import (
 	"bytes"
 	"encoding/binary"
-	"satoblock/lib/blkparser"
+	"satosensible/lib/blkparser"
 )
 
 var empty = make([]byte, 1)

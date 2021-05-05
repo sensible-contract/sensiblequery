@@ -4,9 +4,9 @@ import (
 	"encoding/hex"
 	"log"
 	"net/http"
-	"satoblock/lib/utils"
-	"satoblock/model"
-	"satoblock/service"
+	"satosensible/lib/utils"
+	"satosensible/model"
+	"satosensible/service"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
