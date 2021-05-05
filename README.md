@@ -1,7 +1,7 @@
 
 ## Bitcoin SV blockchain API service
 
-### SatoBlock
+### SatoSensible
 
 我们部署了一个浏览器Demo [BSV Browser](https://sensiblequery.com/#/blocks) ，可测试查看Blockchain的数据。
 
