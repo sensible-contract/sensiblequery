@@ -165,6 +165,12 @@ definitions:
         description: FT symbol
         type: string
     type: object
+  model.MempoolInfoResp:
+    properties:
+      ntx:
+        description: Mempool内包含的Tx数量
+        type: integer
+    type: object
   model.NFTInfoResp:
     properties:
       codehash:
@@ -329,7 +335,7 @@ definitions:
         type: integer
       tokenId:
         description: 当前输入的nft tokenId
-        type: integer
+        type: string
       txid:
         description: Txid
         type: string
@@ -430,7 +436,7 @@ definitions:
         type: integer
       tokenId:
         description: 当前输出的nft tokenId
-        type: integer
+        type: string
       txid:
         description: 当前txid
         type: string
@@ -475,7 +481,7 @@ definitions:
         type: integer
       tokenId:
         description: 当前输出的nft tokenId
-        type: integer
+        type: string
       txid:
         description: 当前txid
         type: string
@@ -520,7 +526,7 @@ definitions:
         type: integer
       tokenId:
         description: 当前输出的nft tokenId
-        type: integer
+        type: string
       txid:
         description: 当前txid
         type: string
@@ -1395,6 +1401,21 @@ paths:
       summary: 通过交易txid和交易被打包的区块高度height获取交易所有输出信息列表
       tags:
       - Txout
+  /mempool/info:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 0, "data": {}, "msg": "ok"}'
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.MempoolInfoResp'
+              type: object
+      summary: 获取mempool信息
   /nft/codehash-info/{codehash}:
     get:
       parameters:

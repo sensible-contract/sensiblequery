@@ -64,6 +64,8 @@ func main() {
 
 	router.GET("/blockchain/info", controller.GetBlockchainInfo)
 
+	router.GET("/mempool/info", controller.GetMempoolInfo)
+
 	router.GET("/blocks", controller.GetBlocksByHeightRange)
 
 	router.GET("/block/id/:blkid", controller.GetBlockById)

@@ -83,10 +83,11 @@ LEFT JOIN  (
     LIMIT 1
 ) AS blk
 USING height
-WHERE height IN (
+WHERE (height = 4294967295 OR
+      height IN (
     SELECT height FROM tx_height
     WHERE txid = unhex('%s')
-) AND txid = unhex('%s')
+)) AND txid = unhex('%s')
 LIMIT 1`, SQL_FIELEDS_TX_TIMESTAMP, txidHex, txidHex, txidHex)
 	return GetTxBySql(psql)
 }

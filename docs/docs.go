@@ -1381,6 +1381,34 @@ var doc = `{
                 }
             }
         },
+        "/mempool/info": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "获取mempool信息",
+                "responses": {
+                    "200": {
+                        "description": "{\"code\": 0, \"data\": {}, \"msg\": \"ok\"}",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/model.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/model.MempoolInfoResp"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
         "/nft/codehash-info/{codehash}": {
             "get": {
                 "produces": [
@@ -2536,6 +2564,15 @@ var doc = `{
                 }
             }
         },
+        "model.MempoolInfoResp": {
+            "type": "object",
+            "properties": {
+                "ntx": {
+                    "description": "Mempool内包含的Tx数量",
+                    "type": "integer"
+                }
+            }
+        },
         "model.NFTInfoResp": {
             "type": "object",
             "properties": {
@@ -2762,7 +2799,7 @@ var doc = `{
                 },
                 "tokenId": {
                     "description": "当前输入的nft tokenId",
-                    "type": "integer"
+                    "type": "string"
                 },
                 "txid": {
                     "description": "Txid",
@@ -2900,7 +2937,7 @@ var doc = `{
                 },
                 "tokenId": {
                     "description": "当前输出的nft tokenId",
-                    "type": "integer"
+                    "type": "string"
                 },
                 "txid": {
                     "description": "当前txid",
@@ -2961,7 +2998,7 @@ var doc = `{
                 },
                 "tokenId": {
                     "description": "当前输出的nft tokenId",
-                    "type": "integer"
+                    "type": "string"
                 },
                 "txid": {
                     "description": "当前txid",
@@ -3022,7 +3059,7 @@ var doc = `{
                 },
                 "tokenId": {
                     "description": "当前输出的nft tokenId",
-                    "type": "integer"
+                    "type": "string"
                 },
                 "txid": {
                     "description": "当前txid",

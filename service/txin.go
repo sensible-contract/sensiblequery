@@ -11,6 +11,7 @@ import (
 	"satosensible/lib/script"
 	"satosensible/lib/utils"
 	"satosensible/model"
+	"strconv"
 )
 
 const (
@@ -47,10 +48,11 @@ func GetTxInputsByTxId(cursor, size int, txidHex string) (txInsRsp []*model.TxIn
 	psql := fmt.Sprintf(`
 SELECT %s FROM txin
 WHERE txid = unhex('%s') AND
+   (height = 4294967295 OR
     height IN (
         SELECT height FROM tx_height
         WHERE txid = unhex('%s')
-    ) AND
+    )) AND
       idx >= %d
 ORDER BY idx
 LIMIT %d`, SQL_FIELEDS_TXIN, txidHex, txidHex, cursor, size)
@@ -86,6 +88,14 @@ func GetTxInputsBySql(psql string) (txInsRsp []*model.TxInResp, err error) {
 			address = utils.EncodeAddress(txin.Address, utils.PubKeyHashAddrID)
 		}
 		isNFT, _, _, _, dataValue, decimal := script.ExtractPkScriptForTxo(txin.ScriptPk, txin.ScriptType)
+		tokenId := ""
+		if len(txin.Genesis) >= 20 {
+			if isNFT {
+				tokenId = strconv.Itoa(int(dataValue))
+			} else {
+				tokenId = hex.EncodeToString(txin.Genesis)
+			}
+		}
 		txInsRsp = append(txInsRsp, &model.TxInResp{
 			Height:       int(txin.Height),
 			TxIdHex:      blkparser.HashString(txin.TxId),
@@ -98,7 +108,7 @@ func GetTxInputsBySql(psql string) (txInsRsp []*model.TxInResp, err error) {
 			Vout:          int(txin.Vout),
 			Address:       address,
 			IsNFT:         isNFT,
-			TokenId:       int(dataValue),
+			TokenId:       tokenId,
 			TokenAmount:   int(dataValue),
 			TokenDecimal:  int(decimal),
 			CodeHashHex:   hex.EncodeToString(txin.CodeHash),
@@ -152,6 +162,15 @@ func GetTxInputBySql(psql string) (txInRsp *model.TxInResp, err error) {
 		address = utils.EncodeAddress(txin.Address, utils.PubKeyHashAddrID)
 	}
 	isNFT, _, _, _, dataValue, decimal := script.ExtractPkScriptForTxo(txin.ScriptPk, txin.ScriptType)
+	tokenId := ""
+	if len(txin.Genesis) >= 20 {
+		if isNFT {
+			tokenId = strconv.Itoa(int(dataValue))
+		} else {
+			tokenId = hex.EncodeToString(txin.Genesis)
+		}
+	}
+
 	txInRsp = &model.TxInResp{
 		Height:       int(txin.Height),
 		TxIdHex:      blkparser.HashString(txin.TxId),
@@ -163,7 +182,7 @@ func GetTxInputBySql(psql string) (txInRsp *model.TxInResp, err error) {
 		Vout:          int(txin.Vout),
 		Address:       address,
 		IsNFT:         isNFT,
-		TokenId:       int(dataValue),
+		TokenId:       tokenId,
 		TokenAmount:   int(dataValue),
 		TokenDecimal:  int(decimal),
 		CodeHashHex:   hex.EncodeToString(txin.CodeHash),

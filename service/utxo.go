@@ -9,6 +9,7 @@ import (
 	"satosensible/lib/script"
 	"satosensible/lib/utils"
 	"satosensible/model"
+	"strconv"
 
 	"github.com/go-redis/redis"
 	"github.com/spf13/viper"
@@ -110,6 +111,15 @@ func getUtxoFromRedis(cursor, size int, key string) (txOutsRsp []*model.TxOutRes
 		txout.ScriptType = script.GetLockingScriptType(txout.Script)
 		txout.IsNFT, txout.CodeHash, txout.GenesisId, txout.AddressPkh, txout.DataValue, txout.Decimal = script.ExtractPkScriptForTxo(txout.Script, txout.ScriptType)
 
+		tokenId := ""
+		if len(txout.GenesisId) >= 20 {
+			if txout.IsNFT {
+				tokenId = strconv.Itoa(int(txout.DataValue))
+			} else {
+				tokenId = hex.EncodeToString(txout.GenesisId)
+			}
+		}
+
 		txOutsRsp = append(txOutsRsp, &model.TxOutResp{
 			TxIdHex: blkparser.HashString(txout.UTxid),
 			Vout:    int(txout.Vout),
@@ -117,7 +127,7 @@ func getUtxoFromRedis(cursor, size int, key string) (txOutsRsp []*model.TxOutRes
 			Satoshi: int(txout.Satoshi),
 
 			IsNFT:         txout.IsNFT,
-			TokenId:       int(txout.DataValue),
+			TokenId:       tokenId,
 			TokenAmount:   int(txout.DataValue),
 			TokenDecimal:  int(txout.Decimal),
 			CodeHashHex:   hex.EncodeToString(txout.CodeHash),

@@ -182,3 +182,28 @@ func GetBlockBySql(psql string) (blk *model.BlockInfoResp, err error) {
 	}
 	return
 }
+
+func mempoolResultSRF(rows *sql.Rows) (interface{}, error) {
+	var ret int
+	err := rows.Scan(&ret)
+	if err != nil {
+		return nil, err
+	}
+	return ret, nil
+}
+
+func GetMempoolTxCount() (count int, err error) {
+	psql := "SELECT count(1) FROM blktx_height WHERE height >= 4294967295"
+
+	blkRet, err := clickhouse.ScanOne(psql, mempoolResultSRF)
+	if err != nil {
+		log.Printf("query blk failed: %v", err)
+		return 0, err
+	}
+	if blkRet == nil {
+		return 0, errors.New("not exist")
+	}
+	mempoolTxCount := blkRet.(int)
+
+	return mempoolTxCount, nil
+}

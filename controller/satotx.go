@@ -56,5 +56,28 @@ func GetBlockchainInfo(ctx *gin.Context) {
 			Chainwork:     "",
 		},
 	})
+}
 
+// GetMempoolInfo 获取mempool信息
+// @Summary 获取mempool信息
+// @Produce  json
+// @Success 200 {object} model.Response{data=model.MempoolInfoResp} "{"code": 0, "data": {}, "msg": "ok"}"
+// @Router /mempool/info [get]
+func GetMempoolInfo(ctx *gin.Context) {
+	log.Printf("GetMempoolInfo enter")
+
+	count, err := service.GetMempoolTxCount()
+	if err != nil {
+		log.Printf("get mempool failed: %v", err)
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get mempool failed"})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, model.Response{
+		Code: 0,
+		Msg:  "ok",
+		Data: &model.MempoolInfoResp{
+			TxCount: count,
+		},
+	})
 }

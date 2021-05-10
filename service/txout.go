@@ -11,6 +11,7 @@ import (
 	"satosensible/lib/script"
 	"satosensible/lib/utils"
 	"satosensible/model"
+	"strconv"
 )
 
 const (
@@ -40,20 +41,22 @@ LEFT JOIN
     SELECT utxid, vout, txid, height FROM txin_spent
     WHERE utxid = unhex('%s') AND
            vout >= %d AND
+        (height = 4294967295 OR
          height IN (SELECT height FROM txout_spent_height
                     WHERE utxid = unhex('%s') AND
                            vout >= %d
                     ORDER BY vout
                     LIMIT %d
-                    )
+                    ))
     ORDER BY vout
     LIMIT %d
 ) AS u USING (utxid, vout)
 WHERE utxid = unhex('%s') AND
        vout >= %d AND
+    (height = 4294967295 OR
      height IN (SELECT height FROM tx_height
                 WHERE txid = unhex('%s')
-               )
+               ))
 ORDER BY vout
 LIMIT %d
 `, SQL_FIELEDS_TXOUT_STATUS, // need without script?
@@ -71,12 +74,13 @@ LEFT JOIN
     SELECT utxid, vout, txid, height FROM txin_spent
     WHERE utxid = unhex('%s') AND
            vout >= %d AND
+         (height == 4294967295 OR
          height IN (SELECT height FROM txout_spent_height
                     WHERE utxid = unhex('%s') AND
                            vout >= %d
                     ORDER BY vout
                     LIMIT %d
-                    )
+                    ))
     ORDER BY vout
     LIMIT %d
 ) AS u USING (utxid, vout)
@@ -108,6 +112,15 @@ func GetTxOutputsBySql(psql string) (txOutsRsp []*model.TxOutStatusResp, err err
 			address = utils.EncodeAddress(txOut.Address, utils.PubKeyHashAddrID)
 		}
 		isNFT, _, _, _, dataValue, decimal := script.ExtractPkScriptForTxo(txOut.ScriptPk, txOut.ScriptType)
+		tokenId := ""
+		if len(txOut.Genesis) >= 20 {
+			if isNFT {
+				tokenId = strconv.Itoa(int(dataValue))
+			} else {
+				tokenId = hex.EncodeToString(txOut.Genesis)
+			}
+		}
+
 		txOutsRsp = append(txOutsRsp, &model.TxOutStatusResp{
 			TxIdHex: blkparser.HashString(txOut.TxId),
 			Vout:    int(txOut.Vout),
@@ -115,7 +128,7 @@ func GetTxOutputsBySql(psql string) (txOutsRsp []*model.TxOutStatusResp, err err
 			Satoshi: int(txOut.Satoshi),
 
 			IsNFT:         isNFT,
-			TokenId:       int(dataValue),
+			TokenId:       tokenId,
 			TokenAmount:   int(dataValue),
 			TokenDecimal:  int(decimal),
 			CodeHashHex:   hex.EncodeToString(txOut.CodeHash),
@@ -180,6 +193,14 @@ func GetTxOutputBySql(psql string) (txOutRsp *model.TxOutResp, err error) {
 	}
 
 	isNFT, _, _, _, dataValue, decimal := script.ExtractPkScriptForTxo(txOut.ScriptPk, txOut.ScriptType)
+	tokenId := ""
+	if len(txOut.Genesis) >= 20 {
+		if isNFT {
+			tokenId = strconv.Itoa(int(dataValue))
+		} else {
+			tokenId = hex.EncodeToString(txOut.Genesis)
+		}
+	}
 	txOutRsp = &model.TxOutResp{
 		TxIdHex: blkparser.HashString(txOut.TxId),
 		Vout:    int(txOut.Vout),
@@ -187,7 +208,7 @@ func GetTxOutputBySql(psql string) (txOutRsp *model.TxOutResp, err error) {
 		Satoshi: int(txOut.Satoshi),
 
 		IsNFT:         isNFT,
-		TokenId:       int(dataValue),
+		TokenId:       tokenId,
 		TokenAmount:   int(dataValue),
 		TokenDecimal:  int(decimal),
 		CodeHashHex:   hex.EncodeToString(txOut.CodeHash),

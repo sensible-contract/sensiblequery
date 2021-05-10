@@ -9,6 +9,10 @@ type Welcome struct {
 
 ////////////////
 
+type MempoolInfoResp struct {
+	TxCount int `json:"ntx"` // Mempool内包含的Tx数量
+}
+
 type BlockchainInfoResp struct {
 	Chain         string `json:"chain"`         // main/test
 	Blocks        int    `json:"blocks"`        // 最新区块总数
@@ -85,7 +89,7 @@ type TxInResp struct {
 	GenesisHex    string `json:"genesis"`      // 当前输入花费的outpoint的genesis，Hex编码
 	TokenAmount   int    `json:"tokenAmount"`  // 当前输入花费的outpoint的ft tokenAmount
 	TokenDecimal  int    `json:"tokenDecimal"` // 当前输入花费的outpoint的ft decimal
-	TokenId       int    `json:"tokenId"`      // 当前输入的nft tokenId
+	TokenId       string `json:"tokenId"`      // 当前输入的nft tokenId
 	Satoshi       int    `json:"satoshi"`      // 当前输入花费的outpoint的satoshi
 	ScriptTypeHex string `json:"scriptType"`   // 当前输入锁定脚本类型，Hex编码
 	ScriptPkHex   string `json:"scriptPk"`     // 当前输入锁定脚本，Hex编码
@@ -100,7 +104,7 @@ type TxOutResp struct {
 	GenesisHex    string `json:"genesis"`      // 当前输出的genesis
 	TokenAmount   int    `json:"tokenAmount"`  // 当前输出的ft tokenAmount
 	TokenDecimal  int    `json:"tokenDecimal"` // 当前输入花费的outpoint的ft decimal
-	TokenId       int    `json:"tokenId"`      // 当前输出的nft tokenId
+	TokenId       string `json:"tokenId"`      // 当前输出的nft tokenId
 	Satoshi       int    `json:"satoshi"`      // 当前输出的satoshi
 	ScriptTypeHex string `json:"scriptType"`   // 当前输出锁定脚本类型
 	ScriptPkHex   string `json:"scriptPk"`     // 当前输出锁定脚本
@@ -117,7 +121,7 @@ type TxOutHistoryResp struct {
 	GenesisHex    string `json:"genesis"`      // 当前输出的genesis
 	TokenAmount   int    `json:"tokenAmount"`  // 当前输出的ft tokenAmount
 	TokenDecimal  int    `json:"tokenDecimal"` // 当前输入花费的outpoint的ft decimal
-	TokenId       int    `json:"tokenId"`      // 当前输出的nft tokenId
+	TokenId       string `json:"tokenId"`      // 当前输出的nft tokenId
 	Satoshi       int    `json:"satoshi"`      // 当前输出的satoshi
 	ScriptTypeHex string `json:"scriptType"`   // 当前输出锁定脚本类型
 	Height        int    `json:"height"`       // 当前交易所在区块的高度
@@ -134,7 +138,7 @@ type TxOutStatusResp struct {
 	GenesisHex    string `json:"genesis"`      // 当前输出的genesis
 	TokenAmount   int    `json:"tokenAmount"`  // 当前输出的ft tokenAmount
 	TokenDecimal  int    `json:"tokenDecimal"` // 当前输入花费的outpoint的ft decimal
-	TokenId       int    `json:"tokenId"`      // 当前输出的nft tokenId
+	TokenId       string `json:"tokenId"`      // 当前输出的nft tokenId
 	Satoshi       int    `json:"satoshi"`      // 当前输出的satoshi
 	ScriptTypeHex string `json:"scriptType"`   // 当前输出锁定脚本类型
 	ScriptPkHex   string `json:"scriptPk"`     // 当前输出锁定脚本
