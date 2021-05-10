@@ -87,7 +87,7 @@ func getUtxoFromRedis(cursor, size int, key string) (txOutsRsp []*model.TxOutRes
 	pipe := rdb.Pipeline()
 	m := map[string]*redis.StringCmd{}
 	for _, key := range vals {
-		m[key] = pipe.Get(key[:36])
+		m[key] = pipe.Get(key)
 	}
 	_, err = pipe.Exec()
 	if err != nil && err != redis.Nil {
@@ -106,8 +106,8 @@ func getUtxoFromRedis(cursor, size int, key string) (txOutsRsp []*model.TxOutRes
 		txout.Unmarshal([]byte(res))
 
 		// 补充数据
-		txout.UTxid = []byte(key[:32])                              // 32
-		txout.Vout = binary.LittleEndian.Uint32([]byte(key[32:36])) // 4
+		txout.UTxid = []byte(key[:32])                            // 32
+		txout.Vout = binary.LittleEndian.Uint32([]byte(key[32:])) // 4
 		txout.ScriptType = script.GetLockingScriptType(txout.Script)
 		txout.IsNFT, txout.CodeHash, txout.GenesisId, txout.AddressPkh, txout.DataValue, txout.Decimal = script.ExtractPkScriptForTxo(txout.Script, txout.ScriptType)
 
