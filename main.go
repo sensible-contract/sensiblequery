@@ -71,6 +71,8 @@ func main() {
 	router.GET("/block/id/:blkid", controller.GetBlockById)
 	router.GET("/block/txs/:blkid", controller.GetBlockTxsByBlockId)
 
+	router.GET("/rawtx/:txid", controller.GetRawTxById)
+
 	router.GET("/tx/:txid", controller.GetTxById)
 	router.GET("/tx/:txid/ins", controller.GetTxInputsByTxId)
 	router.GET("/tx/:txid/outs", controller.GetTxOutputsByTxId)
@@ -84,6 +86,7 @@ func main() {
 
 	router.GET("/ft/utxo/:codehash/:genesis/:address", controller.GetFTUtxo)
 	router.GET("/nft/utxo/:codehash/:genesis/:address", controller.GetNFTUtxo)
+	router.GET("/nft/utxo-detail/:codehash/:genesis/:tokenid", controller.GetNFTUtxoDetailByTokenId)
 
 	router.GET("/address/:address/balance", controller.GetBalanceByAddress)
 
@@ -113,6 +116,8 @@ func main() {
 		heightAPI.GET("/block", controller.GetBlockByHeight)
 
 		heightAPI.GET("/block/txs", controller.GetBlockTxsByBlockHeight)
+
+		heightAPI.GET("/rawtx/:txid", controller.GetRawTxByIdInsideHeight)
 
 		heightAPI.GET("/tx/:txid", controller.GetTxByIdInsideHeight)
 		heightAPI.GET("/tx/:txid/ins", controller.GetTxInputsByTxIdInsideHeight)

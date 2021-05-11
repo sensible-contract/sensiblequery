@@ -483,7 +483,7 @@ var doc = `{
                     {
                         "type": "string",
                         "default": "74967a27ce3b46244e2e1fba60844c56bb99afc3",
-                        "description": "Genesis ID ",
+                        "description": "Genesis ID",
                         "name": "genesis",
                         "in": "path",
                         "required": true
@@ -745,7 +745,7 @@ var doc = `{
                     {
                         "type": "string",
                         "default": "74967a27ce3b46244e2e1fba60844c56bb99afc3",
-                        "description": "Genesis ID ",
+                        "description": "Genesis ID",
                         "name": "genesis",
                         "in": "path",
                         "required": true
@@ -873,7 +873,7 @@ var doc = `{
                     {
                         "type": "string",
                         "default": "74967a27ce3b46244e2e1fba60844c56bb99afc3",
-                        "description": "Genesis ID ",
+                        "description": "Genesis ID",
                         "name": "genesis",
                         "in": "path",
                         "required": true
@@ -942,7 +942,7 @@ var doc = `{
                     {
                         "type": "string",
                         "default": "74967a27ce3b46244e2e1fba60844c56bb99afc3",
-                        "description": "Genesis ID ",
+                        "description": "Genesis ID",
                         "name": "genesis",
                         "in": "path",
                         "required": true
@@ -1073,6 +1073,55 @@ var doc = `{
                                             "items": {
                                                 "$ref": "#/definitions/model.TxInfoResp"
                                             }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/height/{height}/rawtx/{txid}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Tx"
+                ],
+                "summary": "通过交易txid和交易被打包的区块高度height获取交易原数据rawtx",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 3,
+                        "description": "Block Height",
+                        "name": "height",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "999e1c837c76a1b7fbb7e57baf87b309960f5ffefbf2a9b95dd890602272f644",
+                        "description": "TxId",
+                        "name": "txid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\": 0, \"data\": \"00...\", \"msg\": \"ok\"}",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/model.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
                                         }
                                     }
                                 }
@@ -1524,7 +1573,7 @@ var doc = `{
                     {
                         "type": "string",
                         "default": "74967a27ce3b46244e2e1fba60844c56bb99afc3",
-                        "description": "Genesis ID ",
+                        "description": "Genesis ID",
                         "name": "genesis",
                         "in": "path",
                         "required": true
@@ -1708,7 +1757,7 @@ var doc = `{
                     {
                         "type": "string",
                         "default": "74967a27ce3b46244e2e1fba60844c56bb99afc3",
-                        "description": "Genesis ID ",
+                        "description": "Genesis ID",
                         "name": "genesis",
                         "in": "path",
                         "required": true
@@ -1836,7 +1885,7 @@ var doc = `{
                     {
                         "type": "string",
                         "default": "74967a27ce3b46244e2e1fba60844c56bb99afc3",
-                        "description": "Genesis ID ",
+                        "description": "Genesis ID",
                         "name": "genesis",
                         "in": "path",
                         "required": true
@@ -1865,6 +1914,67 @@ var doc = `{
                                             "type": "array",
                                             "items": {
                                                 "$ref": "#/definitions/model.BlockTokenVolumeResp"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/nft/utxo-detail/{codehash}/{genesis}/{tokenid}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "UTXO",
+                    "token NFT"
+                ],
+                "summary": "通过NFT合约CodeHash+溯源genesis获取某tokenId的utxo",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "844c56bb99afc374967a27ce3b46244e2e1fba60",
+                        "description": "Code Hash160",
+                        "name": "codehash",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "74967a27ce3b46244e2e1fba60844c56bb99afc3",
+                        "description": "Genesis ID",
+                        "name": "genesis",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "default": 3,
+                        "description": "Token ID",
+                        "name": "tokenid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\": 0, \"data\": [{}], \"msg\": \"ok\"}",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/model.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/model.TxOutResp"
                                             }
                                         }
                                     }
@@ -1913,7 +2023,7 @@ var doc = `{
                     {
                         "type": "string",
                         "default": "74967a27ce3b46244e2e1fba60844c56bb99afc3",
-                        "description": "Genesis ID ",
+                        "description": "Genesis ID",
                         "name": "genesis",
                         "in": "path",
                         "required": true
@@ -1972,6 +2082,47 @@ var doc = `{
                 "responses": {
                     "200": {
                         "description": "{\"code\": 0, \"data\": \"\u003ctxid\u003e\", \"msg\": \"ok\"}",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/model.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/rawtx/{txid}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Tx"
+                ],
+                "summary": "通过交易txid获取交易原数据rawtx",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "999e1c837c76a1b7fbb7e57baf87b309960f5ffefbf2a9b95dd890602272f644",
+                        "description": "TxId",
+                        "name": "txid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\": 0, \"data\": \"00...\", \"msg\": \"ok\"}",
                         "schema": {
                             "allOf": [
                                 {

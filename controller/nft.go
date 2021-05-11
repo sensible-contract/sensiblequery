@@ -98,7 +98,7 @@ func ListNFTSummary(ctx *gin.Context) {
 // @Param start query int true "Start Block Height" default(0)
 // @Param end query int true "Start Block Height" default(3)
 // @Param codehash path string true "Code Hash160" default(844c56bb99afc374967a27ce3b46244e2e1fba60)
-// @Param genesis path string true "Genesis ID " default(74967a27ce3b46244e2e1fba60844c56bb99afc3)
+// @Param genesis path string true "Genesis ID" default(74967a27ce3b46244e2e1fba60844c56bb99afc3)
 // @Param tokenid path int true "Token ID " default(3)
 // @Success 200 {object} model.Response{data=[]model.BlockTokenVolumeResp} "{"code": 0, "data": [{}], "msg": "ok"}"
 // @Router /nft/transfer-volume/{codehash}/{genesis}/{tokenid} [get]
@@ -175,7 +175,7 @@ func GetNFTTransferTimesInBlockRange(ctx *gin.Context) {
 // @Param cursor query int true "起始游标" default(0)
 // @Param size query int true "返回记录数量" default(10)
 // @Param codehash path string true "Code Hash160" default(844c56bb99afc374967a27ce3b46244e2e1fba60)
-// @Param genesis path string true "Genesis ID " default(74967a27ce3b46244e2e1fba60844c56bb99afc3)
+// @Param genesis path string true "Genesis ID" default(74967a27ce3b46244e2e1fba60844c56bb99afc3)
 // @Success 200 {object} model.Response{data=[]model.NFTSummaryResp} "{"code": 0, "data": [{}], "msg": "ok"}"
 // @Router /nft/owners/{codehash}/{genesis} [get]
 func ListNFTOwners(ctx *gin.Context) {
@@ -288,7 +288,7 @@ func ListAllNFTByOwner(ctx *gin.Context) {
 // @Param cursor query int true "起始游标" default(0)
 // @Param size query int true "返回记录数量" default(10)
 // @Param codehash path string true "Code Hash160" default(844c56bb99afc374967a27ce3b46244e2e1fba60)
-// @Param genesis path string true "Genesis ID " default(74967a27ce3b46244e2e1fba60844c56bb99afc3)
+// @Param genesis path string true "Genesis ID" default(74967a27ce3b46244e2e1fba60844c56bb99afc3)
 // @Param address path string true "Address" default(17SkEw2md5avVNyYgj6RiXuQKNwkXaxFyQ)
 // @Success 200 {object} model.Response{data=model.NFTSummaryResp} "{"code": 0, "data": [{}], "msg": "ok"}"
 // @Router /nft/detail/{codehash}/{genesis}/{address} [get]

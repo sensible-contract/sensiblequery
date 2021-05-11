@@ -131,3 +131,55 @@ func GetTxBySql(psql string) (txRsp *model.TxInfoResp, err error) {
 	}
 	return
 }
+
+////////////////////////////////////////////////////////////////
+func rawtxResultSRF(rows *sql.Rows) (interface{}, error) {
+	var ret []byte
+	err := rows.Scan(&ret)
+	if err != nil {
+		return nil, err
+	}
+	return ret, nil
+}
+
+func GetRawTxById(txidHex string) (txRsp []byte, err error) {
+	psql := fmt.Sprintf(`
+SELECT rawtx FROM blktx_height
+WHERE (height = 4294967295 OR
+      height IN (
+    SELECT height FROM tx_height
+    WHERE txid = unhex('%s')
+)) AND txid = unhex('%s')
+LIMIT 1`, txidHex, txidHex)
+
+	txRet, err := clickhouse.ScanOne(psql, rawtxResultSRF)
+	if err != nil {
+		log.Printf("query tx failed: %v", err)
+		return nil, err
+	}
+	if txRet == nil {
+		return nil, errors.New("not exist")
+	}
+	txRsp = txRet.([]byte)
+
+	return txRsp, nil
+}
+
+func GetRawTxByIdInsideHeight(blkHeight int, txidHex string) (txRsp []byte, err error) {
+	psql := fmt.Sprintf(`
+SELECT rawtx FROM blktx_height
+WHERE height = %d AND txid = unhex('%s')
+LIMIT 1`, blkHeight, txidHex)
+
+	txRet, err := clickhouse.ScanOne(psql, rawtxResultSRF)
+	if err != nil {
+		log.Printf("query tx failed: %v", err)
+		return nil, err
+	}
+	if txRet == nil {
+		return nil, errors.New("not exist")
+	}
+	txRsp = txRet.([]byte)
+
+	return txRsp, nil
+}

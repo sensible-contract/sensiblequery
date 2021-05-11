@@ -191,3 +191,81 @@ func GetTxByIdInsideHeight(ctx *gin.Context) {
 		Data: tx,
 	})
 }
+
+////////////////////////////////////////////////////////////////
+// GetRawTxById
+// @Summary 通过交易txid获取交易原数据rawtx
+// @Tags Tx
+// @Produce  json
+// @Param txid path string true "TxId" default(999e1c837c76a1b7fbb7e57baf87b309960f5ffefbf2a9b95dd890602272f644)
+// @Success 200 {object} model.Response{data=string} "{"code": 0, "data": "00...", "msg": "ok"}"
+// @Router /rawtx/{txid} [get]
+func GetRawTxById(ctx *gin.Context) {
+	log.Printf("GetRawTxById enter")
+
+	txIdHex := ctx.Param("txid")
+	// check
+	txIdReverse, err := hex.DecodeString(txIdHex)
+	if err != nil {
+		log.Printf("txid invalid: %v", err)
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "txid invalid"})
+		return
+	}
+	txId := utils.ReverseBytes(txIdReverse)
+
+	tx, err := service.GetRawTxById(hex.EncodeToString(txId))
+	if err != nil {
+		log.Printf("get tx failed: %v", err)
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get tx failed"})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, model.Response{
+		Code: 0,
+		Msg:  "ok",
+		Data: hex.EncodeToString(tx),
+	})
+}
+
+// GetRawTxByIdInsideHeight
+// @Summary 通过交易txid和交易被打包的区块高度height获取交易原数据rawtx
+// @Tags Tx
+// @Produce  json
+// @Param height path int true "Block Height" default(3)
+// @Param txid path string true "TxId" default(999e1c837c76a1b7fbb7e57baf87b309960f5ffefbf2a9b95dd890602272f644)
+// @Success 200 {object} model.Response{data=string} "{"code": 0, "data": "00...", "msg": "ok"}"
+// @Router /height/{height}/rawtx/{txid} [get]
+func GetRawTxByIdInsideHeight(ctx *gin.Context) {
+	log.Printf("GetRawTxByIdInsideHeight enter")
+
+	blkHeightString := ctx.Param("height")
+	blkHeight, err := strconv.Atoi(blkHeightString)
+	if err != nil {
+		log.Printf("height invalid: %v", err)
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "height invalid"})
+		return
+	}
+
+	txIdHex := ctx.Param("txid")
+	// check
+	txIdReverse, err := hex.DecodeString(txIdHex)
+	if err != nil {
+		log.Printf("txid invalid: %v", err)
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "txid invalid"})
+		return
+	}
+	txId := utils.ReverseBytes(txIdReverse)
+
+	tx, err := service.GetRawTxByIdInsideHeight(blkHeight, hex.EncodeToString(txId))
+	if err != nil {
+		log.Printf("get tx failed: %v", err)
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get tx failed"})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, model.Response{
+		Code: 0,
+		Msg:  "ok",
+		Data: hex.EncodeToString(tx),
+	})
+}

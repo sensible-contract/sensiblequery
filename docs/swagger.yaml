@@ -831,7 +831,7 @@ paths:
         required: true
         type: string
       - default: 74967a27ce3b46244e2e1fba60844c56bb99afc3
-        description: 'Genesis ID '
+        description: Genesis ID
         in: path
         name: genesis
         required: true
@@ -994,7 +994,7 @@ paths:
         required: true
         type: string
       - default: 74967a27ce3b46244e2e1fba60844c56bb99afc3
-        description: 'Genesis ID '
+        description: Genesis ID
         in: path
         name: genesis
         required: true
@@ -1076,7 +1076,7 @@ paths:
         required: true
         type: string
       - default: 74967a27ce3b46244e2e1fba60844c56bb99afc3
-        description: 'Genesis ID '
+        description: Genesis ID
         in: path
         name: genesis
         required: true
@@ -1120,7 +1120,7 @@ paths:
         required: true
         type: string
       - default: 74967a27ce3b46244e2e1fba60844c56bb99afc3
-        description: 'Genesis ID '
+        description: Genesis ID
         in: path
         name: genesis
         required: true
@@ -1209,6 +1209,36 @@ paths:
                   type: array
               type: object
       summary: 通过区块height获取区块包含的Tx概述列表
+      tags:
+      - Tx
+  /height/{height}/rawtx/{txid}:
+    get:
+      parameters:
+      - default: 3
+        description: Block Height
+        in: path
+        name: height
+        required: true
+        type: integer
+      - default: 999e1c837c76a1b7fbb7e57baf87b309960f5ffefbf2a9b95dd890602272f644
+        description: TxId
+        in: path
+        name: txid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 0, "data": "00...", "msg": "ok"}'
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: 通过交易txid和交易被打包的区块高度height获取交易原数据rawtx
       tags:
       - Tx
   /height/{height}/tx/{txid}:
@@ -1483,7 +1513,7 @@ paths:
         required: true
         type: string
       - default: 74967a27ce3b46244e2e1fba60844c56bb99afc3
-        description: 'Genesis ID '
+        description: Genesis ID
         in: path
         name: genesis
         required: true
@@ -1601,7 +1631,7 @@ paths:
         required: true
         type: string
       - default: 74967a27ce3b46244e2e1fba60844c56bb99afc3
-        description: 'Genesis ID '
+        description: Genesis ID
         in: path
         name: genesis
         required: true
@@ -1683,7 +1713,7 @@ paths:
         required: true
         type: string
       - default: 74967a27ce3b46244e2e1fba60844c56bb99afc3
-        description: 'Genesis ID '
+        description: Genesis ID
         in: path
         name: genesis
         required: true
@@ -1711,6 +1741,45 @@ paths:
       summary: 查询NFT Token在区块中的转移次数，以合约CodeHash+GenesisID，和tokenId来确认一种NFT。
       tags:
       - token NFT
+  /nft/utxo-detail/{codehash}/{genesis}/{tokenid}:
+    get:
+      parameters:
+      - default: 844c56bb99afc374967a27ce3b46244e2e1fba60
+        description: Code Hash160
+        in: path
+        name: codehash
+        required: true
+        type: string
+      - default: 74967a27ce3b46244e2e1fba60844c56bb99afc3
+        description: Genesis ID
+        in: path
+        name: genesis
+        required: true
+        type: string
+      - default: 3
+        description: Token ID
+        in: path
+        name: tokenid
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 0, "data": [{}], "msg": "ok"}'
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/model.TxOutResp'
+                  type: array
+              type: object
+      summary: 通过NFT合约CodeHash+溯源genesis获取某tokenId的utxo
+      tags:
+      - UTXO
+      - token NFT
   /nft/utxo/{codehash}/{genesis}/{address}:
     get:
       parameters:
@@ -1733,7 +1802,7 @@ paths:
         required: true
         type: string
       - default: 74967a27ce3b46244e2e1fba60844c56bb99afc3
-        description: 'Genesis ID '
+        description: Genesis ID
         in: path
         name: genesis
         required: true
@@ -1784,6 +1853,30 @@ paths:
                   type: string
               type: object
       summary: Push Tx
+  /rawtx/{txid}:
+    get:
+      parameters:
+      - default: 999e1c837c76a1b7fbb7e57baf87b309960f5ffefbf2a9b95dd890602272f644
+        description: TxId
+        in: path
+        name: txid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 0, "data": "00...", "msg": "ok"}'
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: 通过交易txid获取交易原数据rawtx
+      tags:
+      - Tx
   /token/info:
     get:
       produces:
