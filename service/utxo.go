@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"encoding/binary"
 	"encoding/hex"
 	"errors"
@@ -12,11 +13,14 @@ import (
 	"satosensible/model"
 	"strconv"
 
-	"github.com/go-redis/redis"
+	"github.com/go-redis/redis/v8"
 	"github.com/spf13/viper"
 )
 
-var rdb *redis.Client
+var (
+	rdb *redis.Client
+	ctx = context.Background()
+)
 
 func init() {
 	viper.SetConfigFile("conf/redis.yaml")
@@ -51,7 +55,7 @@ func GetBalanceByAddress(addressPkh []byte) (balanceRsp *model.BalanceResp, err 
 		Address: utils.EncodeAddress(addressPkh, utils.PubKeyHashAddrID),
 	}
 
-	balance, err := rdb.ZScore("balance", string(addressPkh)).Result()
+	balance, err := rdb.ZScore(ctx, "balance", string(addressPkh)).Result()
 	if err == redis.Nil {
 		return balanceRsp, nil
 	} else if err != nil {
@@ -63,27 +67,16 @@ func GetBalanceByAddress(addressPkh []byte) (balanceRsp *model.BalanceResp, err 
 }
 
 //////////////// address utxo
-func GetUtxoByAddress(cursor, size int, addressPkh []byte) (txOutsRsp []*model.TxOutResp, err error) {
-	key := "au" + string(addressPkh)
-	utxoOutpoints, err := rdb.ZRevRange(key, int64(cursor), int64(cursor+size-1)).Result()
-	if err != nil {
-		log.Printf("GetUtxoByAddress redis failed: %v", err)
-		return
-	}
-	return getUtxoFromRedis(utxoOutpoints)
-}
-
-//////////////// address utxo
 func GetUtxoByTokenId(codeHash, genesisId []byte, tokenId string) (txOutsRsp *model.TxOutResp, err error) {
 	key := "nd" + string(codeHash) + string(genesisId)
 
-	op := redis.ZRangeBy{
+	op := &redis.ZRangeBy{
 		Min:    tokenId, // 最小分数
 		Max:    tokenId, // 最大分数
 		Offset: 0,       // 类似sql的limit, 表示开始偏移量
 		Count:  1,       // 一次返回多少数据
 	}
-	utxoOutpoints, err := rdb.ZRangeByScore(key, op).Result()
+	utxoOutpoints, err := rdb.ZRangeByScore(ctx, key, op).Result()
 	if err != nil {
 		log.Printf("GetUtxoByTokenId redis failed: %v", err)
 		return
@@ -106,7 +99,7 @@ func GetUtxoByCodeHashGenesisAddress(cursor, size int, codeHash, genesisId, addr
 	} else {
 		key = "fu" + key
 	}
-	utxoOutpoints, err := rdb.ZRevRange(key, int64(cursor), int64(cursor+size-1)).Result()
+	utxoOutpoints, err := rdb.ZRevRange(ctx, key, int64(cursor), int64(cursor+size-1)).Result()
 	if err != nil {
 		log.Printf("GetUtxoByCodeHashGenesisAddress redis failed: %v", err)
 		return
@@ -121,9 +114,9 @@ func getUtxoFromRedis(utxoOutpoints []string) (txOutsRsp []*model.TxOutResp, err
 
 	outpointsCmd := make([]*redis.StringCmd, 0)
 	for _, outpoint := range utxoOutpoints {
-		outpointsCmd = append(outpointsCmd, pipe.Get(outpoint))
+		outpointsCmd = append(outpointsCmd, pipe.Get(ctx, outpoint))
 	}
-	_, err = pipe.Exec()
+	_, err = pipe.Exec(ctx)
 	if err != nil && err != redis.Nil {
 		panic(err)
 	}
@@ -167,6 +160,63 @@ func getUtxoFromRedis(utxoOutpoints []string) (txOutsRsp []*model.TxOutResp, err
 			TokenDecimal:  int(txout.Decimal),
 			CodeHashHex:   hex.EncodeToString(txout.CodeHash),
 			GenesisHex:    hex.EncodeToString(txout.GenesisId),
+			ScriptTypeHex: hex.EncodeToString(txout.ScriptType),
+			// ScriptPkHex:   hex.EncodeToString(txout.Script),
+			Height: int(txout.BlockHeight),
+			Idx:    int(txout.TxIdx),
+		})
+	}
+
+	return txOutsRsp, nil
+}
+
+//////////////// address utxo
+func GetUtxoByAddress(cursor, size int, addressPkh []byte) (txOutsRsp []*model.TxStandardOutResp, err error) {
+	key := "au" + string(addressPkh)
+	utxoOutpoints, err := rdb.ZRevRange(ctx, key, int64(cursor), int64(cursor+size-1)).Result()
+	if err != nil {
+		log.Printf("GetUtxoByAddress redis failed: %v", err)
+		return
+	}
+	return getNonTokenUtxoFromRedis(utxoOutpoints)
+}
+
+////////////////
+func getNonTokenUtxoFromRedis(utxoOutpoints []string) (txOutsRsp []*model.TxStandardOutResp, err error) {
+	log.Printf("getUtxoFromRedis redis: %d", len(utxoOutpoints))
+	pipe := rdb.Pipeline()
+
+	outpointsCmd := make([]*redis.StringCmd, 0)
+	for _, outpoint := range utxoOutpoints {
+		outpointsCmd = append(outpointsCmd, pipe.Get(ctx, outpoint))
+	}
+	_, err = pipe.Exec(ctx)
+	if err != nil && err != redis.Nil {
+		panic(err)
+	}
+
+	for outpointIdx, data := range outpointsCmd {
+		outpoint := utxoOutpoints[outpointIdx]
+		res, err := data.Result()
+		if err == redis.Nil {
+			log.Printf("redis not found outpoint: %s", hex.EncodeToString([]byte(outpoint)))
+			continue
+		} else if err != nil {
+			panic(err)
+		}
+		txout := &model.TxoData{}
+		txout.Unmarshal([]byte(res))
+
+		// 补充数据
+		txout.UTxid = []byte(outpoint[:32])                            // 32
+		txout.Vout = binary.LittleEndian.Uint32([]byte(outpoint[32:])) // 4
+		txout.ScriptType = script.GetLockingScriptType(txout.Script)
+
+		txOutsRsp = append(txOutsRsp, &model.TxStandardOutResp{
+			TxIdHex: blkparser.HashString(txout.UTxid),
+			Vout:    int(txout.Vout),
+			Satoshi: int(txout.Satoshi),
+
 			ScriptTypeHex: hex.EncodeToString(txout.ScriptType),
 			// ScriptPkHex:   hex.EncodeToString(txout.Script),
 			Height: int(txout.BlockHeight),

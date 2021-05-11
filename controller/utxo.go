@@ -46,13 +46,13 @@ func GetBalanceByAddress(ctx *gin.Context) {
 }
 
 // GetUtxoByAddress
-// @Summary 通过地址address获取相关utxo列表
+// @Summary 通过地址address获取相关常规utxo列表
 // @Tags UTXO
 // @Produce  json
 // @Param cursor query int true "起始游标" default(0)
 // @Param size query int true "返回记录数量" default(16)
 // @Param address path string true "Address" default(17SkEw2md5avVNyYgj6RiXuQKNwkXaxFyQ)
-// @Success 200 {object} model.Response{data=[]model.TxOutResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Success 200 {object} model.Response{data=[]model.TxStandardOutResp} "{"code": 0, "data": [{}], "msg": "ok"}"
 // @Router /address/{address}/utxo [get]
 func GetUtxoByAddress(ctx *gin.Context) {
 	log.Printf("GetUtxoByAddress enter")

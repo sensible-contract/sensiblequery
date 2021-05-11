@@ -10,7 +10,7 @@ import (
 ////////////////
 // ft
 func GetTokenOwnersByCodeHashGenesis(cursor, size int, codeHash, genesisId []byte) (ftOwnersRsp []*model.FTOwnerBalanceResp, err error) {
-	vals, err := rdb.ZRevRangeWithScores("fb"+string(codeHash)+string(genesisId), int64(cursor), int64(cursor+size-1)).Result()
+	vals, err := rdb.ZRevRangeWithScores(ctx, "fb"+string(codeHash)+string(genesisId), int64(cursor), int64(cursor+size-1)).Result()
 	if err != nil {
 		log.Printf("GetFTOwnersByCodeHashGenesis redis failed: %v", err)
 		return
@@ -27,7 +27,7 @@ func GetTokenOwnersByCodeHashGenesis(cursor, size int, codeHash, genesisId []byt
 }
 
 func GetAllTokenBalanceByAddress(cursor, size int, addressPkh []byte) (ftOwnersRsp []*model.FTOwnerByAddressResp, err error) {
-	vals, err := rdb.ZRevRangeWithScores("fs"+string(addressPkh), int64(cursor), int64(cursor+size-1)).Result()
+	vals, err := rdb.ZRevRangeWithScores(ctx, "fs"+string(addressPkh), int64(cursor), int64(cursor+size-1)).Result()
 	if err != nil {
 		log.Printf("GetFTOwnersByCodeHashGenesis redis failed: %v", err)
 		return
@@ -45,7 +45,7 @@ func GetAllTokenBalanceByAddress(cursor, size int, addressPkh []byte) (ftOwnersR
 }
 
 func GetTokenBalanceByCodeHashGenesisAddress(codeHash, genesisId, addressPkh []byte) (balanceRsp *model.FTOwnerBalanceResp, err error) {
-	score, err := rdb.ZScore("fb"+string(codeHash)+string(genesisId), string(addressPkh)).Result()
+	score, err := rdb.ZScore(ctx, "fb"+string(codeHash)+string(genesisId), string(addressPkh)).Result()
 	if err != nil {
 		log.Printf("GetFTOwnersByCodeHashGenesis redis failed: %v", err)
 		return
@@ -61,7 +61,7 @@ func GetTokenBalanceByCodeHashGenesisAddress(codeHash, genesisId, addressPkh []b
 ////////////////
 // nft
 func GetNFTOwnersByCodeHashGenesis(cursor, size int, codeHash, genesisId []byte) (ownersRsp []*model.NFTSummaryResp, err error) {
-	vals, err := rdb.ZRevRangeWithScores("no"+string(codeHash)+string(genesisId), int64(cursor), int64(cursor+size-1)).Result()
+	vals, err := rdb.ZRevRangeWithScores(ctx, "no"+string(codeHash)+string(genesisId), int64(cursor), int64(cursor+size-1)).Result()
 	if err != nil {
 		log.Printf("GetFTOwnersByCodeHashGenesis redis failed: %v", err)
 		return
@@ -78,7 +78,7 @@ func GetNFTOwnersByCodeHashGenesis(cursor, size int, codeHash, genesisId []byte)
 }
 
 func GetAllNFTBalanceByAddress(cursor, size int, addressPkh []byte) (ftOwnersRsp []*model.FTOwnerByAddressResp, err error) {
-	vals, err := rdb.ZRevRangeWithScores("ns"+string(addressPkh), int64(cursor), int64(cursor+size-1)).Result()
+	vals, err := rdb.ZRevRangeWithScores(ctx, "ns"+string(addressPkh), int64(cursor), int64(cursor+size-1)).Result()
 	if err != nil {
 		log.Printf("GetFTOwnersByCodeHashGenesis redis failed: %v", err)
 		return
@@ -96,7 +96,7 @@ func GetAllNFTBalanceByAddress(cursor, size int, addressPkh []byte) (ftOwnersRsp
 }
 
 func GetNFTCountByCodeHashGenesisAddress(codeHash, genesisId, addressPkh []byte) (balanceRsp *model.NFTSummaryResp, err error) {
-	score, err := rdb.ZScore("no"+string(codeHash)+string(genesisId), string(addressPkh)).Result()
+	score, err := rdb.ZScore(ctx, "no"+string(codeHash)+string(genesisId), string(addressPkh)).Result()
 	if err != nil {
 		log.Printf("GetFTOwnersByCodeHashGenesis redis failed: %v", err)
 		return

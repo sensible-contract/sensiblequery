@@ -112,6 +112,16 @@ type TxOutResp struct {
 	Idx           int    `json:"idx"`          // 输出被花费的txid所在区块内序号
 }
 
+type TxStandardOutResp struct {
+	TxIdHex       string `json:"txid"`       // 当前txid
+	Vout          int    `json:"vout"`       // 当前输出序号
+	Satoshi       int    `json:"satoshi"`    // 当前输出的satoshi
+	ScriptTypeHex string `json:"scriptType"` // 当前输出锁定脚本类型
+	ScriptPkHex   string `json:"scriptPk"`   // 当前输出锁定脚本
+	Height        int    `json:"height"`     // 当前交易被打包的区块高度
+	Idx           int    `json:"idx"`        // 输出被花费的txid所在区块内序号
+}
+
 type TxOutHistoryResp struct {
 	TxIdHex       string `json:"txid"`         // 当前txid
 	Vout          int    `json:"vout"`         // 当前输出序号

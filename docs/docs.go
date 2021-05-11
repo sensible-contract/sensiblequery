@@ -153,7 +153,7 @@ var doc = `{
                 "tags": [
                     "UTXO"
                 ],
-                "summary": "通过地址address获取相关utxo列表",
+                "summary": "通过地址address获取相关常规utxo列表",
                 "parameters": [
                     {
                         "type": "integer",
@@ -194,7 +194,7 @@ var doc = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/model.TxOutResp"
+                                                "$ref": "#/definitions/model.TxStandardOutResp"
                                             }
                                         }
                                     }
@@ -3218,6 +3218,39 @@ var doc = `{
                 },
                 "txidSpent": {
                     "description": "当前输出被花费的txid",
+                    "type": "string"
+                },
+                "vout": {
+                    "description": "当前输出序号",
+                    "type": "integer"
+                }
+            }
+        },
+        "model.TxStandardOutResp": {
+            "type": "object",
+            "properties": {
+                "height": {
+                    "description": "当前交易被打包的区块高度",
+                    "type": "integer"
+                },
+                "idx": {
+                    "description": "输出被花费的txid所在区块内序号",
+                    "type": "integer"
+                },
+                "satoshi": {
+                    "description": "当前输出的satoshi",
+                    "type": "integer"
+                },
+                "scriptPk": {
+                    "description": "当前输出锁定脚本",
+                    "type": "string"
+                },
+                "scriptType": {
+                    "description": "当前输出锁定脚本类型",
+                    "type": "string"
+                },
+                "txid": {
+                    "description": "当前txid",
                     "type": "string"
                 },
                 "vout": {
