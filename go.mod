@@ -9,7 +9,7 @@ require (
 	github.com/gin-contrib/cors v1.3.1
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-openapi/spec v0.20.3 // indirect
-	github.com/go-redis/redis v6.15.9+incompatible
+	github.com/go-redis/redis/v8 v8.8.3
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
@@ -24,3 +24,5 @@ require (
 	golang.org/x/sys v0.0.0-20210317225723-c4fcb01b228e // indirect
 	golang.org/x/tools v0.1.0 // indirect
 )
+
+replace github.com/go-redis/redis/v8 v8.8.3 => github.com/sensible-contract/redis/v8 v8.8.3
