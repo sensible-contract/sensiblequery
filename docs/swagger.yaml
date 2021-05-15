@@ -1,4 +1,4 @@
-basePath: /
+basePath: /test/
 definitions:
   controller.TxRequest:
     properties:
@@ -10,6 +10,9 @@ definitions:
       address:
         description: address
         type: string
+      pending_satoshi:
+        description: 待确认余额satoshi
+        type: integer
       satoshi:
         description: 余额satoshi
         type: integer
@@ -149,8 +152,11 @@ definitions:
       balance:
         description: 余额
         type: integer
+      pending_balance:
+        description: 待确认余额
+        type: integer
     type: object
-  model.FTOwnerByAddressResp:
+  model.FTSummaryByAddressResp:
     properties:
       balance:
         description: 余额
@@ -161,6 +167,9 @@ definitions:
       genesis:
         description: FT合约的genesis，Hex编码
         type: string
+      pending_balance:
+        description: 待确认余额
+        type: integer
       symbol:
         description: FT symbol
         type: string
@@ -208,7 +217,19 @@ definitions:
         description: NFT website url
         type: string
     type: object
-  model.NFTOwnerByAddressResp:
+  model.NFTOwnerResp:
+    properties:
+      address:
+        description: token持有人的address
+        type: string
+      count:
+        description: 持有的当前NFT个数
+        type: integer
+      pending_count:
+        description: 待确认的当前NFT个数
+        type: integer
+    type: object
+  model.NFTSummaryByAddressResp:
     properties:
       codehash:
         description: NFT合约hash160(CodePart)
@@ -219,18 +240,12 @@ definitions:
       genesis:
         description: NFT合约的genesis，Hex编码
         type: string
+      pending_count:
+        description: 待确认的当前NFT个数
+        type: integer
       symbol:
         description: NFT symbol
         type: string
-    type: object
-  model.NFTSummaryResp:
-    properties:
-      address:
-        description: token持有人的address
-        type: string
-      count:
-        description: 持有的当前NFT个数
-        type: integer
     type: object
   model.Response:
     properties:
@@ -1072,7 +1087,7 @@ paths:
             - properties:
                 data:
                   items:
-                    $ref: '#/definitions/model.FTOwnerByAddressResp'
+                    $ref: '#/definitions/model.FTSummaryByAddressResp'
                   type: array
               type: object
       summary: 查询某人持有的FT Token列表。获得每个token的余额
@@ -1558,7 +1573,7 @@ paths:
             - $ref: '#/definitions/model.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/model.NFTSummaryResp'
+                  $ref: '#/definitions/model.NFTOwnerResp'
               type: object
       summary: 查询某人持有的某NFT Token的所持有的NFT数量
       tags:
@@ -1671,7 +1686,7 @@ paths:
             - properties:
                 data:
                   items:
-                    $ref: '#/definitions/model.NFTSummaryResp'
+                    $ref: '#/definitions/model.NFTOwnerResp'
                   type: array
               type: object
       summary: 查询NFT Token的持有人。获得每个人持有的NFT数量
@@ -1709,7 +1724,7 @@ paths:
             - properties:
                 data:
                   items:
-                    $ref: '#/definitions/model.NFTOwnerByAddressResp'
+                    $ref: '#/definitions/model.NFTSummaryByAddressResp'
                   type: array
               type: object
       summary: 查询某人持有的所有NFT Token列表。获得持有的nft数量计数

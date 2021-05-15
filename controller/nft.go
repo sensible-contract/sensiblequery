@@ -176,7 +176,7 @@ func GetNFTTransferTimesInBlockRange(ctx *gin.Context) {
 // @Param size query int true "返回记录数量" default(10)
 // @Param codehash path string true "Code Hash160" default(844c56bb99afc374967a27ce3b46244e2e1fba60)
 // @Param genesis path string true "Genesis ID" default(74967a27ce3b46244e2e1fba60844c56bb99afc3)
-// @Success 200 {object} model.Response{data=[]model.NFTSummaryResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Success 200 {object} model.Response{data=[]model.NFTOwnerResp} "{"code": 0, "data": [{}], "msg": "ok"}"
 // @Router /nft/owners/{codehash}/{genesis} [get]
 func ListNFTOwners(ctx *gin.Context) {
 	log.Printf("ListNFTOwners enter")
@@ -237,7 +237,7 @@ func ListNFTOwners(ctx *gin.Context) {
 // @Param cursor query int true "起始游标" default(0)
 // @Param size query int true "返回记录数量" default(10)
 // @Param address path string true "Address" default(17SkEw2md5avVNyYgj6RiXuQKNwkXaxFyQ)
-// @Success 200 {object} model.Response{data=[]model.NFTOwnerByAddressResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Success 200 {object} model.Response{data=[]model.NFTSummaryByAddressResp} "{"code": 0, "data": [{}], "msg": "ok"}"
 // @Router /nft/summary/{address} [get]
 func ListAllNFTByOwner(ctx *gin.Context) {
 	log.Printf("ListAllNFTOwners enter")
@@ -290,7 +290,7 @@ func ListAllNFTByOwner(ctx *gin.Context) {
 // @Param codehash path string true "Code Hash160" default(844c56bb99afc374967a27ce3b46244e2e1fba60)
 // @Param genesis path string true "Genesis ID" default(74967a27ce3b46244e2e1fba60844c56bb99afc3)
 // @Param address path string true "Address" default(17SkEw2md5avVNyYgj6RiXuQKNwkXaxFyQ)
-// @Success 200 {object} model.Response{data=model.NFTSummaryResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Success 200 {object} model.Response{data=model.NFTOwnerResp} "{"code": 0, "data": [{}], "msg": "ok"}"
 // @Router /nft/detail/{codehash}/{genesis}/{address} [get]
 func ListNFTCountByOwner(ctx *gin.Context) {
 	log.Printf("ListNFTCountByOwner enter")

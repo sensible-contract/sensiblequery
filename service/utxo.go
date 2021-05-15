@@ -75,6 +75,17 @@ func GetBalanceByAddress(addressPkh []byte) (balanceRsp *model.BalanceResp, err 
 		return
 	}
 	balanceRsp.Satoshi = int(balance)
+
+	// 待确认余额
+	mpBalance, err := rdb.ZScore(ctx, "mp:balance", string(addressPkh)).Result()
+	if err == redis.Nil {
+		mpBalance = 0
+	} else if err != nil {
+		log.Printf("GetBalanceByAddress redis failed: %v", err)
+		return
+	}
+	balanceRsp.PendingSatoshi = int(mpBalance)
+
 	return balanceRsp, nil
 }
 
@@ -162,7 +173,9 @@ func GetUtxoByCodeHashGenesisAddress(cursor, size int, codeHash, genesisId, addr
 
 	//
 	utxoOutpoints, err := rdb.ZRevRange(ctx, finalKey, int64(cursor), int64(cursor+size-1)).Result()
-	if err != nil {
+	if err == redis.Nil {
+		utxoOutpoints = nil
+	} else if err != nil {
 		log.Printf("GetUtxoByCodeHashGenesisAddress redis failed: %v", err)
 		return
 	}
@@ -172,6 +185,7 @@ func GetUtxoByCodeHashGenesisAddress(cursor, size int, codeHash, genesisId, addr
 ////////////////
 func getUtxoFromRedis(utxoOutpoints []string) (txOutsRsp []*model.TxOutResp, err error) {
 	log.Printf("getUtxoFromRedis redis: %d", len(utxoOutpoints))
+	txOutsRsp = make([]*model.TxOutResp, 0)
 	pipe := rdbBlock.Pipeline()
 
 	outpointsCmd := make([]*redis.StringCmd, 0)
@@ -261,12 +275,14 @@ func GetUtxoByAddress(cursor, size int, addressPkh []byte) (txOutsRsp []*model.T
 	}
 	nUnion, err := rdb.ZUnionStore(ctx, finalKey, finalZs).Result()
 	if err != nil {
-		log.Printf("ZDiffStore redis failed: %v", err)
+		log.Printf("ZUnionStore redis failed: %v", err)
 		return
 	}
 	log.Printf("ZUnionStore : %v", nUnion)
 	utxoOutpoints, err := rdb.ZRevRange(ctx, finalKey, int64(cursor), int64(cursor+size-1)).Result()
-	if err != nil {
+	if err == redis.Nil {
+		utxoOutpoints = nil
+	} else if err != nil {
 		log.Printf("GetUtxoByAddress redis failed: %v", err)
 		return
 	}
@@ -275,6 +291,8 @@ func GetUtxoByAddress(cursor, size int, addressPkh []byte) (txOutsRsp []*model.T
 
 ////////////////
 func getNonTokenUtxoFromRedis(utxoOutpoints []string) (txOutsRsp []*model.TxStandardOutResp, err error) {
+	txOutsRsp = make([]*model.TxStandardOutResp, 0)
+
 	log.Printf("getUtxoFromRedis redis: %d", len(utxoOutpoints))
 	pipe := rdbBlock.Pipeline()
 

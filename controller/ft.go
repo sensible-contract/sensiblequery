@@ -225,7 +225,7 @@ func ListFTOwners(ctx *gin.Context) {
 // @Param cursor query int true "起始游标" default(0)
 // @Param size query int true "返回记录数量" default(10)
 // @Param address path string true "Address" default(17SkEw2md5avVNyYgj6RiXuQKNwkXaxFyQ)
-// @Success 200 {object} model.Response{data=[]model.FTOwnerByAddressResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Success 200 {object} model.Response{data=[]model.FTSummaryByAddressResp} "{"code": 0, "data": [{}], "msg": "ok"}"
 // @Router /ft/summary/{address} [get]
 func ListAllFTBalanceByOwner(ctx *gin.Context) {
 	log.Printf("ListAllFTOwners enter")

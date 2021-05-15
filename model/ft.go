@@ -23,13 +23,15 @@ type FTTransferVolumeResp struct {
 }
 
 type FTOwnerBalanceResp struct {
-	Address string `json:"address"` // token持有人的address
-	Balance int    `json:"balance"` // 余额
+	Address        string `json:"address"`         // token持有人的address
+	Balance        int    `json:"balance"`         // 余额
+	PendingBalance int    `json:"pending_balance"` // 待确认余额
 }
 
-type FTOwnerByAddressResp struct {
-	CodeHashHex string `json:"codehash"` // FT合约hash160(CodePart)
-	GenesisHex  string `json:"genesis"`  // FT合约的genesis，Hex编码
-	Symbol      string `json:"symbol"`   // FT symbol
-	Balance     int    `json:"balance"`  // 余额
+type FTSummaryByAddressResp struct {
+	CodeHashHex    string `json:"codehash"`        // FT合约hash160(CodePart)
+	GenesisHex     string `json:"genesis"`         // FT合约的genesis，Hex编码
+	Symbol         string `json:"symbol"`          // FT symbol
+	Balance        int    `json:"balance"`         // 余额
+	PendingBalance int    `json:"pending_balance"` // 待确认余额
 }

@@ -825,7 +825,7 @@ var doc = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/model.FTOwnerByAddressResp"
+                                                "$ref": "#/definitions/model.FTSummaryByAddressResp"
                                             }
                                         }
                                     }
@@ -1599,7 +1599,7 @@ var doc = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/model.NFTSummaryResp"
+                                            "$ref": "#/definitions/model.NFTOwnerResp"
                                         }
                                     }
                                 }
@@ -1777,7 +1777,7 @@ var doc = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/model.NFTSummaryResp"
+                                                "$ref": "#/definitions/model.NFTOwnerResp"
                                             }
                                         }
                                     }
@@ -1837,7 +1837,7 @@ var doc = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/model.NFTOwnerByAddressResp"
+                                                "$ref": "#/definitions/model.NFTSummaryByAddressResp"
                                             }
                                         }
                                     }
@@ -2498,6 +2498,10 @@ var doc = `{
                     "description": "address",
                     "type": "string"
                 },
+                "pending_satoshi": {
+                    "description": "待确认余额satoshi",
+                    "type": "integer"
+                },
                 "satoshi": {
                     "description": "余额satoshi",
                     "type": "integer"
@@ -2691,10 +2695,14 @@ var doc = `{
                 "balance": {
                     "description": "余额",
                     "type": "integer"
+                },
+                "pending_balance": {
+                    "description": "待确认余额",
+                    "type": "integer"
                 }
             }
         },
-        "model.FTOwnerByAddressResp": {
+        "model.FTSummaryByAddressResp": {
             "type": "object",
             "properties": {
                 "balance": {
@@ -2708,6 +2716,10 @@ var doc = `{
                 "genesis": {
                     "description": "FT合约的genesis，Hex编码",
                     "type": "string"
+                },
+                "pending_balance": {
+                    "description": "待确认余额",
+                    "type": "integer"
                 },
                 "symbol": {
                     "description": "FT symbol",
@@ -2775,7 +2787,24 @@ var doc = `{
                 }
             }
         },
-        "model.NFTOwnerByAddressResp": {
+        "model.NFTOwnerResp": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "description": "token持有人的address",
+                    "type": "string"
+                },
+                "count": {
+                    "description": "持有的当前NFT个数",
+                    "type": "integer"
+                },
+                "pending_count": {
+                    "description": "待确认的当前NFT个数",
+                    "type": "integer"
+                }
+            }
+        },
+        "model.NFTSummaryByAddressResp": {
             "type": "object",
             "properties": {
                 "codehash": {
@@ -2790,22 +2819,13 @@ var doc = `{
                     "description": "NFT合约的genesis，Hex编码",
                     "type": "string"
                 },
+                "pending_count": {
+                    "description": "待确认的当前NFT个数",
+                    "type": "integer"
+                },
                 "symbol": {
                     "description": "NFT symbol",
                     "type": "string"
-                }
-            }
-        },
-        "model.NFTSummaryResp": {
-            "type": "object",
-            "properties": {
-                "address": {
-                    "description": "token持有人的address",
-                    "type": "string"
-                },
-                "count": {
-                    "description": "持有的当前NFT个数",
-                    "type": "integer"
                 }
             }
         },
@@ -3289,7 +3309,7 @@ type swaggerInfo struct {
 var SwaggerInfo = swaggerInfo{
 	Version:     "1.0",
 	Host:        "api.sensiblequery.com",
-	BasePath:    "/",
+	BasePath:    "/test/",
 	Schemes:     []string{},
 	Title:       "Sensible Browser",
 	Description: "Sensible 区块浏览器",
