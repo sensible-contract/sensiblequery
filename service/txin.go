@@ -87,7 +87,7 @@ func GetTxInputsBySql(psql string) (txInsRsp []*model.TxInResp, err error) {
 		if len(txin.Address) == 20 {
 			address = utils.EncodeAddress(txin.Address, utils.PubKeyHashAddrID)
 		}
-		isNFT, _, _, _, dataValue, decimal := script.ExtractPkScriptForTxo(txin.ScriptPk, txin.ScriptType)
+		isNFT, _, _, _, metaTxId, dataValue, decimal := script.ExtractPkScriptForTxo(txin.ScriptPk, txin.ScriptType)
 		tokenId := ""
 		if len(txin.Genesis) >= 20 {
 			if isNFT {
@@ -109,6 +109,7 @@ func GetTxInputsBySql(psql string) (txInsRsp []*model.TxInResp, err error) {
 			Address:       address,
 			IsNFT:         isNFT,
 			TokenId:       tokenId,
+			MetaTxId:      hex.EncodeToString(metaTxId),
 			TokenAmount:   int(dataValue),
 			TokenDecimal:  int(decimal),
 			CodeHashHex:   hex.EncodeToString(txin.CodeHash),
@@ -161,7 +162,7 @@ func GetTxInputBySql(psql string) (txInRsp *model.TxInResp, err error) {
 	if len(txin.Address) == 20 {
 		address = utils.EncodeAddress(txin.Address, utils.PubKeyHashAddrID)
 	}
-	isNFT, _, _, _, dataValue, decimal := script.ExtractPkScriptForTxo(txin.ScriptPk, txin.ScriptType)
+	isNFT, _, _, _, metaTxId, dataValue, decimal := script.ExtractPkScriptForTxo(txin.ScriptPk, txin.ScriptType)
 	tokenId := ""
 	if len(txin.Genesis) >= 20 {
 		if isNFT {
@@ -183,6 +184,7 @@ func GetTxInputBySql(psql string) (txInRsp *model.TxInResp, err error) {
 		Address:       address,
 		IsNFT:         isNFT,
 		TokenId:       tokenId,
+		MetaTxId:      hex.EncodeToString(metaTxId),
 		TokenAmount:   int(dataValue),
 		TokenDecimal:  int(decimal),
 		CodeHashHex:   hex.EncodeToString(txin.CodeHash),

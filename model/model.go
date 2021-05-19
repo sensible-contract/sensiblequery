@@ -39,6 +39,7 @@ type TxoData struct {
 	IsNFT       bool
 	CodeHash    []byte
 	GenesisId   []byte
+	MetaTxId    []byte
 	DataValue   uint64 // ft amount / nft tokenIdx
 	Decimal     uint64 // ft decimal
 	Satoshi     uint64

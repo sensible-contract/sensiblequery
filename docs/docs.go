@@ -2940,6 +2940,10 @@ var doc = `{
                     "description": "当前输入花费是否为NFT",
                     "type": "boolean"
                 },
+                "metaTxId": {
+                    "description": "当前输入的nft metaTxId",
+                    "type": "string"
+                },
                 "satoshi": {
                     "description": "当前输入花费的outpoint的satoshi",
                     "type": "integer"
@@ -3090,6 +3094,10 @@ var doc = `{
                     "description": "当前输出是否为NFT",
                     "type": "boolean"
                 },
+                "metaTxId": {
+                    "description": "当前输出的nft metaTxId",
+                    "type": "string"
+                },
                 "satoshi": {
                     "description": "当前输出的satoshi",
                     "type": "integer"
@@ -3103,7 +3111,7 @@ var doc = `{
                     "type": "integer"
                 },
                 "tokenDecimal": {
-                    "description": "当前输入花费的outpoint的ft decimal",
+                    "description": "当前输出花费的outpoint的ft decimal",
                     "type": "integer"
                 },
                 "tokenId": {
@@ -3147,6 +3155,10 @@ var doc = `{
                     "description": "当前输出是否为NFT",
                     "type": "boolean"
                 },
+                "metaTxId": {
+                    "description": "当前输出的nft metaTxId",
+                    "type": "string"
+                },
                 "satoshi": {
                     "description": "当前输出的satoshi",
                     "type": "integer"
@@ -3164,7 +3176,7 @@ var doc = `{
                     "type": "integer"
                 },
                 "tokenDecimal": {
-                    "description": "当前输入花费的outpoint的ft decimal",
+                    "description": "当前输出花费的outpoint的ft decimal",
                     "type": "integer"
                 },
                 "tokenId": {
@@ -3208,6 +3220,10 @@ var doc = `{
                     "description": "当前输出是否为NFT",
                     "type": "boolean"
                 },
+                "metaTxId": {
+                    "description": "当前输出的nft metaTxId",
+                    "type": "string"
+                },
                 "satoshi": {
                     "description": "当前输出的satoshi",
                     "type": "integer"
@@ -3225,7 +3241,7 @@ var doc = `{
                     "type": "integer"
                 },
                 "tokenDecimal": {
-                    "description": "当前输入花费的outpoint的ft decimal",
+                    "description": "当前输出花费的outpoint的ft decimal",
                     "type": "integer"
                 },
                 "tokenId": {
@@ -3309,7 +3325,7 @@ type swaggerInfo struct {
 var SwaggerInfo = swaggerInfo{
 	Version:     "1.0",
 	Host:        "api.sensiblequery.com",
-	BasePath:    "/test/",
+	BasePath:    "/",
 	Schemes:     []string{},
 	Title:       "Sensible Browser",
 	Description: "Sensible 区块浏览器",

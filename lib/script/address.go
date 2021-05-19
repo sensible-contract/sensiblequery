@@ -2,21 +2,21 @@ package script
 
 import utils "satosensible/lib/blkparser"
 
-func ExtractPkScriptForTxo(Pkscript, scriptType []byte) (isNFT bool, codeHash, genesisId, addressPkh []byte, value, decimal uint64) {
+func ExtractPkScriptForTxo(Pkscript, scriptType []byte) (isNFT bool, codeHash, genesisId, addressPkh, metaTxId []byte, value, decimal uint64) {
 	if isPubkeyHash(scriptType) {
 		addressPkh = make([]byte, 20)
 		copy(addressPkh, Pkscript[3:23])
-		return false, empty, empty, addressPkh, 0, 0
+		return false, empty, empty, addressPkh, empty, 0, 0
 	}
 
 	if isPayToScriptHash(scriptType) {
 		addressPkh = utils.GetHash160(Pkscript[2 : len(Pkscript)-1])
-		return false, empty, empty, addressPkh, 0, 0
+		return false, empty, empty, addressPkh, empty, 0, 0
 	}
 
 	if isPubkey(scriptType) {
 		addressPkh = utils.GetHash160(Pkscript[1 : len(Pkscript)-1])
-		return false, empty, empty, addressPkh, 0, 0
+		return false, empty, empty, addressPkh, empty, 0, 0
 	}
 
 	// if isMultiSig(scriptType) {

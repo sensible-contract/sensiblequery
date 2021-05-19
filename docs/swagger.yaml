@@ -1,4 +1,4 @@
-basePath: /test/
+basePath: /
 definitions:
   controller.TxRequest:
     properties:
@@ -327,6 +327,9 @@ definitions:
       isNFT:
         description: 当前输入花费是否为NFT
         type: boolean
+      metaTxId:
+        description: 当前输入的nft metaTxId
+        type: string
       satoshi:
         description: 当前输入花费的outpoint的satoshi
         type: integer
@@ -437,6 +440,9 @@ definitions:
       isNFT:
         description: 当前输出是否为NFT
         type: boolean
+      metaTxId:
+        description: 当前输出的nft metaTxId
+        type: string
       satoshi:
         description: 当前输出的satoshi
         type: integer
@@ -447,7 +453,7 @@ definitions:
         description: 当前输出的ft tokenAmount
         type: integer
       tokenDecimal:
-        description: 当前输入花费的outpoint的ft decimal
+        description: 当前输出花费的outpoint的ft decimal
         type: integer
       tokenId:
         description: 当前输出的nft tokenId
@@ -479,6 +485,9 @@ definitions:
       isNFT:
         description: 当前输出是否为NFT
         type: boolean
+      metaTxId:
+        description: 当前输出的nft metaTxId
+        type: string
       satoshi:
         description: 当前输出的satoshi
         type: integer
@@ -492,7 +501,7 @@ definitions:
         description: 当前输出的ft tokenAmount
         type: integer
       tokenDecimal:
-        description: 当前输入花费的outpoint的ft decimal
+        description: 当前输出花费的outpoint的ft decimal
         type: integer
       tokenId:
         description: 当前输出的nft tokenId
@@ -524,6 +533,9 @@ definitions:
       isNFT:
         description: 当前输出是否为NFT
         type: boolean
+      metaTxId:
+        description: 当前输出的nft metaTxId
+        type: string
       satoshi:
         description: 当前输出的satoshi
         type: integer
@@ -537,7 +549,7 @@ definitions:
         description: 当前输出的ft tokenAmount
         type: integer
       tokenDecimal:
-        description: 当前输入花费的outpoint的ft decimal
+        description: 当前输出花费的outpoint的ft decimal
         type: integer
       tokenId:
         description: 当前输出的nft tokenId
