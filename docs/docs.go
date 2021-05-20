@@ -470,7 +470,7 @@ var doc = `{
                 "tags": [
                     "token FT"
                 ],
-                "summary": "查询某人持有的某FT Token的余额",
+                "summary": "查询某人持有的某FT Token的余额，同时返回UTXO数量",
                 "parameters": [
                     {
                         "type": "string",
@@ -509,7 +509,7 @@ var doc = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/model.FTOwnerBalanceResp"
+                                            "$ref": "#/definitions/model.FTOwnerBalanceWithUtxoCountResp"
                                         }
                                     }
                                 }
@@ -2498,7 +2498,7 @@ var doc = `{
                     "description": "address",
                     "type": "string"
                 },
-                "pending_satoshi": {
+                "pendingSatoshi": {
                     "description": "待确认余额satoshi",
                     "type": "integer"
                 },
@@ -2696,8 +2696,29 @@ var doc = `{
                     "description": "余额",
                     "type": "integer"
                 },
-                "pending_balance": {
+                "pendingBalance": {
                     "description": "待确认余额",
+                    "type": "integer"
+                }
+            }
+        },
+        "model.FTOwnerBalanceWithUtxoCountResp": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "description": "token持有人的address",
+                    "type": "string"
+                },
+                "balance": {
+                    "description": "余额",
+                    "type": "integer"
+                },
+                "pendingBalance": {
+                    "description": "待确认余额",
+                    "type": "integer"
+                },
+                "utxoCount": {
+                    "description": "UTXO 数量",
                     "type": "integer"
                 }
             }
@@ -2717,7 +2738,7 @@ var doc = `{
                     "description": "FT合约的genesis，Hex编码",
                     "type": "string"
                 },
-                "pending_balance": {
+                "pendingBalance": {
                     "description": "待确认余额",
                     "type": "integer"
                 },
@@ -2798,7 +2819,7 @@ var doc = `{
                     "description": "持有的当前NFT个数",
                     "type": "integer"
                 },
-                "pending_count": {
+                "pendingCount": {
                     "description": "待确认的当前NFT个数",
                     "type": "integer"
                 }
@@ -2819,7 +2840,7 @@ var doc = `{
                     "description": "NFT合约的genesis，Hex编码",
                     "type": "string"
                 },
-                "pending_count": {
+                "pendingCount": {
                     "description": "待确认的当前NFT个数",
                     "type": "integer"
                 },

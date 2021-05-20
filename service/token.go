@@ -126,7 +126,7 @@ func GetAllTokenBalanceByAddress(cursor, size int, addressPkh []byte) (ftOwnersR
 	return ftOwnersRsp, nil
 }
 
-func GetTokenBalanceByCodeHashGenesisAddress(codeHash, genesisId, addressPkh []byte) (balanceRsp *model.FTOwnerBalanceResp, err error) {
+func GetTokenBalanceByCodeHashGenesisAddress(codeHash, genesisId, addressPkh []byte) (balanceRsp *model.FTOwnerBalanceWithUtxoCountResp, err error) {
 	score, err := rdb.ZScore(ctx, "fb"+string(codeHash)+string(genesisId), string(addressPkh)).Result()
 	if err == redis.Nil {
 		score = 0
@@ -148,17 +148,17 @@ func GetTokenBalanceByCodeHashGenesisAddress(codeHash, genesisId, addressPkh []b
 		return
 	}
 
-	countUtxo, err := rdb.ZCard(ctx, finalUtxoKey).Result()
+	utxoCount, err := rdb.ZCard(ctx, finalUtxoKey).Result()
 	if err != nil {
 		log.Printf("GetTokenBalanceByCodeHashGenesisAddress redis failed: %v", err)
 		return
 	}
 
-	balanceRsp = &model.FTOwnerBalanceResp{
+	balanceRsp = &model.FTOwnerBalanceWithUtxoCountResp{
 		Address:        utils.EncodeAddress(addressPkh, utils.PubKeyHashAddrID),
 		Balance:        int(score),
 		PendingBalance: int(mpScore),
-		CountUtxo:      int(countUtxo),
+		UtxoCount:      int(utxoCount),
 	}
 	return balanceRsp, nil
 }

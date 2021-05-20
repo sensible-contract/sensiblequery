@@ -269,13 +269,13 @@ func ListAllFTBalanceByOwner(ctx *gin.Context) {
 }
 
 // GetFTBalanceByOwner
-// @Summary 查询某人持有的某FT Token的余额
+// @Summary 查询某人持有的某FT Token的余额，同时返回UTXO数量
 // @Tags token FT
 // @Produce  json
 // @Param codehash path string true "Code Hash160" default(844c56bb99afc374967a27ce3b46244e2e1fba60)
 // @Param genesis path string true "Genesis ID" default(74967a27ce3b46244e2e1fba60844c56bb99afc3)
 // @Param address path string true "Address" default(17SkEw2md5avVNyYgj6RiXuQKNwkXaxFyQ)
-// @Success 200 {object} model.Response{data=model.FTOwnerBalanceResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Success 200 {object} model.Response{data=model.FTOwnerBalanceWithUtxoCountResp} "{"code": 0, "data": [{}], "msg": "ok"}"
 // @Router /ft/balance/{codehash}/{genesis}/{address} [get]
 func GetFTBalanceByOwner(ctx *gin.Context) {
 	log.Printf("GetFTBalanceByOwner enter")
