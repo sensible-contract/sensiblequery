@@ -123,15 +123,14 @@ func GetNFTUtxoByTokenId(key string, tokenId string) (txOutsRsp *model.TxOutResp
 	return result[0], nil
 }
 
-//////////////// genesisId
-func GetUtxoByCodeHashGenesisAddress(cursor, size int, codeHash, genesisId, addressPkh []byte, isNFT bool) (txOutsRsp []*model.TxOutResp, err error) {
+//////////////// merge ft utxo
+func mergeUtxoByCodeHashGenesisAddress(codeHash, genesisId, addressPkh []byte, isNFT bool) (finalKey string, err error) {
 	// 注意这里查询需要原子化，可使用pipeline
 	addressKey := string(codeHash) + string(genesisId) + string(addressPkh)
 	addressUtxoConfirmed := ""
 	addressUtxoSpentUnconfirmed := ""
 	oldUtxoKey := ""
 	newUtxoKey := ""
-	finalKey := ""
 
 	if isNFT {
 		addressUtxoConfirmed = "nu" + addressKey
@@ -170,6 +169,16 @@ func GetUtxoByCodeHashGenesisAddress(cursor, size int, codeHash, genesisId, addr
 		return
 	}
 	log.Printf("ZUnionStore : %v", nUnion)
+
+	return finalKey, nil
+}
+
+//////////////// genesisId
+func GetUtxoByCodeHashGenesisAddress(cursor, size int, codeHash, genesisId, addressPkh []byte, isNFT bool) (txOutsRsp []*model.TxOutResp, err error) {
+	finalKey, err := mergeUtxoByCodeHashGenesisAddress(codeHash, genesisId, addressPkh, isNFT)
+	if err != nil {
+		return nil, err
+	}
 
 	//
 	utxoOutpoints, err := rdb.ZRevRange(ctx, finalKey, int64(cursor), int64(cursor+size-1)).Result()

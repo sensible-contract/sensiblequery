@@ -131,7 +131,7 @@ func GetTokenBalanceByCodeHashGenesisAddress(codeHash, genesisId, addressPkh []b
 	if err == redis.Nil {
 		score = 0
 	} else if err != nil {
-		log.Printf("GetFTOwnersByCodeHashGenesis redis failed: %v", err)
+		log.Printf("GetTokenBalanceByCodeHashGenesisAddress redis failed: %v", err)
 		return
 	}
 
@@ -139,7 +139,18 @@ func GetTokenBalanceByCodeHashGenesisAddress(codeHash, genesisId, addressPkh []b
 	if err == redis.Nil {
 		mpScore = 0
 	} else if err != nil {
-		log.Printf("GetFTOwnersByCodeHashGenesis redis mp failed: %v", err)
+		log.Printf("GetTokenBalanceByCodeHashGenesisAddress redis mp failed: %v", err)
+		return
+	}
+
+	finalUtxoKey, err := mergeUtxoByCodeHashGenesisAddress(codeHash, genesisId, addressPkh, false)
+	if err != nil {
+		return
+	}
+
+	countUtxo, err := rdb.ZCard(ctx, finalUtxoKey).Result()
+	if err != nil {
+		log.Printf("GetTokenBalanceByCodeHashGenesisAddress redis failed: %v", err)
 		return
 	}
 
@@ -147,6 +158,7 @@ func GetTokenBalanceByCodeHashGenesisAddress(codeHash, genesisId, addressPkh []b
 		Address:        utils.EncodeAddress(addressPkh, utils.PubKeyHashAddrID),
 		Balance:        int(score),
 		PendingBalance: int(mpScore),
+		CountUtxo:      int(countUtxo),
 	}
 	return balanceRsp, nil
 }
@@ -175,7 +187,7 @@ func GetNFTOwnersByCodeHashGenesis(cursor, size int, codeHash, genesisId []byte)
 
 	vals, err := rdb.ZRevRangeWithScores(ctx, finalKey, int64(cursor), int64(cursor+size-1)).Result()
 	if err != nil {
-		log.Printf("GetFTOwnersByCodeHashGenesis redis failed: %v", err)
+		log.Printf("GetNFTOwnersByCodeHashGenesis redis failed: %v", err)
 		return
 	}
 
@@ -234,7 +246,7 @@ func GetAllNFTBalanceByAddress(cursor, size int, addressPkh []byte) (nftOwnersRs
 
 	vals, err := rdb.ZRevRangeWithScores(ctx, finalKey, int64(cursor), int64(cursor+size-1)).Result()
 	if err != nil {
-		log.Printf("GetFTOwnersByCodeHashGenesis redis failed: %v", err)
+		log.Printf("GetAllNFTBalanceByAddress redis failed: %v", err)
 		return
 	}
 
@@ -276,7 +288,7 @@ func GetNFTCountByCodeHashGenesisAddress(codeHash, genesisId, addressPkh []byte)
 	if err == redis.Nil {
 		score = 0
 	} else if err != nil {
-		log.Printf("GetFTOwnersByCodeHashGenesis redis failed: %v", err)
+		log.Printf("GetNFTCountByCodeHashGenesisAddress redis failed: %v", err)
 		return
 	}
 
@@ -284,7 +296,7 @@ func GetNFTCountByCodeHashGenesisAddress(codeHash, genesisId, addressPkh []byte)
 	if err == redis.Nil {
 		mpScore = 0
 	} else if err != nil {
-		log.Printf("GetFTOwnersByCodeHashGenesis mp redis failed: %v", err)
+		log.Printf("GetNFTCountByCodeHashGenesisAddress mp redis failed: %v", err)
 		return
 	}
 
