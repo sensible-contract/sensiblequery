@@ -163,7 +163,7 @@ type TxOutStatusResp struct {
 }
 
 type BalanceResp struct {
-	Address        string `json:"address"`         // address
-	Satoshi        int    `json:"satoshi"`         // 余额satoshi
-	PendingSatoshi int    `json:"pending_satoshi"` // 待确认余额satoshi
+	Address        string `json:"address"`        // address
+	Satoshi        int    `json:"satoshi"`        // 余额satoshi
+	PendingSatoshi int    `json:"pendingSatoshi"` // 待确认余额satoshi
 }

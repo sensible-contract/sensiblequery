@@ -22,15 +22,15 @@ type NFTTransferTimesResp struct {
 }
 
 type NFTOwnerResp struct {
-	Address      string `json:"address"`       // token持有人的address
-	Count        int    `json:"count"`         // 持有的当前NFT个数
-	PendingCount int    `json:"pending_count"` // 待确认的当前NFT个数
+	Address      string `json:"address"`      // token持有人的address
+	Count        int    `json:"count"`        // 持有的当前NFT个数
+	PendingCount int    `json:"pendingCount"` // 待确认的当前NFT个数
 }
 
 type NFTSummaryByAddressResp struct {
-	CodeHashHex  string `json:"codehash"`      // NFT合约hash160(CodePart)
-	GenesisHex   string `json:"genesis"`       // NFT合约的genesis，Hex编码
-	Symbol       string `json:"symbol"`        // NFT symbol
-	Count        int    `json:"count"`         // 持有的当前NFT个数
-	PendingCount int    `json:"pending_count"` // 待确认的当前NFT个数
+	CodeHashHex  string `json:"codehash"`     // NFT合约hash160(CodePart)
+	GenesisHex   string `json:"genesis"`      // NFT合约的genesis，Hex编码
+	Symbol       string `json:"symbol"`       // NFT symbol
+	Count        int    `json:"count"`        // 持有的当前NFT个数
+	PendingCount int    `json:"pendingCount"` // 待确认的当前NFT个数
 }
