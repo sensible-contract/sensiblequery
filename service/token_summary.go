@@ -12,7 +12,7 @@ import (
 
 // "height, codehash, genesis, code_type, nft_idx, in_data_value, out_data_value, invalue, outvalue, blkid"
 func tokenInfoResultSRF(rows *sql.Rows) (interface{}, error) {
-	var ret model.NFTInfoDO
+	var ret model.TokenInfoDO
 	err := rows.Scan(&ret.CodeHash, &ret.Genesis, &ret.Count, &ret.InTimes, &ret.OutTimes, &ret.InSatoshi, &ret.OutSatoshi)
 	if err != nil {
 		return nil, err
