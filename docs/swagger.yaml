@@ -152,6 +152,9 @@ definitions:
       balance:
         description: 余额
         type: integer
+      decimal:
+        description: decimal
+        type: integer
       pendingBalance:
         description: 待确认余额
         type: integer
@@ -163,6 +166,9 @@ definitions:
         type: string
       balance:
         description: 余额
+        type: integer
+      decimal:
+        description: decimal
         type: integer
       pendingBalance:
         description: 待确认余额
@@ -179,6 +185,9 @@ definitions:
       codehash:
         description: FT合约hash160(CodePart)
         type: string
+      decimal:
+        description: decimal
+        type: integer
       genesis:
         description: FT合约的genesis，Hex编码
         type: string

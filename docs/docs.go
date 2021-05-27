@@ -2696,6 +2696,10 @@ var doc = `{
                     "description": "余额",
                     "type": "integer"
                 },
+                "decimal": {
+                    "description": "decimal",
+                    "type": "integer"
+                },
                 "pendingBalance": {
                     "description": "待确认余额",
                     "type": "integer"
@@ -2711,6 +2715,10 @@ var doc = `{
                 },
                 "balance": {
                     "description": "余额",
+                    "type": "integer"
+                },
+                "decimal": {
+                    "description": "decimal",
                     "type": "integer"
                 },
                 "pendingBalance": {
@@ -2733,6 +2741,10 @@ var doc = `{
                 "codehash": {
                     "description": "FT合约hash160(CodePart)",
                     "type": "string"
+                },
+                "decimal": {
+                    "description": "decimal",
+                    "type": "integer"
                 },
                 "genesis": {
                     "description": "FT合约的genesis，Hex编码",

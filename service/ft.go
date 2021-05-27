@@ -8,6 +8,8 @@ import (
 	"log"
 	"satosensible/dao/clickhouse"
 	"satosensible/model"
+
+	"github.com/go-redis/redis/v8"
 )
 
 const (
@@ -23,7 +25,30 @@ func ftInfoResultSRF(rows *sql.Rows) (interface{}, error) {
 	return &ret, nil
 }
 
-func GetFTSummary(codeHashHex string) (blksRsp []*model.FTInfoResp, err error) {
+func getFTDecimal(ftsRsp []*model.FTInfoResp) {
+	pipe := rdb.Pipeline()
+	decimalCmds := make([]*redis.StringCmd, 0)
+	for _, ft := range ftsRsp {
+		// decimal of each token
+		key, _ := hex.DecodeString(ft.CodeHashHex + ft.GenesisHex)
+		decimalCmds = append(decimalCmds, pipe.HGet(ctx, "fi"+string(key), "decimal"))
+	}
+	_, err := pipe.Exec(ctx)
+	if err != nil && err != redis.Nil {
+		panic(err)
+	}
+	for idx, ft := range ftsRsp {
+		decimal, err := decimalCmds[idx].Int()
+		if err == redis.Nil {
+			continue
+		} else if err != nil {
+			log.Printf("getFTDecimal redis failed: %v", err)
+		}
+		ft.Decimal = decimal
+	}
+}
+
+func GetFTSummary(codeHashHex string) (ftsRsp []*model.FTInfoResp, err error) {
 	psql := fmt.Sprintf(`
 SELECT codehash, genesis, count(1),
        sum(in_data_value) AS in_volume , sum(out_data_value) AS out_volume,
@@ -32,10 +57,15 @@ WHERE code_type = 1 AND codehash = unhex('%s')
 GROUP BY codehash, genesis
 ORDER BY count(1) DESC
 `, codeHashHex)
-	return GetFTInfoBySQL(psql)
+	ftsRsp, err = GetFTInfoBySQL(psql)
+	if err != nil {
+		return
+	}
+	getFTDecimal(ftsRsp)
+	return
 }
 
-func GetFTInfo() (blksRsp []*model.FTInfoResp, err error) {
+func GetFTInfo() (ftsRsp []*model.FTInfoResp, err error) {
 	psql := `
 SELECT codehash, genesis, count(1),
        sum(in_data_value) AS in_volume , sum(out_data_value) AS out_volume,
@@ -44,7 +74,12 @@ WHERE code_type = 1
 GROUP BY codehash, genesis
 ORDER BY count(1) DESC
 `
-	return GetFTInfoBySQL(psql)
+	ftsRsp, err = GetFTInfoBySQL(psql)
+	if err != nil {
+		return
+	}
+	getFTDecimal(ftsRsp)
+	return
 }
 
 func GetFTInfoBySQL(psql string) (blksRsp []*model.FTInfoResp, err error) {
