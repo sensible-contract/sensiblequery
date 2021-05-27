@@ -301,9 +301,8 @@ func GetUtxoByAddress(cursor, size int, addressPkh []byte) (txOutsRsp []*model.T
 
 ////////////////
 func getNonTokenUtxoFromRedis(utxoOutpoints []string) (txOutsRsp []*model.TxStandardOutResp, err error) {
-	txOutsRsp = make([]*model.TxStandardOutResp, 0)
-
 	log.Printf("getUtxoFromRedis redis: %d", len(utxoOutpoints))
+	txOutsRsp = make([]*model.TxStandardOutResp, 0)
 	pipe := rdbBlock.Pipeline()
 
 	outpointsCmd := make([]*redis.StringCmd, 0)

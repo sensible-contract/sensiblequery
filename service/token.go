@@ -12,6 +12,16 @@ import (
 ////////////////
 // ft
 func GetTokenOwnersByCodeHashGenesis(cursor, size int, codeHash, genesisId []byte) (ftOwnersRsp []*model.FTOwnerBalanceResp, err error) {
+	// get decimal from f info
+	decimal, err := rdb.HGet(ctx, "fi"+string(codeHash)+string(genesisId), "decimal").Int()
+	if err == redis.Nil {
+		decimal = 0
+	} else if err != nil {
+		log.Printf("GetTokenOwnersByCodeHashGenesis decimal, but redis failed: %v", err)
+		return
+	}
+
+	// merge
 	finalKey := "mp:z:fb" + string(codeHash) + string(genesisId)
 
 	oldKey := "fb" + string(codeHash) + string(genesisId)
@@ -52,6 +62,7 @@ func GetTokenOwnersByCodeHashGenesis(cursor, size int, codeHash, genesisId []byt
 		balanceRsp := &model.FTOwnerBalanceResp{
 			Address: utils.EncodeAddress([]byte(val.Member.(string)), utils.PubKeyHashAddrID),
 			Balance: int(val.Score),
+			Decimal: decimal,
 		}
 		ftOwnersRsp = append(ftOwnersRsp, balanceRsp)
 
@@ -96,8 +107,11 @@ func GetAllTokenBalanceByAddress(cursor, size int, addressPkh []byte) (ftOwnersR
 
 	pipe := rdb.Pipeline()
 	pendingBalanceCmds := make([]*redis.FloatCmd, 0)
+	decimalCmds := make([]*redis.StringCmd, 0)
 	for _, val := range vals {
 		pendingBalanceCmds = append(pendingBalanceCmds, pipe.ZScore(ctx, newKey, val.Member.(string)))
+		// decimal of each token
+		decimalCmds = append(decimalCmds, pipe.HGet(ctx, "fi"+val.Member.(string), "decimal"))
 	}
 	_, err = pipe.Exec(ctx)
 	if err != nil && err != redis.Nil {
@@ -110,9 +124,11 @@ func GetAllTokenBalanceByAddress(cursor, size int, addressPkh []byte) (ftOwnersR
 			CodeHashHex: hex.EncodeToString([]byte(val.Member.(string))[:20]),
 			GenesisHex:  hex.EncodeToString([]byte(val.Member.(string))[20:]),
 			Balance:     int(val.Score),
+			Decimal:     0,
 		}
 		ftOwnersRsp = append(ftOwnersRsp, balanceRsp)
 
+		// balance
 		pendingBalance, err := data.Result()
 		if err == redis.Nil {
 			continue
@@ -121,25 +137,43 @@ func GetAllTokenBalanceByAddress(cursor, size int, addressPkh []byte) (ftOwnersR
 		}
 		balanceRsp.PendingBalance = int(pendingBalance)
 		balanceRsp.Balance -= int(pendingBalance)
+
+		// decimal
+		decimal, err := decimalCmds[idx].Int()
+		if err == redis.Nil {
+			continue
+		} else if err != nil {
+			panic(err)
+		}
+		balanceRsp.Decimal = decimal
 	}
 
 	return ftOwnersRsp, nil
 }
 
 func GetTokenBalanceByCodeHashGenesisAddress(codeHash, genesisId, addressPkh []byte) (balanceRsp *model.FTOwnerBalanceWithUtxoCountResp, err error) {
-	score, err := rdb.ZScore(ctx, "fb"+string(codeHash)+string(genesisId), string(addressPkh)).Result()
+	// get decimal from f info
+	decimal, err := rdb.HGet(ctx, "fi"+string(codeHash)+string(genesisId), "decimal").Int()
 	if err == redis.Nil {
-		score = 0
+		decimal = 0
 	} else if err != nil {
-		log.Printf("GetTokenBalanceByCodeHashGenesisAddress redis failed: %v", err)
+		log.Printf("GetTokenBalanceByCodeHashGenesisAddress decimal, but redis failed: %v", err)
 		return
 	}
 
-	mpScore, err := rdb.ZScore(ctx, "mp:fb"+string(codeHash)+string(genesisId), string(addressPkh)).Result()
+	balance, err := rdb.ZScore(ctx, "fb"+string(codeHash)+string(genesisId), string(addressPkh)).Result()
 	if err == redis.Nil {
-		mpScore = 0
+		balance = 0
 	} else if err != nil {
-		log.Printf("GetTokenBalanceByCodeHashGenesisAddress redis mp failed: %v", err)
+		log.Printf("GetTokenBalanceByCodeHashGenesisAddress fb, butredis failed: %v", err)
+		return
+	}
+
+	mpBalance, err := rdb.ZScore(ctx, "mp:fb"+string(codeHash)+string(genesisId), string(addressPkh)).Result()
+	if err == redis.Nil {
+		mpBalance = 0
+	} else if err != nil {
+		log.Printf("GetTokenBalanceByCodeHashGenesisAddress mp:fb, but redis mp failed: %v", err)
 		return
 	}
 
@@ -150,15 +184,16 @@ func GetTokenBalanceByCodeHashGenesisAddress(codeHash, genesisId, addressPkh []b
 
 	utxoCount, err := rdb.ZCard(ctx, finalUtxoKey).Result()
 	if err != nil {
-		log.Printf("GetTokenBalanceByCodeHashGenesisAddress redis failed: %v", err)
+		log.Printf("GetTokenBalanceByCodeHashGenesisAddress merge, but redis failed: %v", err)
 		return
 	}
 
 	balanceRsp = &model.FTOwnerBalanceWithUtxoCountResp{
 		Address:        utils.EncodeAddress(addressPkh, utils.PubKeyHashAddrID),
-		Balance:        int(score),
-		PendingBalance: int(mpScore),
+		Balance:        int(balance),
+		PendingBalance: int(mpBalance),
 		UtxoCount:      int(utxoCount),
+		Decimal:        decimal,
 	}
 	return balanceRsp, nil
 }

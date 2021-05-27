@@ -26,12 +26,14 @@ type FTOwnerBalanceResp struct {
 	Address        string `json:"address"`        // token持有人的address
 	Balance        int    `json:"balance"`        // 余额
 	PendingBalance int    `json:"pendingBalance"` // 待确认余额
+	Decimal        int    `json:"decimal"`        // decimal
 }
 
 type FTOwnerBalanceWithUtxoCountResp struct {
 	Address        string `json:"address"`        // token持有人的address
 	Balance        int    `json:"balance"`        // 余额
 	PendingBalance int    `json:"pendingBalance"` // 待确认余额
+	Decimal        int    `json:"decimal"`        // decimal
 	UtxoCount      int    `json:"utxoCount"`      // UTXO 数量
 }
 
@@ -41,4 +43,5 @@ type FTSummaryByAddressResp struct {
 	Symbol         string `json:"symbol"`         // FT symbol
 	Balance        int    `json:"balance"`        // 余额
 	PendingBalance int    `json:"pendingBalance"` // 待确认余额
+	Decimal        int    `json:"decimal"`        // decimal
 }
