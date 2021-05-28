@@ -8,10 +8,10 @@ import (
 
 var empty = make([]byte, 1)
 
-func ExtractPkScriptGenesisIdAndAddressPkh(pkscript []byte) (isNFT bool, codeHash, genesisId, addressPkh, metaTxId []byte, value, decimal uint64) {
+func ExtractPkScriptGenesisIdAndAddressPkh(pkscript []byte) (isNFT bool, codeHash, genesisId, addressPkh, metaTxId []byte, name, symbol string, value, decimal uint64) {
 	scriptLen := len(pkscript)
 	if scriptLen < 1024 {
-		return false, empty, empty, empty, empty, 0, 0
+		return false, empty, empty, empty, empty, "", "", 0, 0
 	}
 
 	metaTxId = empty
@@ -22,6 +22,8 @@ func ExtractPkScriptGenesisIdAndAddressPkh(pkscript []byte) (isNFT bool, codeHas
 	valueOffset := scriptLen - 8 - 4 - 8
 	addressOffset := scriptLen - 8 - 4 - 8 - 20
 	decimalOffset := scriptLen - 8 - 4 - 8 - 20 - 1
+	symbolOffset := scriptLen - 8 - 4 - 8 - 20 - 1 - 1
+	nameOffset := scriptLen - 8 - 4 - 8 - 20 - 1 - 1 - 10
 
 	if (bytes.HasSuffix(pkscript, []byte("sensible")) || bytes.HasSuffix(pkscript, []byte("oraclesv"))) &&
 		pkscript[scriptLen-8-4] == 1 { // PROTO_TYPE == 1
@@ -47,8 +49,10 @@ func ExtractPkScriptGenesisIdAndAddressPkh(pkscript []byte) (isNFT bool, codeHas
 		valueOffset -= genesisIdLen
 		addressOffset -= genesisIdLen
 		decimalOffset -= genesisIdLen
-		decimal = uint64(pkscript[decimalOffset])
 
+		decimal = uint64(pkscript[decimalOffset])
+		name = string(pkscript[nameOffset : nameOffset+20])
+		symbol = string(pkscript[symbolOffset : symbolOffset+10])
 	} else if pkscript[scriptLen-1] < 2 && pkscript[scriptLen-37-1] == 37 && pkscript[scriptLen-37-1-40-1] == 40 && pkscript[scriptLen-37-1-40-1-1] == OP_RETURN {
 		// nft issue
 		isNFT = true
@@ -72,7 +76,7 @@ func ExtractPkScriptGenesisIdAndAddressPkh(pkscript []byte) (isNFT bool, codeHas
 		metaTxId = make([]byte, 32)
 		copy(metaTxId, pkscript[metaTxIdOffset:metaTxIdOffset+32])
 	} else {
-		return false, empty, empty, empty, empty, 0, 0
+		return false, empty, empty, empty, empty, "", "", 0, 0
 	}
 
 	genesisId = make([]byte, genesisIdLen)
@@ -84,5 +88,5 @@ func ExtractPkScriptGenesisIdAndAddressPkh(pkscript []byte) (isNFT bool, codeHas
 
 	codeHash = blkparser.GetHash160(pkscript[:scriptLen-genesisIdLen-dataLen])
 
-	return isNFT, codeHash, genesisId, addressPkh, metaTxId, value, decimal
+	return isNFT, codeHash, genesisId, addressPkh, metaTxId, name, symbol, value, decimal
 }

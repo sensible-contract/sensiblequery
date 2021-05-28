@@ -8,6 +8,7 @@ import (
 	"log"
 	"satosensible/dao/clickhouse"
 	"satosensible/model"
+	"strconv"
 
 	"github.com/go-redis/redis/v8"
 )
@@ -27,24 +28,32 @@ func ftInfoResultSRF(rows *sql.Rows) (interface{}, error) {
 
 func getFTDecimal(ftsRsp []*model.FTInfoResp) {
 	pipe := rdb.Pipeline()
-	decimalCmds := make([]*redis.StringCmd, 0)
+	ftinfoCmds := make([]*redis.StringStringMapCmd, 0)
 	for _, ft := range ftsRsp {
-		// decimal of each token
+		// ftinfo of each token
 		key, _ := hex.DecodeString(ft.CodeHashHex + ft.GenesisHex)
-		decimalCmds = append(decimalCmds, pipe.HGet(ctx, "fi"+string(key), "decimal"))
+		ftinfoCmds = append(ftinfoCmds, pipe.HGetAll(ctx, "fi"+string(key)))
 	}
 	_, err := pipe.Exec(ctx)
 	if err != nil && err != redis.Nil {
 		panic(err)
 	}
 	for idx, ft := range ftsRsp {
-		decimal, err := decimalCmds[idx].Int()
+		ftinfo, err := ftinfoCmds[idx].Result()
 		if err == redis.Nil {
+			ftinfo = map[string]string{
+				"decimal": "0",
+				"name":    "",
+				"symbol":  "",
+			}
 			continue
 		} else if err != nil {
 			log.Printf("getFTDecimal redis failed: %v", err)
 		}
+		decimal, _ := strconv.Atoi(ftinfo["decimal"])
 		ft.Decimal = decimal
+		ft.Name = ftinfo["name"]
+		ft.Symbol = ftinfo["symbol"]
 	}
 }
 

@@ -222,7 +222,7 @@ func getUtxoFromRedis(utxoOutpoints []string) (txOutsRsp []*model.TxOutResp, err
 		txout.UTxid = []byte(outpoint[:32])                            // 32
 		txout.Vout = binary.LittleEndian.Uint32([]byte(outpoint[32:])) // 4
 		txout.ScriptType = script.GetLockingScriptType(txout.Script)
-		txout.IsNFT, txout.CodeHash, txout.GenesisId, txout.AddressPkh, txout.MetaTxId, txout.DataValue, txout.Decimal = script.ExtractPkScriptForTxo(txout.Script, txout.ScriptType)
+		txout.IsNFT, txout.CodeHash, txout.GenesisId, txout.AddressPkh, txout.MetaTxId, txout.Name, txout.Symbol, txout.DataValue, txout.Decimal = script.ExtractPkScriptForTxo(txout.Script, txout.ScriptType)
 
 		tokenId := ""
 		if len(txout.GenesisId) >= 20 {
@@ -242,6 +242,8 @@ func getUtxoFromRedis(utxoOutpoints []string) (txOutsRsp []*model.TxOutResp, err
 			IsNFT:         txout.IsNFT,
 			TokenId:       tokenId,
 			MetaTxId:      hex.EncodeToString(txout.MetaTxId),
+			TokenName:     txout.Name,
+			TokenSymbol:   txout.Symbol,
 			TokenAmount:   int(txout.DataValue),
 			TokenDecimal:  int(txout.Decimal),
 			CodeHashHex:   hex.EncodeToString(txout.CodeHash),

@@ -40,6 +40,7 @@ type FTOwnerBalanceWithUtxoCountResp struct {
 type FTSummaryByAddressResp struct {
 	CodeHashHex    string `json:"codehash"`       // FT合约hash160(CodePart)
 	GenesisHex     string `json:"genesis"`        // FT合约的genesis，Hex编码
+	Name           string `json:"name"`           // FT name
 	Symbol         string `json:"symbol"`         // FT symbol
 	Balance        int    `json:"balance"`        // 余额
 	PendingBalance int    `json:"pendingBalance"` // 待确认余额

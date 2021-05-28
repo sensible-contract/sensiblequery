@@ -5,6 +5,7 @@ import (
 	"log"
 	"satosensible/lib/utils"
 	"satosensible/model"
+	"strconv"
 
 	"github.com/go-redis/redis/v8"
 )
@@ -50,6 +51,7 @@ func GetTokenOwnersByCodeHashGenesis(cursor, size int, codeHash, genesisId []byt
 	pipe := rdb.Pipeline()
 	pendingBalanceCmds := make([]*redis.FloatCmd, 0)
 	for _, val := range vals {
+		log.Printf("GetFTOwnersByCodeHashGenesis balance: %d", int(val.Score))
 		pendingBalanceCmds = append(pendingBalanceCmds, pipe.ZScore(ctx, newKey, val.Member.(string)))
 	}
 	_, err = pipe.Exec(ctx)
@@ -101,17 +103,17 @@ func GetAllTokenBalanceByAddress(cursor, size int, addressPkh []byte) (ftOwnersR
 
 	vals, err := rdb.ZRevRangeWithScores(ctx, finalKey, int64(cursor), int64(cursor+size-1)).Result()
 	if err != nil {
-		log.Printf("GetFTOwnersByCodeHashGenesis redis failed: %v", err)
+		log.Printf("GetAllTokenBalanceByAddress redis failed: %v", err)
 		return
 	}
 
 	pipe := rdb.Pipeline()
 	pendingBalanceCmds := make([]*redis.FloatCmd, 0)
-	decimalCmds := make([]*redis.StringCmd, 0)
+	ftInfoCmds := make([]*redis.StringStringMapCmd, 0)
 	for _, val := range vals {
 		pendingBalanceCmds = append(pendingBalanceCmds, pipe.ZScore(ctx, newKey, val.Member.(string)))
 		// decimal of each token
-		decimalCmds = append(decimalCmds, pipe.HGet(ctx, "fi"+val.Member.(string), "decimal"))
+		ftInfoCmds = append(ftInfoCmds, pipe.HGetAll(ctx, "fi"+val.Member.(string)))
 	}
 	_, err = pipe.Exec(ctx)
 	if err != nil && err != redis.Nil {
@@ -128,6 +130,23 @@ func GetAllTokenBalanceByAddress(cursor, size int, addressPkh []byte) (ftOwnersR
 		}
 		ftOwnersRsp = append(ftOwnersRsp, balanceRsp)
 
+		// decimal
+		ftinfo, err := ftInfoCmds[idx].Result()
+		if err == redis.Nil {
+			log.Println("GetAllTokenBalanceByAddress ftinfo not found")
+			ftinfo = map[string]string{
+				"decimal": "0",
+				"name":    "",
+				"symbol":  "",
+			}
+		} else if err != nil {
+			panic(err)
+		}
+		decimal, _ := strconv.Atoi(ftinfo["decimal"])
+		balanceRsp.Decimal = decimal
+		balanceRsp.Name = ftinfo["name"]
+		balanceRsp.Symbol = ftinfo["symbol"]
+
 		// balance
 		pendingBalance, err := data.Result()
 		if err == redis.Nil {
@@ -137,15 +156,6 @@ func GetAllTokenBalanceByAddress(cursor, size int, addressPkh []byte) (ftOwnersR
 		}
 		balanceRsp.PendingBalance = int(pendingBalance)
 		balanceRsp.Balance -= int(pendingBalance)
-
-		// decimal
-		decimal, err := decimalCmds[idx].Int()
-		if err == redis.Nil {
-			continue
-		} else if err != nil {
-			panic(err)
-		}
-		balanceRsp.Decimal = decimal
 	}
 
 	return ftOwnersRsp, nil
@@ -163,19 +173,22 @@ func GetTokenBalanceByCodeHashGenesisAddress(codeHash, genesisId, addressPkh []b
 
 	balance, err := rdb.ZScore(ctx, "fb"+string(codeHash)+string(genesisId), string(addressPkh)).Result()
 	if err == redis.Nil {
+		log.Printf("GetTokenBalanceByCodeHashGenesisAddress fb, but not found")
 		balance = 0
 	} else if err != nil {
-		log.Printf("GetTokenBalanceByCodeHashGenesisAddress fb, butredis failed: %v", err)
+		log.Printf("GetTokenBalanceByCodeHashGenesisAddress fb, but redis failed: %v", err)
 		return
 	}
-
+	log.Printf("GetTokenBalanceByCodeHashGenesisAddress fb, balance: %f", balance)
 	mpBalance, err := rdb.ZScore(ctx, "mp:fb"+string(codeHash)+string(genesisId), string(addressPkh)).Result()
 	if err == redis.Nil {
+		log.Printf("GetTokenBalanceByCodeHashGenesisAddress mp:fb, but not found")
 		mpBalance = 0
 	} else if err != nil {
 		log.Printf("GetTokenBalanceByCodeHashGenesisAddress mp:fb, but redis mp failed: %v", err)
 		return
 	}
+	log.Printf("GetTokenBalanceByCodeHashGenesisAddress fb, pending balance: %f", mpBalance)
 
 	finalUtxoKey, err := mergeUtxoByCodeHashGenesisAddress(codeHash, genesisId, addressPkh, false)
 	if err != nil {

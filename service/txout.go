@@ -111,7 +111,7 @@ func GetTxOutputsBySql(psql string) (txOutsRsp []*model.TxOutStatusResp, err err
 		if len(txOut.Address) == 20 {
 			address = utils.EncodeAddress(txOut.Address, utils.PubKeyHashAddrID)
 		}
-		isNFT, _, _, _, metaTxId, dataValue, decimal := script.ExtractPkScriptForTxo(txOut.ScriptPk, txOut.ScriptType)
+		isNFT, _, _, _, metaTxId, name, symbol, dataValue, decimal := script.ExtractPkScriptForTxo(txOut.ScriptPk, txOut.ScriptType)
 		tokenId := ""
 		if len(txOut.Genesis) >= 20 {
 			if isNFT {
@@ -130,6 +130,8 @@ func GetTxOutputsBySql(psql string) (txOutsRsp []*model.TxOutStatusResp, err err
 			IsNFT:         isNFT,
 			TokenId:       tokenId,
 			MetaTxId:      hex.EncodeToString(metaTxId),
+			TokenName:     name,
+			TokenSymbol:   symbol,
 			TokenAmount:   int(dataValue),
 			TokenDecimal:  int(decimal),
 			CodeHashHex:   hex.EncodeToString(txOut.CodeHash),
@@ -193,7 +195,7 @@ func GetTxOutputBySql(psql string) (txOutRsp *model.TxOutResp, err error) {
 		address = utils.EncodeAddress(txOut.Address, utils.PubKeyHashAddrID)
 	}
 
-	isNFT, _, _, _, metaTxId, dataValue, decimal := script.ExtractPkScriptForTxo(txOut.ScriptPk, txOut.ScriptType)
+	isNFT, _, _, _, metaTxId, name, symbol, dataValue, decimal := script.ExtractPkScriptForTxo(txOut.ScriptPk, txOut.ScriptType)
 	tokenId := ""
 	if len(txOut.Genesis) >= 20 {
 		if isNFT {
@@ -211,6 +213,8 @@ func GetTxOutputBySql(psql string) (txOutRsp *model.TxOutResp, err error) {
 		IsNFT:         isNFT,
 		TokenId:       tokenId,
 		MetaTxId:      hex.EncodeToString(metaTxId),
+		TokenName:     name,
+		TokenSymbol:   symbol,
 		TokenAmount:   int(dataValue),
 		TokenDecimal:  int(decimal),
 		CodeHashHex:   hex.EncodeToString(txOut.CodeHash),

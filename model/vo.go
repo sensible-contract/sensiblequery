@@ -89,6 +89,8 @@ type TxInResp struct {
 	GenesisHex    string `json:"genesis"`      // 当前输入花费的outpoint的genesis，Hex编码
 	TokenAmount   int    `json:"tokenAmount"`  // 当前输入花费的outpoint的ft tokenAmount
 	TokenDecimal  int    `json:"tokenDecimal"` // 当前输入花费的outpoint的ft decimal
+	TokenName     string `json:"tokenName"`    // 当前输入的ft tokenName
+	TokenSymbol   string `json:"tokenSymbol"`  // 当前输入的ft tokenSymbol
 	TokenId       string `json:"tokenId"`      // 当前输入的nft tokenId
 	MetaTxId      string `json:"metaTxId"`     // 当前输入的nft metaTxId
 	Satoshi       int    `json:"satoshi"`      // 当前输入花费的outpoint的satoshi
@@ -105,6 +107,8 @@ type TxOutResp struct {
 	GenesisHex    string `json:"genesis"`      // 当前输出的genesis
 	TokenAmount   int    `json:"tokenAmount"`  // 当前输出的ft tokenAmount
 	TokenDecimal  int    `json:"tokenDecimal"` // 当前输出花费的outpoint的ft decimal
+	TokenName     string `json:"tokenName"`    // 当前输出的ft tokenName
+	TokenSymbol   string `json:"tokenSymbol"`  // 当前输出的ft tokenSymbol
 	TokenId       string `json:"tokenId"`      // 当前输出的nft tokenId
 	MetaTxId      string `json:"metaTxId"`     // 当前输出的nft metaTxId
 	Satoshi       int    `json:"satoshi"`      // 当前输出的satoshi
@@ -133,6 +137,8 @@ type TxOutHistoryResp struct {
 	GenesisHex    string `json:"genesis"`      // 当前输出的genesis
 	TokenAmount   int    `json:"tokenAmount"`  // 当前输出的ft tokenAmount
 	TokenDecimal  int    `json:"tokenDecimal"` // 当前输出花费的outpoint的ft decimal
+	TokenName     string `json:"tokenName"`    // 当前输出的ft tokenName
+	TokenSymbol   string `json:"tokenSymbol"`  // 当前输出的ft tokenSymbol
 	TokenId       string `json:"tokenId"`      // 当前输出的nft tokenId
 	MetaTxId      string `json:"metaTxId"`     // 当前输出的nft metaTxId
 	Satoshi       int    `json:"satoshi"`      // 当前输出的satoshi
@@ -151,6 +157,8 @@ type TxOutStatusResp struct {
 	GenesisHex    string `json:"genesis"`      // 当前输出的genesis
 	TokenAmount   int    `json:"tokenAmount"`  // 当前输出的ft tokenAmount
 	TokenDecimal  int    `json:"tokenDecimal"` // 当前输出花费的outpoint的ft decimal
+	TokenName     string `json:"tokenName"`    // 当前输出的ft tokenName
+	TokenSymbol   string `json:"tokenSymbol"`  // 当前输出的ft tokenSymbol
 	TokenId       string `json:"tokenId"`      // 当前输出的nft tokenId
 	MetaTxId      string `json:"metaTxId"`     // 当前输出的nft metaTxId
 	Satoshi       int    `json:"satoshi"`      // 当前输出的satoshi
