@@ -22,8 +22,8 @@ func ExtractPkScriptGenesisIdAndAddressPkh(pkscript []byte) (isNFT bool, codeHas
 	valueOffset := scriptLen - 8 - 4 - 8
 	addressOffset := scriptLen - 8 - 4 - 8 - 20
 	decimalOffset := scriptLen - 8 - 4 - 8 - 20 - 1
-	symbolOffset := scriptLen - 8 - 4 - 8 - 20 - 1 - 1
-	nameOffset := scriptLen - 8 - 4 - 8 - 20 - 1 - 1 - 10
+	symbolOffset := scriptLen - 8 - 4 - 8 - 20 - 1 - 1 - 10
+	nameOffset := scriptLen - 8 - 4 - 8 - 20 - 1 - 1 - 10 - 20
 
 	if (bytes.HasSuffix(pkscript, []byte("sensible")) || bytes.HasSuffix(pkscript, []byte("oraclesv"))) &&
 		pkscript[scriptLen-8-4] == 1 { // PROTO_TYPE == 1
