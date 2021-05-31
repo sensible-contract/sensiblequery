@@ -13,15 +13,15 @@ Testnet 支持的API见：`https://api.sensiblequery.com/test/swagger/index.html
 
 区块数据服务包括3个组件，使用clickhouse作为数据计算存储引擎，redis作为每个地址的UTXO集合的数据存储。
 
-## 1. 节点区块同步程序：satoblock
+### 1. 节点区块同步程序：satoblock
 
 satoblock 通过访问全节点的区块文件夹来同步区块数据(默认在`~/.bitcoin/blocks/`)，同步的数据保存在clickhouse中，UTXO信息保存在redis中。可支持已确认区块数据查询。
 
-## 2. 节点mempool实时同步程序：satomempool
+### 2. 节点mempool实时同步程序：satomempool
 
 satomempool 通过监听节点zmq，实时获取tx内容并更新到redis、clickhouse中。可支持tx、余额、UTXO数据的实时查询。
 
-## 3. 数据API server：satosensible
+### 3. 数据API server：satosensible
 
 查询redis、clickhouse中的数据，以对外提供数据API服务。
 
