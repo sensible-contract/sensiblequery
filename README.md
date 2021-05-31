@@ -58,3 +58,18 @@ redis配置，主要包括address、database等。
 可使用nohup或其他技术将程序放置到后台运行。
 
 satosensible服务可以随时重启，不会造成任何最终数据问题。
+
+
+## 部署资源需求
+
+|----------------------|--------|-------|
+| 部署                 | DISK   | MEM   |
+|----------------------|--------|-------|
+| satosensible         | 20 GB  | 4 GB  |
+| satomempool          | 20 GB  | 4 GB  |
+| bsv-node + satoblock | 500 GB | 16 GB |
+| clickhouse           | 1.5 TB | 16 GB |
+| redis                | 100GB  | 32GB  |
+|----------------------|--------|-------|
+
+其中satosensible用来对外提供API服务，可以部署多实例。其他都是单实例运行。
