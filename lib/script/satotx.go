@@ -53,8 +53,8 @@ func ExtractPkScriptGenesisIdAndAddressPkh(pkscript []byte) (isNFT bool, codeHas
 		nameOffset -= genesisIdLen
 
 		decimal = uint64(pkscript[decimalOffset])
-		symbol = string(pkscript[symbolOffset : symbolOffset+10])
-		name = string(pkscript[nameOffset : nameOffset+20])
+		symbol = string(bytes.TrimRight(pkscript[symbolOffset:symbolOffset+10], "\x00"))
+		name = string(bytes.TrimRight(pkscript[nameOffset:nameOffset+20], "\x00"))
 	} else if pkscript[scriptLen-1] < 2 && pkscript[scriptLen-37-1] == 37 && pkscript[scriptLen-37-1-40-1] == 40 && pkscript[scriptLen-37-1-40-1-1] == OP_RETURN {
 		// nft issue
 		isNFT = true
