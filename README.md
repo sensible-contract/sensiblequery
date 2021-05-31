@@ -56,3 +56,5 @@ redis配置，主要包括address、database等。
     $ LISTEN=:5555 ./satosensible
 
 可使用nohup或其他技术将程序放置到后台运行。
+
+satosensible服务可以随时重启，不会造成任何最终数据问题。
