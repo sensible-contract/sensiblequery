@@ -104,8 +104,8 @@ func GetHistoryByGenesis(ctx *gin.Context) {
 
 	result, err := service.GetHistoryByGenesis(cursor, size, codeHashHex, genesisIdHex, hex.EncodeToString(addressPkh))
 	if err != nil {
-		log.Printf("get block failed: %v", err)
-		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get txo failed"})
+		log.Printf("get history failed: %v", err)
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get histroy failed"})
 		return
 	}
 

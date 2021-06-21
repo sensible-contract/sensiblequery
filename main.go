@@ -85,6 +85,7 @@ func main() {
 	router.GET("/ft/owners/:codehash/:genesis", controller.ListFTOwners)
 	router.GET("/ft/summary/:address", controller.ListAllFTBalanceByOwner)
 	router.GET("/ft/balance/:codehash/:genesis/:address", controller.GetFTBalanceByOwner)
+	router.GET("/ft/history/:codehash/:genesis/:address", controller.GetFTHistoryByGenesis)
 
 	router.GET("/nft/codehash/all", controller.ListAllNFTCodeHash)
 	router.GET("/nft/codehash-info/:codehash", controller.ListNFTSummary)
@@ -93,6 +94,7 @@ func main() {
 	router.GET("/nft/owners/:codehash/:genesis", controller.ListNFTOwners)
 	router.GET("/nft/summary/:address", controller.ListAllNFTByOwner)
 	router.GET("/nft/detail/:codehash/:genesis/:address", controller.ListNFTCountByOwner)
+	router.GET("/nft/history/:codehash/:genesis/:address", controller.GetNFTHistoryByGenesis)
 
 	router.GET("/address/:address/history", controller.GetHistoryByAddress)
 	router.GET("/contract/history/:codehash/:genesis/:address", controller.GetHistoryByGenesis)

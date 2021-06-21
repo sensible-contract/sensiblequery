@@ -57,6 +57,7 @@ LIMIT 128
 
 //////////////// genesis
 func GetHistoryByGenesis(cursor, size int, codeHashHex, genesisHex, addressHex string) (txOutsRsp []*model.TxOutHistoryResp, err error) {
+	log.Printf("query tx history by codehash/genesis for address(%s)", addressHex)
 	psql := fmt.Sprintf(`
 SELECT txid, idx, address, genesis, satoshi, script_type, height, txidx, io_type FROM
 (
