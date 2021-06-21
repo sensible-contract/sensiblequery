@@ -87,7 +87,7 @@ type TxInResp struct {
 	IsNFT         bool   `json:"isNFT"`        // 当前输入花费是否为NFT
 	CodeHashHex   string `json:"codehash"`     // 合约hash160(CodePart)
 	GenesisHex    string `json:"genesis"`      // 当前输入花费的outpoint的genesis，Hex编码
-	TokenAmount   int    `json:"tokenAmount"`  // 当前输入花费的outpoint的ft tokenAmount
+	TokenAmount   string `json:"tokenAmount"`  // 当前输入花费的outpoint的ft tokenAmount
 	TokenDecimal  int    `json:"tokenDecimal"` // 当前输入花费的outpoint的ft decimal
 	TokenName     string `json:"tokenName"`    // 当前输入的ft tokenName
 	TokenSymbol   string `json:"tokenSymbol"`  // 当前输入的ft tokenSymbol
@@ -105,7 +105,7 @@ type TxOutResp struct {
 	IsNFT         bool   `json:"isNFT"`        // 当前输出是否为NFT
 	CodeHashHex   string `json:"codehash"`     // 合约hash160(CodePart)
 	GenesisHex    string `json:"genesis"`      // 当前输出的genesis
-	TokenAmount   int    `json:"tokenAmount"`  // 当前输出的ft tokenAmount
+	TokenAmount   string `json:"tokenAmount"`  // 当前输出的ft tokenAmount
 	TokenDecimal  int    `json:"tokenDecimal"` // 当前输出花费的outpoint的ft decimal
 	TokenName     string `json:"tokenName"`    // 当前输出的ft tokenName
 	TokenSymbol   string `json:"tokenSymbol"`  // 当前输出的ft tokenSymbol
@@ -135,7 +135,7 @@ type TxOutHistoryResp struct {
 	IsNFT         bool   `json:"isNFT"`        // 当前输出是否为NFT
 	CodeHashHex   string `json:"codehash"`     // 合约hash160(CodePart)
 	GenesisHex    string `json:"genesis"`      // 当前输出的genesis
-	TokenAmount   int    `json:"tokenAmount"`  // 当前输出的ft tokenAmount
+	TokenAmount   string `json:"tokenAmount"`  // 当前输出的ft tokenAmount
 	TokenDecimal  int    `json:"tokenDecimal"` // 当前输出花费的outpoint的ft decimal
 	TokenName     string `json:"tokenName"`    // 当前输出的ft tokenName
 	TokenSymbol   string `json:"tokenSymbol"`  // 当前输出的ft tokenSymbol
@@ -155,7 +155,7 @@ type TxOutStatusResp struct {
 	IsNFT         bool   `json:"isNFT"`        // 当前输出是否为NFT
 	CodeHashHex   string `json:"codehash"`     // 合约hash160(CodePart)
 	GenesisHex    string `json:"genesis"`      // 当前输出的genesis
-	TokenAmount   int    `json:"tokenAmount"`  // 当前输出的ft tokenAmount
+	TokenAmount   string `json:"tokenAmount"`  // 当前输出的ft tokenAmount
 	TokenDecimal  int    `json:"tokenDecimal"` // 当前输出花费的outpoint的ft decimal
 	TokenName     string `json:"tokenName"`    // 当前输出的ft tokenName
 	TokenSymbol   string `json:"tokenSymbol"`  // 当前输出的ft tokenSymbol

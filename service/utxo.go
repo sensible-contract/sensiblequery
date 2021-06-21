@@ -244,7 +244,7 @@ func getUtxoFromRedis(utxoOutpoints []string) (txOutsRsp []*model.TxOutResp, err
 			MetaTxId:      hex.EncodeToString(txout.MetaTxId),
 			TokenName:     txout.Name,
 			TokenSymbol:   txout.Symbol,
-			TokenAmount:   int(txout.DataValue),
+			TokenAmount:   strconv.Itoa(int(txout.DataValue)),
 			TokenDecimal:  int(txout.Decimal),
 			CodeHashHex:   hex.EncodeToString(txout.CodeHash),
 			GenesisHex:    hex.EncodeToString(txout.GenesisId),
