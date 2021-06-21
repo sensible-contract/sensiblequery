@@ -2750,6 +2750,10 @@ var doc = `{
                     "description": "FT合约的genesis，Hex编码",
                     "type": "string"
                 },
+                "name": {
+                    "description": "FT name",
+                    "type": "string"
+                },
                 "pendingBalance": {
                     "description": "待确认余额",
                     "type": "integer"
@@ -2999,7 +3003,7 @@ var doc = `{
                 },
                 "tokenAmount": {
                     "description": "当前输入花费的outpoint的ft tokenAmount",
-                    "type": "integer"
+                    "type": "string"
                 },
                 "tokenDecimal": {
                     "description": "当前输入花费的outpoint的ft decimal",
@@ -3007,6 +3011,14 @@ var doc = `{
                 },
                 "tokenId": {
                     "description": "当前输入的nft tokenId",
+                    "type": "string"
+                },
+                "tokenName": {
+                    "description": "当前输入的ft tokenName",
+                    "type": "string"
+                },
+                "tokenSymbol": {
+                    "description": "当前输入的ft tokenSymbol",
                     "type": "string"
                 },
                 "txid": {
@@ -3141,7 +3153,7 @@ var doc = `{
                 },
                 "tokenAmount": {
                     "description": "当前输出的ft tokenAmount",
-                    "type": "integer"
+                    "type": "string"
                 },
                 "tokenDecimal": {
                     "description": "当前输出花费的outpoint的ft decimal",
@@ -3149,6 +3161,14 @@ var doc = `{
                 },
                 "tokenId": {
                     "description": "当前输出的nft tokenId",
+                    "type": "string"
+                },
+                "tokenName": {
+                    "description": "当前输出的ft tokenName",
+                    "type": "string"
+                },
+                "tokenSymbol": {
+                    "description": "当前输出的ft tokenSymbol",
                     "type": "string"
                 },
                 "txid": {
@@ -3206,7 +3226,7 @@ var doc = `{
                 },
                 "tokenAmount": {
                     "description": "当前输出的ft tokenAmount",
-                    "type": "integer"
+                    "type": "string"
                 },
                 "tokenDecimal": {
                     "description": "当前输出花费的outpoint的ft decimal",
@@ -3214,6 +3234,14 @@ var doc = `{
                 },
                 "tokenId": {
                     "description": "当前输出的nft tokenId",
+                    "type": "string"
+                },
+                "tokenName": {
+                    "description": "当前输出的ft tokenName",
+                    "type": "string"
+                },
+                "tokenSymbol": {
+                    "description": "当前输出的ft tokenSymbol",
                     "type": "string"
                 },
                 "txid": {
@@ -3271,7 +3299,7 @@ var doc = `{
                 },
                 "tokenAmount": {
                     "description": "当前输出的ft tokenAmount",
-                    "type": "integer"
+                    "type": "string"
                 },
                 "tokenDecimal": {
                     "description": "当前输出花费的outpoint的ft decimal",
@@ -3279,6 +3307,14 @@ var doc = `{
                 },
                 "tokenId": {
                     "description": "当前输出的nft tokenId",
+                    "type": "string"
+                },
+                "tokenName": {
+                    "description": "当前输出的ft tokenName",
+                    "type": "string"
+                },
+                "tokenSymbol": {
+                    "description": "当前输出的ft tokenSymbol",
                     "type": "string"
                 },
                 "txid": {
