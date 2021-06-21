@@ -69,11 +69,12 @@ func GetBalanceByAddress(addressPkh []byte) (balanceRsp *model.BalanceResp, err 
 
 	balance, err := rdb.ZScore(ctx, "balance", string(addressPkh)).Result()
 	if err == redis.Nil {
-		return balanceRsp, nil
+		balance = 0
 	} else if err != nil {
 		log.Printf("GetBalanceByAddress redis failed: %v", err)
 		return
 	}
+	log.Printf("GetBalanceByAddress balance: %f", balance)
 	balanceRsp.Satoshi = int(balance)
 
 	// 待确认余额
@@ -84,6 +85,7 @@ func GetBalanceByAddress(addressPkh []byte) (balanceRsp *model.BalanceResp, err 
 		log.Printf("GetBalanceByAddress redis failed: %v", err)
 		return
 	}
+	log.Printf("GetBalanceByAddress pending: %f", mpBalance)
 	balanceRsp.PendingSatoshi = int(mpBalance)
 
 	return balanceRsp, nil

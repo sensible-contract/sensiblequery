@@ -30,7 +30,7 @@ func GetBalanceByAddress(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "address invalid"})
 		return
 	}
-
+	log.Printf("address: %s", hex.EncodeToString(addressPkh))
 	result, err := service.GetBalanceByAddress(addressPkh)
 	if err != nil {
 		log.Printf("get block failed: %v", err)
