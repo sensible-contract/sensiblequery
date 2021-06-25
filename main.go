@@ -62,6 +62,7 @@ func main() {
 	router.GET("/block/txs/:blkid", controller.GetBlockTxsByBlockId)
 
 	router.GET("/rawtx/:txid", controller.GetRawTxById)
+	router.GET("/relay/:txid", controller.RelayTxById)
 
 	router.GET("/tx/:txid", controller.GetTxById)
 	router.GET("/tx/:txid/ins", controller.GetTxInputsByTxId)

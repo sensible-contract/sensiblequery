@@ -1,15 +1,23 @@
 package controller
 
 import (
+	"bytes"
 	"encoding/hex"
+	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"satosensible/lib/utils"
 	"satosensible/model"
 	"satosensible/service"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+)
+
+var (
+	is_testnet = os.Getenv("TESTNET")
 )
 
 // GetBlockTxsByBlockHeight
@@ -224,6 +232,56 @@ func GetRawTxById(ctx *gin.Context) {
 		Code: 0,
 		Msg:  "ok",
 		Data: hex.EncodeToString(tx),
+	})
+}
+
+////////////////////////////////////////////////////////////////
+// RelayTxById
+// @Summary 将交易txid重新发送到woc
+// @Tags Tx
+// @Produce  json
+// @Param txid path string true "TxId" default(999e1c837c76a1b7fbb7e57baf87b309960f5ffefbf2a9b95dd890602272f644)
+// @Success 200 {object} model.Response{data=string} "{"code": 0, "data": "00...", "msg": "ok"}"
+// @Router /relay/{txid} [get]
+func RelayTxById(ctx *gin.Context) {
+	log.Printf("RelayTxById enter")
+
+	txIdHex := ctx.Param("txid")
+	// check
+	txIdReverse, err := hex.DecodeString(txIdHex)
+	if err != nil {
+		log.Printf("txid invalid: %v", err)
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "txid invalid"})
+		return
+	}
+	txId := utils.ReverseBytes(txIdReverse)
+
+	tx, err := service.GetRawTxById(hex.EncodeToString(txId))
+	if err != nil {
+		log.Printf("get tx failed: %v", err)
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get tx failed"})
+		return
+	}
+
+	woc := "https://api.whatsonchain.com/v1/bsv/main/tx/raw"
+	if is_testnet != "" {
+		woc = "https://api.whatsonchain.com/v1/bsv/test/tx/raw"
+	}
+	jsonData := fmt.Sprintf(`{"txhex": "%s"}`, hex.EncodeToString(tx))
+	resp, err := http.Post(woc, "application/json", bytes.NewBufferString(jsonData))
+	if err != nil {
+		log.Printf("relay tx failed: %v", err)
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "relay tx failed"})
+		return
+	}
+	defer resp.Body.Close()
+
+	body, _ := ioutil.ReadAll(resp.Body)
+
+	ctx.JSON(http.StatusOK, model.Response{
+		Code: 0,
+		Msg:  "ok",
+		Data: string(body),
 	})
 }
 
