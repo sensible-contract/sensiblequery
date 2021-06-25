@@ -3,7 +3,6 @@ package script
 import (
 	"bytes"
 	"encoding/binary"
-	"satosensible/lib/blkparser"
 )
 
 var empty = make([]byte, 1)
@@ -88,7 +87,7 @@ func ExtractPkScriptGenesisIdAndAddressPkh(pkscript []byte) (isNFT bool, codeHas
 
 	value = binary.LittleEndian.Uint64(pkscript[valueOffset : valueOffset+8])
 
-	codeHash = blkparser.GetHash160(pkscript[:scriptLen-genesisIdLen-dataLen])
+	codeHash = GetHash160(pkscript[:scriptLen-genesisIdLen-dataLen])
 
 	return isNFT, codeHash, genesisId, addressPkh, metaTxId, name, symbol, value, decimal
 }

@@ -1,7 +1,5 @@
 package script
 
-import utils "satosensible/lib/blkparser"
-
 func ExtractPkScriptForTxo(Pkscript, scriptType []byte) (isNFT bool, codeHash, genesisId, addressPkh, metaTxId []byte, name, symbol string, value, decimal uint64) {
 	if isPubkeyHash(scriptType) {
 		addressPkh = make([]byte, 20)
@@ -10,12 +8,12 @@ func ExtractPkScriptForTxo(Pkscript, scriptType []byte) (isNFT bool, codeHash, g
 	}
 
 	if isPayToScriptHash(scriptType) {
-		addressPkh = utils.GetHash160(Pkscript[2 : len(Pkscript)-1])
+		addressPkh = GetHash160(Pkscript[2 : len(Pkscript)-1])
 		return false, empty, empty, addressPkh, empty, "", "", 0, 0
 	}
 
 	if isPubkey(scriptType) {
-		addressPkh = utils.GetHash160(Pkscript[1 : len(Pkscript)-1])
+		addressPkh = GetHash160(Pkscript[1 : len(Pkscript)-1])
 		return false, empty, empty, addressPkh, empty, "", "", 0, 0
 	}
 
@@ -40,7 +38,7 @@ func GetLockingScriptType(pkscript []byte) (scriptType []byte) {
 	for p < e && lenType < 32 {
 		c := pkscript[p]
 		if 0 < c && c < 0x4f {
-			cnt, cntsize := utils.DecodeVarIntForScript(pkscript[p:])
+			cnt, cntsize := SafeDecodeVarIntForScript(pkscript[p:])
 			p += cnt + cntsize
 		} else {
 			p += 1
@@ -62,7 +60,7 @@ func IsLockingScriptOnlyEqual(pkscript []byte) bool {
 	if pkscript[length-1] != 0x87 {
 		return false
 	}
-	cnt, cntsize := utils.DecodeVarIntForScript(pkscript)
+	cnt, cntsize := SafeDecodeVarIntForScript(pkscript)
 	if length == int(cnt+cntsize+1) {
 		return true
 	}
