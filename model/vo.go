@@ -27,7 +27,7 @@ type BlockTokenVolumeResp struct {
 	Height       int    `json:"height"` // 区块高度
 	CodeHashHex  string `json:"codehash"`
 	GenesisHex   string `json:"genesis"`
-	CodeType     int    `json:"codeType"`     // 合约类型 0: nft, 1: ft
+	CodeType     int    `json:"codeType"`     // 合约类型 0: None, 1: FT, 2: Unique, 3: NFT
 	NFTIdx       int    `json:"nftIdx"`       // nft tokenIdx
 	InDataValue  int    `json:"inDataValue"`  // 输入数量
 	OutDataValue int    `json:"outDataValue"` // 输出数量

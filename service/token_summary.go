@@ -26,7 +26,7 @@ SELECT codehash, genesis, count(nft_idx), sum(in_times), sum(out_times), sum(in_
      SELECT codehash, genesis, nft_idx,
             sum(in_data_value) AS in_times , sum(out_data_value) AS out_times,
             sum(invalue) AS in_satoshi , sum(outvalue) AS out_satoshi FROM blk_codehash_height
-     WHERE code_type = 0
+     WHERE code_type = 3
      GROUP BY codehash, genesis, nft_idx
 )
 GROUP BY codehash, genesis
@@ -57,7 +57,7 @@ func tokenCodeHashResultSRF(rows *sql.Rows) (interface{}, error) {
 	return &ret, nil
 }
 
-func GetTokenCodeHash(codeType int) (blksRsp []*model.TokenCodeHashResp, err error) {
+func GetTokenCodeHash(codeType uint32) (blksRsp []*model.TokenCodeHashResp, err error) {
 	psql := fmt.Sprintf(`
 SELECT codehash, count(1), sum(in_times), sum(out_times) FROM (
      SELECT codehash, genesis, nft_idx,

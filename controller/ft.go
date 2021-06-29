@@ -10,6 +10,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	scriptDecoder "github.com/sensible-contract/sensible-script-decoder"
 )
 
 // ListAllFTCodeHash
@@ -21,7 +22,7 @@ import (
 func ListAllFTCodeHash(ctx *gin.Context) {
 	log.Printf("ListAllFTCodeHash enter")
 
-	result, err := service.GetTokenCodeHash(1)
+	result, err := service.GetTokenCodeHash(scriptDecoder.CodeType_FT)
 	if err != nil {
 		log.Printf("get dummy failed: %v", err)
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get dummy failed"})
@@ -100,7 +101,7 @@ func ListFTSummary(ctx *gin.Context) {
 // @Param codehash path string true "Code Hash160" default(844c56bb99afc374967a27ce3b46244e2e1fba60)
 // @Param genesis path string true "Genesis ID" default(74967a27ce3b46244e2e1fba60844c56bb99afc3)
 // @Success 200 {object} model.Response{data=[]model.BlockTokenVolumeResp} "{"code": 0, "data": [{}], "msg": "ok"}"
-// @Router /ft/transfer-volume/{codehash}/{genesis} [get]
+// @Router /ft/transfer-times/{codehash}/{genesis} [get]
 func GetFTTransferVolumeInBlockRange(ctx *gin.Context) {
 	log.Printf("GetFTTransferVolumeInBlockRange enter")
 
@@ -144,7 +145,7 @@ func GetFTTransferVolumeInBlockRange(ctx *gin.Context) {
 		return
 	}
 
-	result, err := service.GetTokenVolumesInBlocksByHeightRange(blkStartHeight, blkEndHeight, codeHashHex, genesisIdHex, 0, 0)
+	result, err := service.GetTokenVolumesInBlocksByHeightRange(blkStartHeight, blkEndHeight, codeHashHex, genesisIdHex, scriptDecoder.CodeType_FT, 0)
 	if err != nil {
 		log.Printf("get dummy failed: %v", err)
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get dummy failed"})

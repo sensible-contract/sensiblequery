@@ -10,6 +10,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	scriptDecoder "github.com/sensible-contract/sensible-script-decoder"
 )
 
 // ListAllNFTCodeHash
@@ -21,7 +22,7 @@ import (
 func ListAllNFTCodeHash(ctx *gin.Context) {
 	log.Printf("ListAllNFTCodeHash enter")
 
-	result, err := service.GetTokenCodeHash(0)
+	result, err := service.GetTokenCodeHash(scriptDecoder.CodeType_NFT)
 	if err != nil {
 		log.Printf("get dummy failed: %v", err)
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get dummy failed"})
@@ -101,7 +102,7 @@ func ListNFTSummary(ctx *gin.Context) {
 // @Param genesis path string true "Genesis ID" default(74967a27ce3b46244e2e1fba60844c56bb99afc3)
 // @Param tokenid path int true "Token ID " default(3)
 // @Success 200 {object} model.Response{data=[]model.BlockTokenVolumeResp} "{"code": 0, "data": [{}], "msg": "ok"}"
-// @Router /nft/transfer-volume/{codehash}/{genesis}/{tokenid} [get]
+// @Router /nft/transfer-times/{codehash}/{genesis}/{tokenid} [get]
 func GetNFTTransferTimesInBlockRange(ctx *gin.Context) {
 	log.Printf("GetNFTTransferTimesInBlockRange enter")
 
@@ -154,7 +155,7 @@ func GetNFTTransferTimesInBlockRange(ctx *gin.Context) {
 		return
 	}
 
-	result, err := service.GetTokenVolumesInBlocksByHeightRange(blkStartHeight, blkEndHeight, codeHashHex, genesisIdHex, 0, tokenIdx)
+	result, err := service.GetTokenVolumesInBlocksByHeightRange(blkStartHeight, blkEndHeight, codeHashHex, genesisIdHex, scriptDecoder.CodeType_NFT, tokenIdx)
 	if err != nil {
 		log.Printf("GetNFTTransferTimesInBlockRange failed: %v", err)
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "data failed"})

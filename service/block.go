@@ -35,7 +35,7 @@ func blockResultSRF(rows *sql.Rows) (interface{}, error) {
 	return &ret, nil
 }
 
-func GetTokenVolumesInBlocksByHeightRange(blkStartHeight, blkEndHeight int, codeHashHex, genesisHex string, codeType, nftIdx int) (blksRsp []*model.BlockTokenVolumeResp, err error) {
+func GetTokenVolumesInBlocksByHeightRange(blkStartHeight, blkEndHeight int, codeHashHex, genesisHex string, codeType uint32, nftIdx int) (blksRsp []*model.BlockTokenVolumeResp, err error) {
 	psql := fmt.Sprintf(`
 SELECT %s FROM blk_codehash_height
 WHERE height >= %d AND height < %d AND

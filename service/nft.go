@@ -26,7 +26,7 @@ SELECT codehash, genesis, count(1), sum(in_times), sum(out_times), sum(in_satosh
      SELECT codehash, genesis, nft_idx,
             sum(in_data_value) AS in_times , sum(out_data_value) AS out_times,
             sum(invalue) AS in_satoshi , sum(outvalue) AS out_satoshi FROM blk_codehash_height
-     WHERE code_type = 0 AND codehash = unhex('%s')
+     WHERE code_type = 3 AND codehash = unhex('%s')
      GROUP BY codehash, genesis, nft_idx
 )
 GROUP BY codehash, genesis
@@ -42,7 +42,7 @@ SELECT codehash, genesis, count(1), sum(in_times), sum(out_times), sum(in_satosh
      SELECT codehash, genesis, nft_idx,
             sum(in_data_value) AS in_times , sum(out_data_value) AS out_times,
             sum(invalue) AS in_satoshi , sum(outvalue) AS out_satoshi FROM blk_codehash_height
-     WHERE code_type = 0
+     WHERE code_type = 3
      GROUP BY codehash, genesis, nft_idx
 )
 GROUP BY codehash, genesis
