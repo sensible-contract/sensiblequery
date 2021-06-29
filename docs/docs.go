@@ -836,7 +836,7 @@ var doc = `{
                 }
             }
         },
-        "/ft/transfer-volume/{codehash}/{genesis}": {
+        "/ft/transfer-times/{codehash}/{genesis}": {
             "get": {
                 "produces": [
                     "application/json"
@@ -1848,7 +1848,7 @@ var doc = `{
                 }
             }
         },
-        "/nft/transfer-volume/{codehash}/{genesis}/{tokenid}": {
+        "/nft/transfer-times/{codehash}/{genesis}/{tokenid}": {
             "get": {
                 "produces": [
                     "application/json"
@@ -2110,6 +2110,47 @@ var doc = `{
                     "Tx"
                 ],
                 "summary": "通过交易txid获取交易原数据rawtx",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "999e1c837c76a1b7fbb7e57baf87b309960f5ffefbf2a9b95dd890602272f644",
+                        "description": "TxId",
+                        "name": "txid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\": 0, \"data\": \"00...\", \"msg\": \"ok\"}",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/model.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/relay/{txid}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Tx"
+                ],
+                "summary": "将交易txid重新发送到woc",
                 "parameters": [
                     {
                         "type": "string",
@@ -2567,7 +2608,7 @@ var doc = `{
                     "type": "string"
                 },
                 "codeType": {
-                    "description": "合约类型 0: nft, 1: ft",
+                    "description": "合约类型 0: None, 1: FT, 2: Unique, 3: NFT",
                     "type": "integer"
                 },
                 "codehash": {
@@ -2953,6 +2994,10 @@ var doc = `{
                     "description": "当前输入花费的outpoint的address",
                     "type": "string"
                 },
+                "codeType": {
+                    "description": "当前输出的合约类型 0: None, 1: FT, 2: Unique, 3: NFT",
+                    "type": "integer"
+                },
                 "codehash": {
                     "description": "合约hash160(CodePart)",
                     "type": "string"
@@ -3115,6 +3160,10 @@ var doc = `{
                     "description": "当前输出的address",
                     "type": "string"
                 },
+                "codeType": {
+                    "description": "当前输出的合约类型 0: None, 1: FT, 2: Unique, 3: NFT",
+                    "type": "integer"
+                },
                 "codehash": {
                     "description": "合约hash160(CodePart)",
                     "type": "string"
@@ -3188,6 +3237,10 @@ var doc = `{
                     "description": "当前输出的address",
                     "type": "string"
                 },
+                "codeType": {
+                    "description": "当前输出的合约类型 0: None, 1: FT, 2: Unique, 3: NFT",
+                    "type": "integer"
+                },
                 "codehash": {
                     "description": "合约hash160(CodePart)",
                     "type": "string"
@@ -3260,6 +3313,10 @@ var doc = `{
                 "address": {
                     "description": "当前输出的address",
                     "type": "string"
+                },
+                "codeType": {
+                    "description": "当前输出的合约类型 0: None, 1: FT, 2: Unique, 3: NFT",
+                    "type": "integer"
                 },
                 "codehash": {
                     "description": "合约hash160(CodePart)",

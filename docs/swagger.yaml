@@ -60,7 +60,7 @@ definitions:
       blkid:
         type: string
       codeType:
-        description: '合约类型 0: nft, 1: ft'
+        description: '合约类型 0: None, 1: FT, 2: Unique, 3: NFT'
         type: integer
       codehash:
         type: string
@@ -336,6 +336,9 @@ definitions:
       address:
         description: 当前输入花费的outpoint的address
         type: string
+      codeType:
+        description: '当前输出的合约类型 0: None, 1: FT, 2: Unique, 3: NFT'
+        type: integer
       codehash:
         description: 合约hash160(CodePart)
         type: string
@@ -455,6 +458,9 @@ definitions:
       address:
         description: 当前输出的address
         type: string
+      codeType:
+        description: '当前输出的合约类型 0: None, 1: FT, 2: Unique, 3: NFT'
+        type: integer
       codehash:
         description: 合约hash160(CodePart)
         type: string
@@ -509,6 +515,9 @@ definitions:
       address:
         description: 当前输出的address
         type: string
+      codeType:
+        description: '当前输出的合约类型 0: None, 1: FT, 2: Unique, 3: NFT'
+        type: integer
       codehash:
         description: 合约hash160(CodePart)
         type: string
@@ -563,6 +572,9 @@ definitions:
       address:
         description: 当前输出的address
         type: string
+      codeType:
+        description: '当前输出的合约类型 0: None, 1: FT, 2: Unique, 3: NFT'
+        type: integer
       codehash:
         description: 合约hash160(CodePart)
         type: string
@@ -1156,7 +1168,7 @@ paths:
       summary: 查询某人持有的FT Token列表。获得每个token的余额
       tags:
       - token FT
-  /ft/transfer-volume/{codehash}/{genesis}:
+  /ft/transfer-times/{codehash}/{genesis}:
     get:
       parameters:
       - default: 0
@@ -1793,7 +1805,7 @@ paths:
       summary: 查询某人持有的所有NFT Token列表。获得持有的nft数量计数
       tags:
       - token NFT
-  /nft/transfer-volume/{codehash}/{genesis}/{tokenid}:
+  /nft/transfer-times/{codehash}/{genesis}/{tokenid}:
     get:
       parameters:
       - default: 0
@@ -1977,6 +1989,30 @@ paths:
                   type: string
               type: object
       summary: 通过交易txid获取交易原数据rawtx
+      tags:
+      - Tx
+  /relay/{txid}:
+    get:
+      parameters:
+      - default: 999e1c837c76a1b7fbb7e57baf87b309960f5ffefbf2a9b95dd890602272f644
+        description: TxId
+        in: path
+        name: txid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 0, "data": "00...", "msg": "ok"}'
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: 将交易txid重新发送到woc
       tags:
       - Tx
   /token/info:
