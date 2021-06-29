@@ -8,12 +8,12 @@ import (
 	"fmt"
 	"log"
 	"satosensible/lib/blkparser"
-	"satosensible/lib/script"
 	"satosensible/lib/utils"
 	"satosensible/model"
 	"strconv"
 
 	"github.com/go-redis/redis/v8"
+	scriptDecoder "github.com/sensible-contract/sensible-script-decoder"
 	"github.com/spf13/viper"
 )
 
@@ -223,33 +223,34 @@ func getUtxoFromRedis(utxoOutpoints []string) (txOutsRsp []*model.TxOutResp, err
 		// 补充数据
 		txout.UTxid = []byte(outpoint[:32])                            // 32
 		txout.Vout = binary.LittleEndian.Uint32([]byte(outpoint[32:])) // 4
-		txout.ScriptType = script.GetLockingScriptType(txout.Script)
-		txout.IsNFT, txout.CodeHash, txout.GenesisId, txout.AddressPkh, txout.MetaTxId, txout.Name, txout.Symbol, txout.DataValue, txout.Decimal = script.ExtractPkScriptForTxo(txout.Script, txout.ScriptType)
+		txout.ScriptType = scriptDecoder.GetLockingScriptType(txout.Script)
 
+		txo := scriptDecoder.ExtractPkScriptForTxo(txout.Script, txout.ScriptType)
 		tokenId := ""
-		if len(txout.GenesisId) >= 20 {
-			if txout.IsNFT {
-				tokenId = strconv.Itoa(int(txout.DataValue))
-			} else {
-				tokenId = hex.EncodeToString(txout.GenesisId)
+		if len(txo.GenesisId) >= 20 {
+			if txo.CodeType == scriptDecoder.CodeType_NFT {
+				tokenId = strconv.Itoa(int(txo.TokenIdx))
+			} else if txo.CodeType == scriptDecoder.CodeType_FT {
+				tokenId = hex.EncodeToString(txo.GenesisId)
 			}
 		}
 
 		txOutsRsp = append(txOutsRsp, &model.TxOutResp{
 			TxIdHex: blkparser.HashString(txout.UTxid),
 			Vout:    int(txout.Vout),
-			Address: utils.EncodeAddress(txout.AddressPkh, utils.PubKeyHashAddrID),
+			Address: utils.EncodeAddress(txo.AddressPkh, utils.PubKeyHashAddrID),
 			Satoshi: int(txout.Satoshi),
 
-			IsNFT:         txout.IsNFT,
+			IsNFT:         (txo.CodeType == scriptDecoder.CodeType_NFT),
+			CodeType:      int(txo.CodeType),
 			TokenId:       tokenId,
-			MetaTxId:      hex.EncodeToString(txout.MetaTxId),
-			TokenName:     txout.Name,
-			TokenSymbol:   txout.Symbol,
-			TokenAmount:   strconv.Itoa(int(txout.DataValue)),
-			TokenDecimal:  int(txout.Decimal),
-			CodeHashHex:   hex.EncodeToString(txout.CodeHash),
-			GenesisHex:    hex.EncodeToString(txout.GenesisId),
+			MetaTxId:      hex.EncodeToString(txo.MetaTxId),
+			TokenName:     txo.Name,
+			TokenSymbol:   txo.Symbol,
+			TokenAmount:   strconv.Itoa(int(txo.Amount)),
+			TokenDecimal:  int(txo.Decimal),
+			CodeHashHex:   hex.EncodeToString(txo.CodeHash),
+			GenesisHex:    hex.EncodeToString(txo.GenesisId),
 			ScriptTypeHex: hex.EncodeToString(txout.ScriptType),
 			// ScriptPkHex:   hex.EncodeToString(txout.Script),
 			Height: int(txout.BlockHeight),
@@ -333,7 +334,7 @@ func getNonTokenUtxoFromRedis(utxoOutpoints []string) (txOutsRsp []*model.TxStan
 		// 补充数据
 		txout.UTxid = []byte(outpoint[:32])                            // 32
 		txout.Vout = binary.LittleEndian.Uint32([]byte(outpoint[32:])) // 4
-		txout.ScriptType = script.GetLockingScriptType(txout.Script)
+		txout.ScriptType = scriptDecoder.GetLockingScriptType(txout.Script)
 
 		txOutsRsp = append(txOutsRsp, &model.TxStandardOutResp{
 			TxIdHex: blkparser.HashString(txout.UTxid),

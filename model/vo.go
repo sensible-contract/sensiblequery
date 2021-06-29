@@ -85,6 +85,7 @@ type TxInResp struct {
 	Vout          int    `json:"vout"`         // 当前输入花费的outpoint的index
 	Address       string `json:"address"`      // 当前输入花费的outpoint的address
 	IsNFT         bool   `json:"isNFT"`        // 当前输入花费是否为NFT
+	CodeType      int    `json:"codeType"`     // 当前输出的合约类型 0: None, 1: FT, 2: Unique, 3: NFT
 	CodeHashHex   string `json:"codehash"`     // 合约hash160(CodePart)
 	GenesisHex    string `json:"genesis"`      // 当前输入花费的outpoint的genesis，Hex编码
 	TokenAmount   string `json:"tokenAmount"`  // 当前输入花费的outpoint的ft tokenAmount
@@ -103,6 +104,7 @@ type TxOutResp struct {
 	Vout          int    `json:"vout"`         // 当前输出序号
 	Address       string `json:"address"`      // 当前输出的address
 	IsNFT         bool   `json:"isNFT"`        // 当前输出是否为NFT
+	CodeType      int    `json:"codeType"`     // 当前输出的合约类型 0: None, 1: FT, 2: Unique, 3: NFT
 	CodeHashHex   string `json:"codehash"`     // 合约hash160(CodePart)
 	GenesisHex    string `json:"genesis"`      // 当前输出的genesis
 	TokenAmount   string `json:"tokenAmount"`  // 当前输出的ft tokenAmount
@@ -133,6 +135,7 @@ type TxOutHistoryResp struct {
 	Vout          int    `json:"vout"`         // 当前输出序号
 	Address       string `json:"address"`      // 当前输出的address
 	IsNFT         bool   `json:"isNFT"`        // 当前输出是否为NFT
+	CodeType      int    `json:"codeType"`     // 当前输出的合约类型 0: None, 1: FT, 2: Unique, 3: NFT
 	CodeHashHex   string `json:"codehash"`     // 合约hash160(CodePart)
 	GenesisHex    string `json:"genesis"`      // 当前输出的genesis
 	TokenAmount   string `json:"tokenAmount"`  // 当前输出的ft tokenAmount
@@ -153,6 +156,7 @@ type TxOutStatusResp struct {
 	Vout          int    `json:"vout"`         // 当前输出序号
 	Address       string `json:"address"`      // 当前输出的address
 	IsNFT         bool   `json:"isNFT"`        // 当前输出是否为NFT
+	CodeType      int    `json:"codeType"`     // 当前输出的合约类型 0: None, 1: FT, 2: Unique, 3: NFT
 	CodeHashHex   string `json:"codehash"`     // 合约hash160(CodePart)
 	GenesisHex    string `json:"genesis"`      // 当前输出的genesis
 	TokenAmount   string `json:"tokenAmount"`  // 当前输出的ft tokenAmount

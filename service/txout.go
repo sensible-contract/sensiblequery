@@ -8,10 +8,11 @@ import (
 	"log"
 	"satosensible/dao/clickhouse"
 	"satosensible/lib/blkparser"
-	"satosensible/lib/script"
 	"satosensible/lib/utils"
 	"satosensible/model"
 	"strconv"
+
+	scriptDecoder "github.com/sensible-contract/sensible-script-decoder"
 )
 
 const (
@@ -111,12 +112,13 @@ func GetTxOutputsBySql(psql string) (txOutsRsp []*model.TxOutStatusResp, err err
 		if len(txOut.Address) == 20 {
 			address = utils.EncodeAddress(txOut.Address, utils.PubKeyHashAddrID)
 		}
-		isNFT, _, _, _, metaTxId, name, symbol, dataValue, decimal := script.ExtractPkScriptForTxo(txOut.ScriptPk, txOut.ScriptType)
+
+		txo := scriptDecoder.ExtractPkScriptForTxo(txOut.ScriptPk, txOut.ScriptType)
 		tokenId := ""
 		if len(txOut.Genesis) >= 20 {
-			if isNFT {
-				tokenId = strconv.Itoa(int(dataValue))
-			} else {
+			if txo.CodeType == scriptDecoder.CodeType_NFT {
+				tokenId = strconv.Itoa(int(txo.TokenIdx))
+			} else if txo.CodeType == scriptDecoder.CodeType_FT {
 				tokenId = hex.EncodeToString(txOut.Genesis)
 			}
 		}
@@ -127,13 +129,14 @@ func GetTxOutputsBySql(psql string) (txOutsRsp []*model.TxOutStatusResp, err err
 			Address: address,
 			Satoshi: int(txOut.Satoshi),
 
-			IsNFT:         isNFT,
+			IsNFT:         (txo.CodeType == scriptDecoder.CodeType_NFT),
+			CodeType:      int(txo.CodeType),
 			TokenId:       tokenId,
-			MetaTxId:      hex.EncodeToString(metaTxId),
-			TokenName:     name,
-			TokenSymbol:   symbol,
-			TokenAmount:   strconv.Itoa(int(dataValue)),
-			TokenDecimal:  int(decimal),
+			MetaTxId:      hex.EncodeToString(txo.MetaTxId),
+			TokenName:     txo.Name,
+			TokenSymbol:   txo.Symbol,
+			TokenAmount:   strconv.Itoa(int(txo.Amount)),
+			TokenDecimal:  int(txo.Decimal),
 			CodeHashHex:   hex.EncodeToString(txOut.CodeHash),
 			GenesisHex:    hex.EncodeToString(txOut.Genesis),
 			ScriptTypeHex: hex.EncodeToString(txOut.ScriptType),
@@ -195,11 +198,11 @@ func GetTxOutputBySql(psql string) (txOutRsp *model.TxOutResp, err error) {
 		address = utils.EncodeAddress(txOut.Address, utils.PubKeyHashAddrID)
 	}
 
-	isNFT, _, _, _, metaTxId, name, symbol, dataValue, decimal := script.ExtractPkScriptForTxo(txOut.ScriptPk, txOut.ScriptType)
+	txo := scriptDecoder.ExtractPkScriptForTxo(txOut.ScriptPk, txOut.ScriptType)
 	tokenId := ""
 	if len(txOut.Genesis) >= 20 {
-		if isNFT {
-			tokenId = strconv.Itoa(int(dataValue))
+		if txo.CodeType == scriptDecoder.CodeType_NFT {
+			tokenId = strconv.Itoa(int(txo.TokenIdx))
 		} else {
 			tokenId = hex.EncodeToString(txOut.Genesis)
 		}
@@ -210,13 +213,14 @@ func GetTxOutputBySql(psql string) (txOutRsp *model.TxOutResp, err error) {
 		Address: address,
 		Satoshi: int(txOut.Satoshi),
 
-		IsNFT:         isNFT,
+		IsNFT:         (txo.CodeType == scriptDecoder.CodeType_NFT),
+		CodeType:      int(txo.CodeType),
 		TokenId:       tokenId,
-		MetaTxId:      hex.EncodeToString(metaTxId),
-		TokenName:     name,
-		TokenSymbol:   symbol,
-		TokenAmount:   strconv.Itoa(int(dataValue)),
-		TokenDecimal:  int(decimal),
+		MetaTxId:      hex.EncodeToString(txo.MetaTxId),
+		TokenName:     txo.Name,
+		TokenSymbol:   txo.Symbol,
+		TokenAmount:   strconv.Itoa(int(txo.Amount)),
+		TokenDecimal:  int(txo.Decimal),
 		CodeHashHex:   hex.EncodeToString(txOut.CodeHash),
 		GenesisHex:    hex.EncodeToString(txOut.Genesis),
 		ScriptTypeHex: hex.EncodeToString(txOut.ScriptType),
