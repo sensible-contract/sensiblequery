@@ -35,15 +35,6 @@ type TxoData struct {
 	Vout        uint32
 	BlockHeight uint32
 	TxIdx       uint64
-	AddressPkh  []byte
-	IsNFT       bool
-	CodeHash    []byte
-	GenesisId   []byte
-	MetaTxId    []byte
-	DataValue   uint64 // ft amount / nft tokenIdx
-	Name        string // ft name
-	Symbol      string // ft symbol
-	Decimal     uint64 // ft decimal
 	Satoshi     uint64
 	ScriptType  []byte
 	Script      []byte
