@@ -33,9 +33,6 @@ var (
 
 // @license.name MIT License
 // @license.url https://opensource.org/licenses/MIT
-
-// @host api.sensiblequery.com
-// @basepath /
 func main() {
 	router := gin.Default()
 	router.Use(gzip.Gzip(gzip.DefaultCompression, gzip.WithDecompressFn(gzip.DefaultDecompressHandle)))

@@ -14,8 +14,6 @@
         },
         "version": "1.0"
     },
-    "host": "api.sensiblequery.com",
-    "basePath": "/",
     "paths": {
         "/": {
             "get": {

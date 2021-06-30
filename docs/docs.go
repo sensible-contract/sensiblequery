@@ -3450,8 +3450,8 @@ type swaggerInfo struct {
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = swaggerInfo{
 	Version:     "1.0",
-	Host:        "api.sensiblequery.com",
-	BasePath:    "/",
+	Host:        "",
+	BasePath:    "",
 	Schemes:     []string{},
 	Title:       "Sensible Browser",
 	Description: "Sensible 区块浏览器",
