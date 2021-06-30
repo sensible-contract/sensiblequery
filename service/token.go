@@ -135,9 +135,10 @@ func GetAllTokenBalanceByAddress(cursor, size int, addressPkh []byte) (ftOwnersR
 		if err == redis.Nil {
 			log.Println("GetAllTokenBalanceByAddress ftinfo not found")
 			ftinfo = map[string]string{
-				"decimal": "0",
-				"name":    "",
-				"symbol":  "",
+				"decimal":    "0",
+				"name":       "",
+				"symbol":     "",
+				"sensibleid": "",
 			}
 		} else if err != nil {
 			panic(err)
@@ -146,6 +147,7 @@ func GetAllTokenBalanceByAddress(cursor, size int, addressPkh []byte) (ftOwnersR
 		balanceRsp.Decimal = decimal
 		balanceRsp.Name = ftinfo["name"]
 		balanceRsp.Symbol = ftinfo["symbol"]
+		balanceRsp.SensibleIdHex = hex.EncodeToString([]byte(ftinfo["sensibleid"]))
 
 		// balance
 		pendingBalance, err := data.Result()

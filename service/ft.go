@@ -42,9 +42,10 @@ func getFTDecimal(ftsRsp []*model.FTInfoResp) {
 		ftinfo, err := ftinfoCmds[idx].Result()
 		if err == redis.Nil {
 			ftinfo = map[string]string{
-				"decimal": "0",
-				"name":    "",
-				"symbol":  "",
+				"decimal":    "0",
+				"name":       "",
+				"symbol":     "",
+				"sensibleid": "",
 			}
 			continue
 		} else if err != nil {
@@ -54,6 +55,7 @@ func getFTDecimal(ftsRsp []*model.FTInfoResp) {
 		ft.Decimal = decimal
 		ft.Name = ftinfo["name"]
 		ft.Symbol = ftinfo["symbol"]
+		ft.SensibleIdHex = hex.EncodeToString([]byte(ftinfo["sensibleid"]))
 	}
 }
 
