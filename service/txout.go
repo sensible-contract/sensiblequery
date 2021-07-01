@@ -118,7 +118,7 @@ func GetTxOutputsBySql(psql string) (txOutsRsp []*model.TxOutStatusResp, err err
 		if len(txOut.Genesis) >= 20 {
 			if txo.CodeType == scriptDecoder.CodeType_NFT {
 				tokenId = strconv.Itoa(int(txo.TokenIdx))
-			} else if txo.CodeType == scriptDecoder.CodeType_FT {
+			} else if txo.CodeType == scriptDecoder.CodeType_FT || txo.CodeType == scriptDecoder.CodeType_UNIQUE {
 				tokenId = hex.EncodeToString(txOut.Genesis)
 			}
 		}
@@ -139,6 +139,7 @@ func GetTxOutputsBySql(psql string) (txOutsRsp []*model.TxOutStatusResp, err err
 			TokenDecimal:  int(txo.Decimal),
 			CodeHashHex:   hex.EncodeToString(txOut.CodeHash),
 			GenesisHex:    hex.EncodeToString(txOut.Genesis),
+			SensibleIdHex: hex.EncodeToString(txo.SensibleId),
 			ScriptTypeHex: hex.EncodeToString(txOut.ScriptType),
 			ScriptPkHex:   hex.EncodeToString(txOut.ScriptPk),
 			Height:        int(txOut.Height),

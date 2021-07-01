@@ -88,6 +88,7 @@ type TxInResp struct {
 	CodeType      int    `json:"codeType"`     // 当前输出的合约类型 0: None, 1: FT, 2: Unique, 3: NFT
 	CodeHashHex   string `json:"codehash"`     // 合约hash160(CodePart)
 	GenesisHex    string `json:"genesis"`      // 当前输入花费的outpoint的genesis，Hex编码
+	SensibleIdHex string `json:"sensibleId"`   // 合约的sensibleId，即genesisTx的outpoint，Hex编码
 	TokenAmount   string `json:"tokenAmount"`  // 当前输入花费的outpoint的ft tokenAmount
 	TokenDecimal  int    `json:"tokenDecimal"` // 当前输入花费的outpoint的ft decimal
 	TokenName     string `json:"tokenName"`    // 当前输入的ft tokenName
@@ -107,6 +108,7 @@ type TxOutResp struct {
 	CodeType      int    `json:"codeType"`     // 当前输出的合约类型 0: None, 1: FT, 2: Unique, 3: NFT
 	CodeHashHex   string `json:"codehash"`     // 合约hash160(CodePart)
 	GenesisHex    string `json:"genesis"`      // 当前输出的genesis
+	SensibleIdHex string `json:"sensibleId"`   // 合约的sensibleId，即genesisTx的outpoint，Hex编码
 	TokenAmount   string `json:"tokenAmount"`  // 当前输出的ft tokenAmount
 	TokenDecimal  int    `json:"tokenDecimal"` // 当前输出花费的outpoint的ft decimal
 	TokenName     string `json:"tokenName"`    // 当前输出的ft tokenName
@@ -159,6 +161,7 @@ type TxOutStatusResp struct {
 	CodeType      int    `json:"codeType"`     // 当前输出的合约类型 0: None, 1: FT, 2: Unique, 3: NFT
 	CodeHashHex   string `json:"codehash"`     // 合约hash160(CodePart)
 	GenesisHex    string `json:"genesis"`      // 当前输出的genesis
+	SensibleIdHex string `json:"sensibleId"`   // 合约的sensibleId，即genesisTx的outpoint，Hex编码
 	TokenAmount   string `json:"tokenAmount"`  // 当前输出的ft tokenAmount
 	TokenDecimal  int    `json:"tokenDecimal"` // 当前输出花费的outpoint的ft decimal
 	TokenName     string `json:"tokenName"`    // 当前输出的ft tokenName

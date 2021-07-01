@@ -95,7 +95,7 @@ func GetTxInputsBySql(psql string) (txInsRsp []*model.TxInResp, err error) {
 		if len(txin.Genesis) >= 20 {
 			if txo.CodeType == scriptDecoder.CodeType_NFT {
 				tokenId = strconv.Itoa(int(txo.TokenIdx))
-			} else if txo.CodeType == scriptDecoder.CodeType_FT {
+			} else if txo.CodeType == scriptDecoder.CodeType_FT || txo.CodeType == scriptDecoder.CodeType_UNIQUE {
 				tokenId = hex.EncodeToString(txin.Genesis)
 			}
 		}
@@ -120,6 +120,7 @@ func GetTxInputsBySql(psql string) (txInsRsp []*model.TxInResp, err error) {
 			TokenDecimal:  int(txo.Decimal),
 			CodeHashHex:   hex.EncodeToString(txin.CodeHash),
 			GenesisHex:    hex.EncodeToString(txin.Genesis),
+			SensibleIdHex: hex.EncodeToString(txo.SensibleId),
 			Satoshi:       int(txin.Satoshi),
 			ScriptTypeHex: hex.EncodeToString(txin.ScriptType),
 			ScriptPkHex:   hex.EncodeToString(txin.ScriptPk),
@@ -173,7 +174,7 @@ func GetTxInputBySql(psql string) (txInRsp *model.TxInResp, err error) {
 	if len(txin.Genesis) >= 20 {
 		if txo.CodeType == scriptDecoder.CodeType_NFT {
 			tokenId = strconv.Itoa(int(txo.TokenIdx))
-		} else if txo.CodeType == scriptDecoder.CodeType_FT {
+		} else if txo.CodeType == scriptDecoder.CodeType_FT || txo.CodeType == scriptDecoder.CodeType_UNIQUE {
 			tokenId = hex.EncodeToString(txin.Genesis)
 		}
 	}
@@ -198,6 +199,7 @@ func GetTxInputBySql(psql string) (txInRsp *model.TxInResp, err error) {
 		TokenDecimal:  int(txo.Decimal),
 		CodeHashHex:   hex.EncodeToString(txin.CodeHash),
 		GenesisHex:    hex.EncodeToString(txin.Genesis),
+		SensibleIdHex: hex.EncodeToString(txo.SensibleId),
 		Satoshi:       int(txin.Satoshi),
 		ScriptTypeHex: hex.EncodeToString(txin.ScriptType),
 	}

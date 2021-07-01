@@ -230,7 +230,7 @@ func getUtxoFromRedis(utxoOutpoints []string) (txOutsRsp []*model.TxOutResp, err
 		if len(txo.GenesisId) >= 20 {
 			if txo.CodeType == scriptDecoder.CodeType_NFT {
 				tokenId = strconv.Itoa(int(txo.TokenIdx))
-			} else if txo.CodeType == scriptDecoder.CodeType_FT {
+			} else if txo.CodeType == scriptDecoder.CodeType_FT || txo.CodeType == scriptDecoder.CodeType_UNIQUE {
 				tokenId = hex.EncodeToString(txo.GenesisId)
 			}
 		}
@@ -251,6 +251,7 @@ func getUtxoFromRedis(utxoOutpoints []string) (txOutsRsp []*model.TxOutResp, err
 			TokenDecimal:  int(txo.Decimal),
 			CodeHashHex:   hex.EncodeToString(txo.CodeHash),
 			GenesisHex:    hex.EncodeToString(txo.GenesisId),
+			SensibleIdHex: hex.EncodeToString(txo.SensibleId),
 			ScriptTypeHex: hex.EncodeToString(txout.ScriptType),
 			// ScriptPkHex:   hex.EncodeToString(txout.Script),
 			Height: int(txout.BlockHeight),
