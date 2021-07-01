@@ -2716,6 +2716,10 @@ var doc = `{
                     "description": "输出数量",
                     "type": "integer"
                 },
+                "sensibleId": {
+                    "description": "FT合约的sensibleId，即genesisTx的outpoint，Hex编码",
+                    "type": "string"
+                },
                 "symbol": {
                     "description": "FT symbol",
                     "type": "string"
@@ -2798,6 +2802,10 @@ var doc = `{
                 "pendingBalance": {
                     "description": "待确认余额",
                     "type": "integer"
+                },
+                "sensibleId": {
+                    "description": "FT合约的sensibleId，即genesisTx的outpoint，Hex编码",
+                    "type": "string"
                 },
                 "symbol": {
                     "description": "FT symbol",
@@ -3042,6 +3050,10 @@ var doc = `{
                     "description": "当前输入锁定脚本类型，Hex编码",
                     "type": "string"
                 },
+                "sensibleId": {
+                    "description": "合约的sensibleId，即genesisTx的outpoint，Hex编码",
+                    "type": "string"
+                },
                 "sequence": {
                     "description": "Tx input的sequence",
                     "type": "integer"
@@ -3277,6 +3289,10 @@ var doc = `{
                     "description": "当前输出锁定脚本类型",
                     "type": "string"
                 },
+                "sensibleId": {
+                    "description": "合约的sensibleId，即genesisTx的outpoint，Hex编码",
+                    "type": "string"
+                },
                 "tokenAmount": {
                     "description": "当前输出的ft tokenAmount",
                     "type": "string"
@@ -3352,6 +3368,10 @@ var doc = `{
                 },
                 "scriptType": {
                     "description": "当前输出锁定脚本类型",
+                    "type": "string"
+                },
+                "sensibleId": {
+                    "description": "合约的sensibleId，即genesisTx的outpoint，Hex编码",
                     "type": "string"
                 },
                 "tokenAmount": {
