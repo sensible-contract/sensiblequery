@@ -4,6 +4,13 @@ definitions:
       txHex:
         type: string
     type: object
+  controller.TxsRequest:
+    properties:
+      txsHex:
+        items:
+          type: string
+        type: array
+    type: object
   model.BalanceResp:
     properties:
       address:
@@ -1980,6 +1987,30 @@ paths:
                   type: string
               type: object
       summary: Push Tx
+  /pushtxs:
+    post:
+      parameters:
+      - description: txsHex
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/controller.TxsRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 0, "data": ["<txid>", "<txid>"...], "msg": "ok"}'
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  items:
+                    type: string
+                  type: array
+              type: object
+      summary: Push Tx list
   /rawtx/{txid}:
     get:
       parameters:

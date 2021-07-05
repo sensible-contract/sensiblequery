@@ -2101,6 +2101,48 @@ var doc = `{
                 }
             }
         },
+        "/pushtxs": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Push Tx list",
+                "parameters": [
+                    {
+                        "description": "txsHex",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controller.TxsRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\": 0, \"data\": [\"\u003ctxid\u003e\", \"\u003ctxid\u003e\"...], \"msg\": \"ok\"}",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/model.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
         "/rawtx/{txid}": {
             "get": {
                 "produces": [
@@ -2529,6 +2571,17 @@ var doc = `{
             "properties": {
                 "txHex": {
                     "type": "string"
+                }
+            }
+        },
+        "controller.TxsRequest": {
+            "type": "object",
+            "properties": {
+                "txsHex": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 }
             }
         },
