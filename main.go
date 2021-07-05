@@ -48,6 +48,7 @@ func main() {
 	router.GET("/", controller.Satotx)
 
 	router.POST("/pushtx", controller.PushTx)
+	router.POST("/pushtxs", controller.PushTxs)
 
 	router.GET("/blockchain/info", controller.GetBlockchainInfo)
 
