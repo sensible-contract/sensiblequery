@@ -4,7 +4,6 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"fmt"
-	"log"
 	"net/http"
 	"satosensible/logger"
 	"satosensible/model"
@@ -68,11 +67,11 @@ func PushTx(ctx *gin.Context) {
 	logger.Log.Info("send", zap.String("rawtx", req.TxHex))
 	response, err := rpcClient.Call("sendrawtransaction", []string{req.TxHex})
 	if err != nil {
-		log.Println("call failed:", err)
+		logger.Log.Info("call failed", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "rpc failed"})
 		return
 	}
-	log.Println("Receive remote return:", response)
+	logger.Log.Info("Receive remote return", zap.Any("response", response))
 
 	if response.Error != nil {
 		ctx.JSON(http.StatusOK, model.Response{
@@ -132,11 +131,11 @@ func PushTxs(ctx *gin.Context) {
 		logger.Log.Info("send", zap.String("rawtx", txHex))
 		response, err := rpcClient.Call("sendrawtransaction", []string{txHex})
 		if err != nil {
-			log.Println("call failed:", err)
+			logger.Log.Info("call failed", zap.Error(err))
 			ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "rpc failed", Data: txIdResponse})
 			return
 		}
-		log.Println("Receive remote return:", response)
+		logger.Log.Info("Receive remote return", zap.Any("response", response))
 
 		if response.Error != nil {
 			ctx.JSON(http.StatusOK, model.Response{

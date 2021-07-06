@@ -2,7 +2,6 @@ package service
 
 import (
 	"encoding/hex"
-	"log"
 	"satosensible/lib/utils"
 	"satosensible/logger"
 	"satosensible/model"
@@ -135,7 +134,7 @@ func GetAllTokenBalanceByAddress(cursor, size int, addressPkh []byte) (ftOwnersR
 		// decimal
 		ftinfo, err := ftInfoCmds[idx].Result()
 		if err == redis.Nil {
-			log.Println("GetAllTokenBalanceByAddress ftinfo not found")
+			logger.Log.Info("GetAllTokenBalanceByAddress ftinfo not found")
 			ftinfo = map[string]string{
 				"decimal":    "0",
 				"name":       "",
