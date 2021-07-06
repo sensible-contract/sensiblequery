@@ -5,14 +5,15 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
-	"log"
 	"satosensible/dao/clickhouse"
 	"satosensible/lib/blkparser"
 	"satosensible/lib/utils"
+	"satosensible/logger"
 	"satosensible/model"
 	"strconv"
 
 	scriptDecoder "github.com/sensible-contract/sensible-script-decoder"
+	"go.uber.org/zap"
 )
 
 const (
@@ -76,7 +77,7 @@ LIMIT %d`, SQL_FIELEDS_TXIN, txidHex, blkHeight, cursor, size)
 func GetTxInputsBySql(psql string) (txInsRsp []*model.TxInResp, err error) {
 	txInsRet, err := clickhouse.ScanAll(psql, txInResultSRF)
 	if err != nil {
-		log.Printf("query txs by blkid failed: %v", err)
+		logger.Log.Info("query txs by blkid failed", zap.Error(err))
 		return nil, err
 	}
 	if txInsRet == nil {
@@ -94,7 +95,7 @@ func GetTxInputsBySql(psql string) (txInsRsp []*model.TxInResp, err error) {
 		tokenId := ""
 		if len(txin.Genesis) >= 20 {
 			if txo.CodeType == scriptDecoder.CodeType_NFT {
-				tokenId = strconv.Itoa(int(txo.TokenIdx))
+				tokenId = strconv.FormatUint(txo.TokenIdx, 10)
 			} else if txo.CodeType == scriptDecoder.CodeType_FT || txo.CodeType == scriptDecoder.CodeType_UNIQUE {
 				tokenId = hex.EncodeToString(txin.Genesis)
 			}
@@ -116,7 +117,7 @@ func GetTxInputsBySql(psql string) (txInsRsp []*model.TxInResp, err error) {
 			MetaTxId:      hex.EncodeToString(txo.MetaTxId),
 			TokenName:     txo.Name,
 			TokenSymbol:   txo.Symbol,
-			TokenAmount:   strconv.Itoa(int(txo.Amount)),
+			TokenAmount:   strconv.FormatUint(txo.Amount, 10),
 			TokenDecimal:  int(txo.Decimal),
 			CodeHashHex:   hex.EncodeToString(txin.CodeHash),
 			GenesisHex:    hex.EncodeToString(txin.Genesis),
@@ -157,7 +158,7 @@ LIMIT 1`, SQL_FIELEDS_TXIN, txidHex, index, blkHeight)
 func GetTxInputBySql(psql string) (txInRsp *model.TxInResp, err error) {
 	txInRet, err := clickhouse.ScanOne(psql, txInResultSRF)
 	if err != nil {
-		log.Printf("query tx by blkid failed: %v", err)
+		logger.Log.Info("query tx by blkid failed", zap.Error(err))
 		return nil, err
 	}
 	if txInRet == nil {
@@ -173,7 +174,7 @@ func GetTxInputBySql(psql string) (txInRsp *model.TxInResp, err error) {
 	tokenId := ""
 	if len(txin.Genesis) >= 20 {
 		if txo.CodeType == scriptDecoder.CodeType_NFT {
-			tokenId = strconv.Itoa(int(txo.TokenIdx))
+			tokenId = strconv.FormatUint(txo.TokenIdx, 10)
 		} else if txo.CodeType == scriptDecoder.CodeType_FT || txo.CodeType == scriptDecoder.CodeType_UNIQUE {
 			tokenId = hex.EncodeToString(txin.Genesis)
 		}
@@ -195,7 +196,7 @@ func GetTxInputBySql(psql string) (txInRsp *model.TxInResp, err error) {
 		MetaTxId:      hex.EncodeToString(txo.MetaTxId),
 		TokenName:     txo.Name,
 		TokenSymbol:   txo.Symbol,
-		TokenAmount:   strconv.Itoa(int(txo.Amount)),
+		TokenAmount:   strconv.FormatUint(txo.Amount, 10),
 		TokenDecimal:  int(txo.Decimal),
 		CodeHashHex:   hex.EncodeToString(txin.CodeHash),
 		GenesisHex:    hex.EncodeToString(txin.Genesis),
@@ -220,7 +221,7 @@ LIMIT 1`, SQL_FIELEDS_TXIN_SPENT, txidHex, index, txidHex, index)
 
 	txInRet, err := clickhouse.ScanOne(psql, txInSpentResultSRF)
 	if err != nil {
-		log.Printf("query tx by blkid failed: %v", err)
+		logger.Log.Info("query tx by blkid failed", zap.Error(err))
 		return nil, err
 	}
 	if txInRet == nil {

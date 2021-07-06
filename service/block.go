@@ -5,10 +5,12 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
-	"log"
 	"satosensible/dao/clickhouse"
 	"satosensible/lib/blkparser"
+	"satosensible/logger"
 	"satosensible/model"
+
+	"go.uber.org/zap"
 )
 
 const (
@@ -49,7 +51,7 @@ LIMIT %d`,
 
 	blksRet, err := clickhouse.ScanAll(psql, blockTokenVolumeResultSRF)
 	if err != nil {
-		log.Printf("query blk failed: %v", err)
+		logger.Log.Info("query blk failed", zap.Error(err))
 		return nil, err
 	}
 	if blksRet == nil {
@@ -92,7 +94,7 @@ LIMIT %d
 
 	blksRet, err := clickhouse.ScanAll(psql, blockResultSRF)
 	if err != nil {
-		log.Printf("query blk failed: %v", err)
+		logger.Log.Info("query blk failed", zap.Error(err))
 		return nil, err
 	}
 	if blksRet == nil {
@@ -158,7 +160,7 @@ func GetBestBlock() (blk *model.BlockInfoResp, err error) {
 func GetBlockBySql(psql string) (blk *model.BlockInfoResp, err error) {
 	blkRet, err := clickhouse.ScanOne(psql, blockResultSRF)
 	if err != nil {
-		log.Printf("query blk failed: %v", err)
+		logger.Log.Info("query blk failed", zap.Error(err))
 		return nil, err
 	}
 	if blkRet == nil {
@@ -197,7 +199,7 @@ func GetMempoolTxCount() (count int, err error) {
 
 	blkRet, err := clickhouse.ScanOne(psql, mempoolResultSRF)
 	if err != nil {
-		log.Printf("query blk failed: %v", err)
+		logger.Log.Info("query blk failed", zap.Error(err))
 		return 0, err
 	}
 	if blkRet == nil {

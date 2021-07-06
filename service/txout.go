@@ -5,14 +5,15 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
-	"log"
 	"satosensible/dao/clickhouse"
 	"satosensible/lib/blkparser"
 	"satosensible/lib/utils"
+	"satosensible/logger"
 	"satosensible/model"
 	"strconv"
 
 	scriptDecoder "github.com/sensible-contract/sensible-script-decoder"
+	"go.uber.org/zap"
 )
 
 const (
@@ -100,7 +101,7 @@ LIMIT %d
 func GetTxOutputsBySql(psql string) (txOutsRsp []*model.TxOutStatusResp, err error) {
 	txOutsRet, err := clickhouse.ScanAll(psql, txOutStatusResultSRF)
 	if err != nil {
-		log.Printf("query txouts by blkid failed: %v", err)
+		logger.Log.Info("query txouts by blkid failed", zap.Error(err))
 		return nil, err
 	}
 	if txOutsRet == nil {
@@ -117,7 +118,7 @@ func GetTxOutputsBySql(psql string) (txOutsRsp []*model.TxOutStatusResp, err err
 		tokenId := ""
 		if len(txOut.Genesis) >= 20 {
 			if txo.CodeType == scriptDecoder.CodeType_NFT {
-				tokenId = strconv.Itoa(int(txo.TokenIdx))
+				tokenId = strconv.FormatUint(txo.TokenIdx, 10)
 			} else if txo.CodeType == scriptDecoder.CodeType_FT || txo.CodeType == scriptDecoder.CodeType_UNIQUE {
 				tokenId = hex.EncodeToString(txOut.Genesis)
 			}
@@ -135,7 +136,7 @@ func GetTxOutputsBySql(psql string) (txOutsRsp []*model.TxOutStatusResp, err err
 			MetaTxId:      hex.EncodeToString(txo.MetaTxId),
 			TokenName:     txo.Name,
 			TokenSymbol:   txo.Symbol,
-			TokenAmount:   strconv.Itoa(int(txo.Amount)),
+			TokenAmount:   strconv.FormatUint(txo.Amount, 10),
 			TokenDecimal:  int(txo.Decimal),
 			CodeHashHex:   hex.EncodeToString(txOut.CodeHash),
 			GenesisHex:    hex.EncodeToString(txOut.Genesis),
@@ -187,7 +188,7 @@ func txOutResultSRF(rows *sql.Rows) (interface{}, error) {
 func GetTxOutputBySql(psql string) (txOutRsp *model.TxOutResp, err error) {
 	txOutRet, err := clickhouse.ScanOne(psql, txOutResultSRF)
 	if err != nil {
-		log.Printf("query txout by blkid failed: %v", err)
+		logger.Log.Info("query txout by blkid failed", zap.Error(err))
 		return nil, err
 	}
 	if txOutRet == nil {
@@ -203,7 +204,7 @@ func GetTxOutputBySql(psql string) (txOutRsp *model.TxOutResp, err error) {
 	tokenId := ""
 	if len(txOut.Genesis) >= 20 {
 		if txo.CodeType == scriptDecoder.CodeType_NFT {
-			tokenId = strconv.Itoa(int(txo.TokenIdx))
+			tokenId = strconv.FormatUint(txo.TokenIdx, 10)
 		} else {
 			tokenId = hex.EncodeToString(txOut.Genesis)
 		}
@@ -220,7 +221,7 @@ func GetTxOutputBySql(psql string) (txOutRsp *model.TxOutResp, err error) {
 		MetaTxId:      hex.EncodeToString(txo.MetaTxId),
 		TokenName:     txo.Name,
 		TokenSymbol:   txo.Symbol,
-		TokenAmount:   strconv.Itoa(int(txo.Amount)),
+		TokenAmount:   strconv.FormatUint(txo.Amount, 10),
 		TokenDecimal:  int(txo.Decimal),
 		CodeHashHex:   hex.EncodeToString(txOut.CodeHash),
 		GenesisHex:    hex.EncodeToString(txOut.Genesis),

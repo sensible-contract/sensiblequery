@@ -4,10 +4,12 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"log"
 	"satosensible/dao/clickhouse"
 	"satosensible/lib/blkparser"
+	"satosensible/logger"
 	"satosensible/model"
+
+	"go.uber.org/zap"
 )
 
 const (
@@ -46,7 +48,7 @@ LIMIT %d`, SQL_FIELEDS_TX, blkidHex, cursor, size)
 func GetBlockTxsBySql(psql string) (txsRsp []*model.TxInfoResp, err error) {
 	txsRet, err := clickhouse.ScanAll(psql, txResultSRF)
 	if err != nil {
-		log.Printf("query txs by blkid failed: %v", err)
+		logger.Log.Info("query txs by blkid failed", zap.Error(err))
 		return nil, err
 	}
 	if txsRet == nil {
@@ -109,7 +111,7 @@ LIMIT 1`, SQL_FIELEDS_TX_TIMESTAMP, blkHeight, blkHeight, txidHex)
 func GetTxBySql(psql string) (txRsp *model.TxInfoResp, err error) {
 	txRet, err := clickhouse.ScanOne(psql, txResultSRF)
 	if err != nil {
-		log.Printf("query tx failed: %v", err)
+		logger.Log.Info("query tx failed", zap.Error(err))
 		return nil, err
 	}
 	if txRet == nil {
@@ -154,7 +156,7 @@ LIMIT 1`, txidHex, txidHex)
 
 	txRet, err := clickhouse.ScanOne(psql, rawtxResultSRF)
 	if err != nil {
-		log.Printf("query tx failed: %v", err)
+		logger.Log.Info("query tx failed", zap.Error(err))
 		return nil, err
 	}
 	if txRet == nil {
@@ -173,7 +175,7 @@ LIMIT 1`, blkHeight, txidHex)
 
 	txRet, err := clickhouse.ScanOne(psql, rawtxResultSRF)
 	if err != nil {
-		log.Printf("query tx failed: %v", err)
+		logger.Log.Info("query tx failed", zap.Error(err))
 		return nil, err
 	}
 	if txRet == nil {

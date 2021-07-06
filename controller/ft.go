@@ -2,15 +2,16 @@ package controller
 
 import (
 	"encoding/hex"
-	"log"
 	"net/http"
 	"satosensible/lib/utils"
+	"satosensible/logger"
 	"satosensible/model"
 	"satosensible/service"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 	scriptDecoder "github.com/sensible-contract/sensible-script-decoder"
+	"go.uber.org/zap"
 )
 
 // ListAllFTCodeHash
@@ -20,11 +21,11 @@ import (
 // @Success 200 {object} model.Response{data=[]model.TokenCodeHashResp} "{"code": 0, "data": [{}], "msg": "ok"}"
 // @Router /ft/codehash/all [get]
 func ListAllFTCodeHash(ctx *gin.Context) {
-	log.Printf("ListAllFTCodeHash enter")
+	logger.Log.Info("ListAllFTCodeHash enter")
 
 	result, err := service.GetTokenCodeHash(scriptDecoder.CodeType_FT)
 	if err != nil {
-		log.Printf("get dummy failed: %v", err)
+		logger.Log.Info("get dummy failed", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get dummy failed"})
 		return
 	}
@@ -43,11 +44,11 @@ func ListAllFTCodeHash(ctx *gin.Context) {
 // @Success 200 {object} model.Response{data=[]model.FTInfoResp} "{"code": 0, "data": [{}], "msg": "ok"}"
 // @Router /ft/info/all [get]
 func ListAllFTInfo(ctx *gin.Context) {
-	log.Printf("ListFTInfo enter")
+	logger.Log.Info("ListFTInfo enter")
 
 	result, err := service.GetFTInfo()
 	if err != nil {
-		log.Printf("get dummy failed: %v", err)
+		logger.Log.Info("get dummy failed", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get dummy failed"})
 		return
 	}
@@ -67,20 +68,20 @@ func ListAllFTInfo(ctx *gin.Context) {
 // @Success 200 {object} model.Response{data=[]model.FTInfoResp} "{"code": 0, "data": [{}], "msg": "ok"}"
 // @Router /ft/codehash-info/{codehash} [get]
 func ListFTSummary(ctx *gin.Context) {
-	log.Printf("ListFTSummary enter")
+	logger.Log.Info("ListFTSummary enter")
 
 	codeHashHex := ctx.Param("codehash")
 	// check
 	_, err := hex.DecodeString(codeHashHex)
 	if err != nil {
-		log.Printf("codeHash invalid: %v", err)
+		logger.Log.Info("codeHash invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "codeHash invalid"})
 		return
 	}
 
 	result, err := service.GetFTSummary(codeHashHex)
 	if err != nil {
-		log.Printf("get dummy failed: %v", err)
+		logger.Log.Info("get dummy failed", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get dummy failed"})
 		return
 	}
@@ -103,26 +104,26 @@ func ListFTSummary(ctx *gin.Context) {
 // @Success 200 {object} model.Response{data=[]model.BlockTokenVolumeResp} "{"code": 0, "data": [{}], "msg": "ok"}"
 // @Router /ft/transfer-times/{codehash}/{genesis} [get]
 func GetFTTransferVolumeInBlockRange(ctx *gin.Context) {
-	log.Printf("GetFTTransferVolumeInBlockRange enter")
+	logger.Log.Info("GetFTTransferVolumeInBlockRange enter")
 
 	// check height
 	blkStartHeightString := ctx.DefaultQuery("start", "0")
 	blkStartHeight, err := strconv.Atoi(blkStartHeightString)
 	if err != nil || blkStartHeight < 0 {
-		log.Printf("blk start height invalid: %v", err)
+		logger.Log.Info("blk start height invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "blk start height invalid"})
 		return
 	}
 	blkEndHeightString := ctx.DefaultQuery("end", "0")
 	blkEndHeight, err := strconv.Atoi(blkEndHeightString)
 	if err != nil || blkEndHeight < 0 {
-		log.Printf("blk end height invalid: %v", err)
+		logger.Log.Info("blk end height invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "blk end height invalid"})
 		return
 	}
 
 	if blkEndHeight <= blkStartHeight || (blkEndHeight-blkStartHeight > 1000) {
-		log.Printf("blk end height invalid: %v", err)
+		logger.Log.Info("blk end height invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "blk end height invalid"})
 		return
 	}
@@ -131,7 +132,7 @@ func GetFTTransferVolumeInBlockRange(ctx *gin.Context) {
 	// check
 	_, err = hex.DecodeString(codeHashHex)
 	if err != nil {
-		log.Printf("codeHash invalid: %v", err)
+		logger.Log.Info("codeHash invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "codeHash invalid"})
 		return
 	}
@@ -140,14 +141,14 @@ func GetFTTransferVolumeInBlockRange(ctx *gin.Context) {
 	// check
 	_, err = hex.DecodeString(genesisIdHex)
 	if err != nil {
-		log.Printf("genesisId invalid: %v", err)
+		logger.Log.Info("genesisId invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "genesisId invalid"})
 		return
 	}
 
 	result, err := service.GetTokenVolumesInBlocksByHeightRange(blkStartHeight, blkEndHeight, codeHashHex, genesisIdHex, scriptDecoder.CodeType_FT, 0)
 	if err != nil {
-		log.Printf("get dummy failed: %v", err)
+		logger.Log.Info("get dummy failed", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get dummy failed"})
 		return
 	}
@@ -170,19 +171,19 @@ func GetFTTransferVolumeInBlockRange(ctx *gin.Context) {
 // @Success 200 {object} model.Response{data=[]model.FTOwnerBalanceResp} "{"code": 0, "data": [{}], "msg": "ok"}"
 // @Router /ft/owners/{codehash}/{genesis} [get]
 func ListFTOwners(ctx *gin.Context) {
-	log.Printf("ListFTOwners enter")
+	logger.Log.Info("ListFTOwners enter")
 	// get cursor/size
 	cursorString := ctx.DefaultQuery("cursor", "0")
 	cursor, err := strconv.Atoi(cursorString)
 	if err != nil || cursor < 0 {
-		log.Printf("cursor invalid: %v", err)
+		logger.Log.Info("cursor invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "cursor invalid"})
 		return
 	}
 	sizeString := ctx.DefaultQuery("size", "16")
 	size, err := strconv.Atoi(sizeString)
 	if err != nil || size < 0 {
-		log.Printf("size invalid: %v", err)
+		logger.Log.Info("size invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "size invalid"})
 		return
 	}
@@ -191,7 +192,7 @@ func ListFTOwners(ctx *gin.Context) {
 	// check
 	codeHash, err := hex.DecodeString(codeHashHex)
 	if err != nil {
-		log.Printf("codeHash invalid: %v", err)
+		logger.Log.Info("codeHash invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "codeHash invalid"})
 		return
 	}
@@ -200,14 +201,14 @@ func ListFTOwners(ctx *gin.Context) {
 	// check
 	genesisId, err := hex.DecodeString(genesisIdHex)
 	if err != nil {
-		log.Printf("genesisId invalid: %v", err)
+		logger.Log.Info("genesisId invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "genesisId invalid"})
 		return
 	}
 
 	result, err := service.GetTokenOwnersByCodeHashGenesis(cursor, size, codeHash, genesisId)
 	if err != nil {
-		log.Printf("get dummy failed: %v", err)
+		logger.Log.Info("get dummy failed", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get dummy failed"})
 		return
 	}
@@ -229,19 +230,19 @@ func ListFTOwners(ctx *gin.Context) {
 // @Success 200 {object} model.Response{data=[]model.FTSummaryByAddressResp} "{"code": 0, "data": [{}], "msg": "ok"}"
 // @Router /ft/summary/{address} [get]
 func ListAllFTBalanceByOwner(ctx *gin.Context) {
-	log.Printf("ListAllFTOwners enter")
+	logger.Log.Info("ListAllFTOwners enter")
 	// get cursor/size
 	cursorString := ctx.DefaultQuery("cursor", "0")
 	cursor, err := strconv.Atoi(cursorString)
 	if err != nil || cursor < 0 {
-		log.Printf("cursor invalid: %v", err)
+		logger.Log.Info("cursor invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "cursor invalid"})
 		return
 	}
 	sizeString := ctx.DefaultQuery("size", "16")
 	size, err := strconv.Atoi(sizeString)
 	if err != nil || size < 0 {
-		log.Printf("size invalid: %v", err)
+		logger.Log.Info("size invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "size invalid"})
 		return
 	}
@@ -250,14 +251,14 @@ func ListAllFTBalanceByOwner(ctx *gin.Context) {
 	// check
 	addressPkh, err := utils.DecodeAddress(address)
 	if err != nil {
-		log.Printf("address invalid: %v", err)
+		logger.Log.Info("address invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "address invalid"})
 		return
 	}
 
 	result, err := service.GetAllTokenBalanceByAddress(cursor, size, addressPkh)
 	if err != nil {
-		log.Printf("get dummy failed: %v", err)
+		logger.Log.Info("get dummy failed", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get dummy failed"})
 		return
 	}
@@ -279,12 +280,12 @@ func ListAllFTBalanceByOwner(ctx *gin.Context) {
 // @Success 200 {object} model.Response{data=model.FTOwnerBalanceWithUtxoCountResp} "{"code": 0, "data": [{}], "msg": "ok"}"
 // @Router /ft/balance/{codehash}/{genesis}/{address} [get]
 func GetFTBalanceByOwner(ctx *gin.Context) {
-	log.Printf("GetFTBalanceByOwner enter")
+	logger.Log.Info("GetFTBalanceByOwner enter")
 	codeHashHex := ctx.Param("codehash")
 	// check
 	codeHash, err := hex.DecodeString(codeHashHex)
 	if err != nil {
-		log.Printf("codeHash invalid: %v", err)
+		logger.Log.Info("codeHash invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "codeHash invalid"})
 		return
 	}
@@ -293,7 +294,7 @@ func GetFTBalanceByOwner(ctx *gin.Context) {
 	// check
 	genesisId, err := hex.DecodeString(genesisIdHex)
 	if err != nil {
-		log.Printf("genesisId invalid: %v", err)
+		logger.Log.Info("genesisId invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "genesisId invalid"})
 		return
 	}
@@ -302,14 +303,14 @@ func GetFTBalanceByOwner(ctx *gin.Context) {
 	// check
 	addressPkh, err := utils.DecodeAddress(address)
 	if err != nil {
-		log.Printf("address invalid: %v", err)
+		logger.Log.Info("address invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "address invalid"})
 		return
 	}
 
 	result, err := service.GetTokenBalanceByCodeHashGenesisAddress(codeHash, genesisId, addressPkh)
 	if err != nil {
-		log.Printf("get dummy failed: %v", err)
+		logger.Log.Info("get dummy failed", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get dummy failed"})
 		return
 	}

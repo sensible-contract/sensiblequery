@@ -1,12 +1,13 @@
 package controller
 
 import (
-	"log"
 	"net/http"
+	"satosensible/logger"
 	"satosensible/model"
 	"satosensible/service"
 
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
 // Satotx
@@ -15,7 +16,7 @@ import (
 // @Success 200 {object} model.Response{data=model.Welcome} "{"code": 0, "data": {}, "msg": "ok"}"
 // @Router / [get]
 func Satotx(ctx *gin.Context) {
-	log.Printf("Satotx enter")
+	logger.Log.Info("Satotx enter")
 
 	ctx.JSON(http.StatusOK, model.Response{
 		Code: 0,
@@ -34,11 +35,11 @@ func Satotx(ctx *gin.Context) {
 // @Success 200 {object} model.Response{data=model.BlockchainInfoResp} "{"code": 0, "data": {}, "msg": "ok"}"
 // @Router /blockchain/info [get]
 func GetBlockchainInfo(ctx *gin.Context) {
-	log.Printf("GetBlockchainInfo enter")
+	logger.Log.Info("GetBlockchainInfo enter")
 
 	blk, err := service.GetBestBlock()
 	if err != nil {
-		log.Printf("best block failed: %v", err)
+		logger.Log.Info("best block failed", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get best block failed"})
 		return
 	}
@@ -64,11 +65,11 @@ func GetBlockchainInfo(ctx *gin.Context) {
 // @Success 200 {object} model.Response{data=model.MempoolInfoResp} "{"code": 0, "data": {}, "msg": "ok"}"
 // @Router /mempool/info [get]
 func GetMempoolInfo(ctx *gin.Context) {
-	log.Printf("GetMempoolInfo enter")
+	logger.Log.Info("GetMempoolInfo enter")
 
 	count, err := service.GetMempoolTxCount()
 	if err != nil {
-		log.Printf("get mempool failed: %v", err)
+		logger.Log.Info("get mempool failed", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get mempool failed"})
 		return
 	}

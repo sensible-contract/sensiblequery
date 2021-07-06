@@ -5,12 +5,13 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
-	"log"
 	"satosensible/dao/clickhouse"
+	"satosensible/logger"
 	"satosensible/model"
 	"strconv"
 
 	"github.com/go-redis/redis/v8"
+	"go.uber.org/zap"
 )
 
 const (
@@ -49,7 +50,7 @@ func getFTDecimal(ftsRsp []*model.FTInfoResp) {
 			}
 			continue
 		} else if err != nil {
-			log.Printf("getFTDecimal redis failed: %v", err)
+			logger.Log.Info("getFTDecimal redis failed", zap.Error(err))
 		}
 		decimal, _ := strconv.Atoi(ftinfo["decimal"])
 		ft.Decimal = decimal
@@ -96,7 +97,7 @@ ORDER BY count(1) DESC
 func GetFTInfoBySQL(psql string) (blksRsp []*model.FTInfoResp, err error) {
 	blksRet, err := clickhouse.ScanAll(psql, ftInfoResultSRF)
 	if err != nil {
-		log.Printf("query blk failed: %v", err)
+		logger.Log.Info("query blk failed", zap.Error(err))
 		return nil, err
 	}
 	if blksRet == nil {

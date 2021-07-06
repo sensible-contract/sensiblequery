@@ -4,10 +4,12 @@ import (
 	"encoding/hex"
 	"log"
 	"satosensible/lib/utils"
+	"satosensible/logger"
 	"satosensible/model"
 	"strconv"
 
 	"github.com/go-redis/redis/v8"
+	"go.uber.org/zap"
 )
 
 ////////////////
@@ -18,7 +20,7 @@ func GetTokenOwnersByCodeHashGenesis(cursor, size int, codeHash, genesisId []byt
 	if err == redis.Nil {
 		decimal = 0
 	} else if err != nil {
-		log.Printf("GetTokenOwnersByCodeHashGenesis decimal, but redis failed: %v", err)
+		logger.Log.Info("GetTokenOwnersByCodeHashGenesis decimal, but redis failed", zap.Error(err))
 		return
 	}
 
@@ -37,21 +39,21 @@ func GetTokenOwnersByCodeHashGenesis(cursor, size int, codeHash, genesisId []byt
 	// 合并已确认余额和未确认余额
 	nUnion, err := rdb.ZUnionStore(ctx, finalKey, finalZs).Result()
 	if err != nil {
-		log.Printf("ZUnionStore redis failed: %v", err)
+		logger.Log.Info("ZUnionStore redis failed", zap.Error(err))
 		return
 	}
-	log.Printf("ZUnionStore : %v", nUnion)
+	logger.Log.Info("ZUnionStore", zap.Int64("n", nUnion))
 
 	vals, err := rdb.ZRevRangeWithScores(ctx, finalKey, int64(cursor), int64(cursor+size-1)).Result()
 	if err != nil {
-		log.Printf("GetFTOwnersByCodeHashGenesis redis failed: %v", err)
+		logger.Log.Info("GetFTOwnersByCodeHashGenesis redis failed", zap.Error(err))
 		return
 	}
 
 	pipe := rdb.Pipeline()
 	pendingBalanceCmds := make([]*redis.FloatCmd, 0)
 	for _, val := range vals {
-		log.Printf("GetFTOwnersByCodeHashGenesis balance: %d", int(val.Score))
+		logger.Log.Info("GetFTOwnersByCodeHashGenesis", zap.Float64("balance", val.Score))
 		pendingBalanceCmds = append(pendingBalanceCmds, pipe.ZScore(ctx, newKey, val.Member.(string)))
 	}
 	_, err = pipe.Exec(ctx)
@@ -96,14 +98,14 @@ func GetAllTokenBalanceByAddress(cursor, size int, addressPkh []byte) (ftOwnersR
 	// 合并已确认余额和未确认余额
 	nUnion, err := rdb.ZUnionStore(ctx, finalKey, finalZs).Result()
 	if err != nil {
-		log.Printf("ZUnionStore redis failed: %v", err)
+		logger.Log.Info("ZUnionStore redis failed", zap.Error(err))
 		return
 	}
-	log.Printf("ZUnionStore : %v", nUnion)
+	logger.Log.Info("ZUnionStore", zap.Int64("n", nUnion))
 
 	vals, err := rdb.ZRevRangeWithScores(ctx, finalKey, int64(cursor), int64(cursor+size-1)).Result()
 	if err != nil {
-		log.Printf("GetAllTokenBalanceByAddress redis failed: %v", err)
+		logger.Log.Info("GetAllTokenBalanceByAddress redis failed", zap.Error(err))
 		return
 	}
 
@@ -169,28 +171,28 @@ func GetTokenBalanceByCodeHashGenesisAddress(codeHash, genesisId, addressPkh []b
 	if err == redis.Nil {
 		decimal = 0
 	} else if err != nil {
-		log.Printf("GetTokenBalanceByCodeHashGenesisAddress decimal, but redis failed: %v", err)
+		logger.Log.Info("GetTokenBalanceByCodeHashGenesisAddress decimal, but redis failed", zap.Error(err))
 		return
 	}
 
 	balance, err := rdb.ZScore(ctx, "fb"+string(codeHash)+string(genesisId), string(addressPkh)).Result()
 	if err == redis.Nil {
-		log.Printf("GetTokenBalanceByCodeHashGenesisAddress fb, but not found")
+		logger.Log.Info("GetTokenBalanceByCodeHashGenesisAddress fb, but not found")
 		balance = 0
 	} else if err != nil {
-		log.Printf("GetTokenBalanceByCodeHashGenesisAddress fb, but redis failed: %v", err)
+		logger.Log.Info("GetTokenBalanceByCodeHashGenesisAddress fb, but redis failed", zap.Error(err))
 		return
 	}
-	log.Printf("GetTokenBalanceByCodeHashGenesisAddress fb, balance: %f", balance)
+	logger.Log.Info("GetTokenBalanceByCodeHashGenesisAddress fb", zap.Float64("balance", balance))
 	mpBalance, err := rdb.ZScore(ctx, "mp:fb"+string(codeHash)+string(genesisId), string(addressPkh)).Result()
 	if err == redis.Nil {
-		log.Printf("GetTokenBalanceByCodeHashGenesisAddress mp:fb, but not found")
+		logger.Log.Info("GetTokenBalanceByCodeHashGenesisAddress mp:fb, but not found")
 		mpBalance = 0
 	} else if err != nil {
-		log.Printf("GetTokenBalanceByCodeHashGenesisAddress mp:fb, but redis mp failed: %v", err)
+		logger.Log.Info("GetTokenBalanceByCodeHashGenesisAddress mp:fb, but redis mp failed", zap.Error(err))
 		return
 	}
-	log.Printf("GetTokenBalanceByCodeHashGenesisAddress fb, pending balance: %f", mpBalance)
+	logger.Log.Info("GetTokenBalanceByCodeHashGenesisAddress fb", zap.Float64("pendingBalance", mpBalance))
 
 	finalUtxoKey, err := mergeUtxoByCodeHashGenesisAddress(codeHash, genesisId, addressPkh, false)
 	if err != nil {
@@ -199,7 +201,7 @@ func GetTokenBalanceByCodeHashGenesisAddress(codeHash, genesisId, addressPkh []b
 
 	utxoCount, err := rdb.ZCard(ctx, finalUtxoKey).Result()
 	if err != nil {
-		log.Printf("GetTokenBalanceByCodeHashGenesisAddress merge, but redis failed: %v", err)
+		logger.Log.Info("GetTokenBalanceByCodeHashGenesisAddress merge, but redis failed", zap.Error(err))
 		return
 	}
 
@@ -230,14 +232,14 @@ func GetNFTOwnersByCodeHashGenesis(cursor, size int, codeHash, genesisId []byte)
 	// 合并已确认数量和未确认数量
 	nUnion, err := rdb.ZUnionStore(ctx, finalKey, finalZs).Result()
 	if err != nil {
-		log.Printf("ZUnionStore redis failed: %v", err)
+		logger.Log.Info("ZUnionStore redis failed", zap.Error(err))
 		return
 	}
-	log.Printf("ZUnionStore : %v", nUnion)
+	logger.Log.Info("ZUnionStore", zap.Int64("n", nUnion))
 
 	vals, err := rdb.ZRevRangeWithScores(ctx, finalKey, int64(cursor), int64(cursor+size-1)).Result()
 	if err != nil {
-		log.Printf("GetNFTOwnersByCodeHashGenesis redis failed: %v", err)
+		logger.Log.Info("GetNFTOwnersByCodeHashGenesis redis failed", zap.Error(err))
 		return
 	}
 
@@ -289,14 +291,14 @@ func GetAllNFTBalanceByAddress(cursor, size int, addressPkh []byte) (nftOwnersRs
 	// 合并已确认数量和未确认数量
 	nUnion, err := rdb.ZUnionStore(ctx, finalKey, finalZs).Result()
 	if err != nil {
-		log.Printf("ZUnionStore redis failed: %v", err)
+		logger.Log.Info("ZUnionStore redis failed", zap.Error(err))
 		return
 	}
-	log.Printf("ZUnionStore : %v", nUnion)
+	logger.Log.Info("ZUnionStore", zap.Int64("n", nUnion))
 
 	vals, err := rdb.ZRevRangeWithScores(ctx, finalKey, int64(cursor), int64(cursor+size-1)).Result()
 	if err != nil {
-		log.Printf("GetAllNFTBalanceByAddress redis failed: %v", err)
+		logger.Log.Info("GetAllNFTBalanceByAddress redis failed", zap.Error(err))
 		return
 	}
 
@@ -338,7 +340,7 @@ func GetNFTCountByCodeHashGenesisAddress(codeHash, genesisId, addressPkh []byte)
 	if err == redis.Nil {
 		score = 0
 	} else if err != nil {
-		log.Printf("GetNFTCountByCodeHashGenesisAddress redis failed: %v", err)
+		logger.Log.Info("GetNFTCountByCodeHashGenesisAddress redis failed", zap.Error(err))
 		return
 	}
 
@@ -346,7 +348,7 @@ func GetNFTCountByCodeHashGenesisAddress(codeHash, genesisId, addressPkh []byte)
 	if err == redis.Nil {
 		mpScore = 0
 	} else if err != nil {
-		log.Printf("GetNFTCountByCodeHashGenesisAddress mp redis failed: %v", err)
+		logger.Log.Info("GetNFTCountByCodeHashGenesisAddress mp redis failed", zap.Error(err))
 		return
 	}
 

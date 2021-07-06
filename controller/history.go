@@ -2,14 +2,15 @@ package controller
 
 import (
 	"encoding/hex"
-	"log"
 	"net/http"
 	"satosensible/lib/utils"
+	"satosensible/logger"
 	"satosensible/model"
 	"satosensible/service"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
 // GetHistoryByAddress
@@ -20,20 +21,20 @@ import (
 // @Success 200 {object} model.Response{data=[]model.TxOutHistoryResp} "{"code": 0, "data": [{}], "msg": "ok"}"
 // @Router /address/{address}/history [get]
 func GetHistoryByAddress(ctx *gin.Context) {
-	log.Printf("GetHistoryByAddress enter")
+	logger.Log.Info("GetHistoryByAddress enter")
 
 	address := ctx.Param("address")
 	// check
 	addressPkh, err := utils.DecodeAddress(address)
 	if err != nil {
-		log.Printf("address invalid: %v", err)
+		logger.Log.Info("address invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "address invalid"})
 		return
 	}
 
 	result, err := service.GetHistoryByAddress(hex.EncodeToString(addressPkh))
 	if err != nil {
-		log.Printf("get block failed: %v", err)
+		logger.Log.Info("get block failed", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get txo failed"})
 		return
 	}
@@ -57,20 +58,20 @@ func GetHistoryByAddress(ctx *gin.Context) {
 // @Success 200 {object} model.Response{data=[]model.TxOutHistoryResp} "{"code": 0, "data": [{}], "msg": "ok"}"
 // @Router /contract/history/{codehash}/{genesis}/{address} [get]
 func GetHistoryByGenesis(ctx *gin.Context) {
-	log.Printf("GetHistoryByGenesis enter")
+	logger.Log.Info("GetHistoryByGenesis enter")
 
 	// get cursor/size
 	cursorString := ctx.DefaultQuery("cursor", "0")
 	cursor, err := strconv.Atoi(cursorString)
 	if err != nil || cursor < 0 {
-		log.Printf("cursor invalid: %v", err)
+		logger.Log.Info("cursor invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "cursor invalid"})
 		return
 	}
 	sizeString := ctx.DefaultQuery("size", "16")
 	size, err := strconv.Atoi(sizeString)
 	if err != nil || size < 0 {
-		log.Printf("size invalid: %v", err)
+		logger.Log.Info("size invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "size invalid"})
 		return
 	}
@@ -79,7 +80,7 @@ func GetHistoryByGenesis(ctx *gin.Context) {
 	// check
 	_, err = hex.DecodeString(codeHashHex)
 	if err != nil {
-		log.Printf("codeHash invalid: %v", err)
+		logger.Log.Info("codeHash invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "codeHash invalid"})
 		return
 	}
@@ -88,7 +89,7 @@ func GetHistoryByGenesis(ctx *gin.Context) {
 	// check
 	_, err = hex.DecodeString(genesisIdHex)
 	if err != nil {
-		log.Printf("genesisId invalid: %v", err)
+		logger.Log.Info("genesisId invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "genesisId invalid"})
 		return
 	}
@@ -97,14 +98,14 @@ func GetHistoryByGenesis(ctx *gin.Context) {
 	// check
 	addressPkh, err := utils.DecodeAddress(address)
 	if err != nil {
-		log.Printf("address invalid: %v", err)
+		logger.Log.Info("address invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "address invalid"})
 		return
 	}
 
 	result, err := service.GetHistoryByGenesis(cursor, size, codeHashHex, genesisIdHex, hex.EncodeToString(addressPkh))
 	if err != nil {
-		log.Printf("get history failed: %v", err)
+		logger.Log.Info("get history failed", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get histroy failed"})
 		return
 	}
@@ -128,7 +129,7 @@ func GetHistoryByGenesis(ctx *gin.Context) {
 // @Success 200 {object} model.Response{data=[]model.TxOutHistoryResp} "{"code": 0, "data": [{}], "msg": "ok"}"
 // @Router /ft/history/{codehash}/{genesis}/{address} [get]
 func GetFTHistoryByGenesis(ctx *gin.Context) {
-	log.Printf("GetFTHistoryByGenesis enter")
+	logger.Log.Info("GetFTHistoryByGenesis enter")
 	GetHistoryByGenesis(ctx)
 }
 
@@ -144,6 +145,6 @@ func GetFTHistoryByGenesis(ctx *gin.Context) {
 // @Success 200 {object} model.Response{data=[]model.TxOutHistoryResp} "{"code": 0, "data": [{}], "msg": "ok"}"
 // @Router /nft/history/{codehash}/{genesis}/{address} [get]
 func GetNFTHistoryByGenesis(ctx *gin.Context) {
-	log.Printf("GetNFTHistoryByGenesis enter")
+	logger.Log.Info("GetNFTHistoryByGenesis enter")
 	GetHistoryByGenesis(ctx)
 }

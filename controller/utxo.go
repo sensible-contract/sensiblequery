@@ -2,14 +2,15 @@ package controller
 
 import (
 	"encoding/hex"
-	"log"
 	"net/http"
 	"satosensible/lib/utils"
+	"satosensible/logger"
 	"satosensible/model"
 	"satosensible/service"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
 // GetBalanceByAddress
@@ -20,20 +21,20 @@ import (
 // @Success 200 {object} model.Response{data=model.BalanceResp} "{"code": 0, "data": {}, "msg": "ok"}"
 // @Router /address/{address}/balance [get]
 func GetBalanceByAddress(ctx *gin.Context) {
-	log.Printf("GetBalanceByAddress enter")
+	logger.Log.Info("GetBalanceByAddress enter")
 
 	address := ctx.Param("address")
 	// check
 	addressPkh, err := utils.DecodeAddress(address)
 	if err != nil {
-		log.Printf("address invalid: %v", err)
+		logger.Log.Info("address invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "address invalid"})
 		return
 	}
-	log.Printf("address: %s", hex.EncodeToString(addressPkh))
+	logger.Log.Info("GetBalance", zap.String("address", hex.EncodeToString(addressPkh)))
 	result, err := service.GetBalanceByAddress(addressPkh)
 	if err != nil {
-		log.Printf("get block failed: %v", err)
+		logger.Log.Info("get block failed", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get txo failed"})
 		return
 	}
@@ -55,20 +56,20 @@ func GetBalanceByAddress(ctx *gin.Context) {
 // @Success 200 {object} model.Response{data=[]model.TxStandardOutResp} "{"code": 0, "data": [{}], "msg": "ok"}"
 // @Router /address/{address}/utxo [get]
 func GetUtxoByAddress(ctx *gin.Context) {
-	log.Printf("GetUtxoByAddress enter")
+	logger.Log.Info("GetUtxoByAddress enter")
 
 	// get cursor/size
 	cursorString := ctx.DefaultQuery("cursor", "0")
 	cursor, err := strconv.Atoi(cursorString)
 	if err != nil || cursor < 0 {
-		log.Printf("cursor invalid: %v", err)
+		logger.Log.Info("cursor invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "cursor invalid"})
 		return
 	}
 	sizeString := ctx.DefaultQuery("size", "16")
 	size, err := strconv.Atoi(sizeString)
 	if err != nil || size < 0 {
-		log.Printf("size invalid: %v", err)
+		logger.Log.Info("size invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "size invalid"})
 		return
 	}
@@ -77,14 +78,14 @@ func GetUtxoByAddress(ctx *gin.Context) {
 	// check
 	addressPkh, err := utils.DecodeAddress(address)
 	if err != nil {
-		log.Printf("address invalid: %v", err)
+		logger.Log.Info("address invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "address invalid"})
 		return
 	}
 
 	result, err := service.GetUtxoByAddress(cursor, size, addressPkh)
 	if err != nil {
-		log.Printf("get block failed: %v", err)
+		logger.Log.Info("get block failed", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get txo failed"})
 		return
 	}
@@ -106,13 +107,13 @@ func GetUtxoByAddress(ctx *gin.Context) {
 // @Success 200 {object} model.Response{data=[]model.TxOutResp} "{"code": 0, "data": [{}], "msg": "ok"}"
 // @Router /nft/utxo-detail/{codehash}/{genesis}/{tokenid} [get]
 func GetNFTUtxoDetailByTokenId(ctx *gin.Context) {
-	log.Printf("GetNFTUtxoDetailByTokenId enter")
+	logger.Log.Info("GetNFTUtxoDetailByTokenId enter")
 
 	codeHashHex := ctx.Param("codehash")
 	// check
 	codeHash, err := hex.DecodeString(codeHashHex)
 	if err != nil {
-		log.Printf("codeHash invalid: %v", err)
+		logger.Log.Info("codeHash invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "codeHash invalid"})
 		return
 	}
@@ -121,7 +122,7 @@ func GetNFTUtxoDetailByTokenId(ctx *gin.Context) {
 	// check
 	genesisId, err := hex.DecodeString(genesisIdHex)
 	if err != nil {
-		log.Printf("genesisId invalid: %v", err)
+		logger.Log.Info("genesisId invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "genesisId invalid"})
 		return
 	}
@@ -129,14 +130,14 @@ func GetNFTUtxoDetailByTokenId(ctx *gin.Context) {
 	tokenIdxString := ctx.Param("tokenid")
 	tokenIdx, err := strconv.Atoi(tokenIdxString)
 	if err != nil || tokenIdx < 0 {
-		log.Printf("tokenIdx invalid: %v", err)
+		logger.Log.Info("tokenIdx invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "tokenIdx invalid"})
 		return
 	}
 
 	result, err := service.GetUtxoByTokenId(codeHash, genesisId, tokenIdxString)
 	if err != nil {
-		log.Printf("get nft utxo detail failed: %v", err)
+		logger.Log.Info("get nft utxo detail failed", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get txo failed"})
 		return
 	}
@@ -160,7 +161,7 @@ func GetNFTUtxoDetailByTokenId(ctx *gin.Context) {
 // @Success 200 {object} model.Response{data=[]model.TxOutResp} "{"code": 0, "data": [{}], "msg": "ok"}"
 // @Router /ft/utxo/{codehash}/{genesis}/{address} [get]
 func GetFTUtxo(ctx *gin.Context) {
-	log.Printf("GetFTUtxo enter")
+	logger.Log.Info("GetFTUtxo enter")
 	GetUtxoByCodeHashGenesisAddress(ctx, false)
 }
 
@@ -176,7 +177,7 @@ func GetFTUtxo(ctx *gin.Context) {
 // @Success 200 {object} model.Response{data=[]model.TxOutResp} "{"code": 0, "data": [{}], "msg": "ok"}"
 // @Router /nft/utxo/{codehash}/{genesis}/{address} [get]
 func GetNFTUtxo(ctx *gin.Context) {
-	log.Printf("GetNFTUtxo enter")
+	logger.Log.Info("GetNFTUtxo enter")
 	GetUtxoByCodeHashGenesisAddress(ctx, true)
 }
 
@@ -185,14 +186,14 @@ func GetUtxoByCodeHashGenesisAddress(ctx *gin.Context, isNFT bool) {
 	cursorString := ctx.DefaultQuery("cursor", "0")
 	cursor, err := strconv.Atoi(cursorString)
 	if err != nil || cursor < 0 {
-		log.Printf("cursor invalid: %v", err)
+		logger.Log.Info("cursor invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "cursor invalid"})
 		return
 	}
 	sizeString := ctx.DefaultQuery("size", "16")
 	size, err := strconv.Atoi(sizeString)
 	if err != nil || size < 0 {
-		log.Printf("size invalid: %v", err)
+		logger.Log.Info("size invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "size invalid"})
 		return
 	}
@@ -201,7 +202,7 @@ func GetUtxoByCodeHashGenesisAddress(ctx *gin.Context, isNFT bool) {
 	// check
 	codeHash, err := hex.DecodeString(codeHashHex)
 	if err != nil {
-		log.Printf("codeHash invalid: %v", err)
+		logger.Log.Info("codeHash invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "codeHash invalid"})
 		return
 	}
@@ -210,7 +211,7 @@ func GetUtxoByCodeHashGenesisAddress(ctx *gin.Context, isNFT bool) {
 	// check
 	genesisId, err := hex.DecodeString(genesisIdHex)
 	if err != nil {
-		log.Printf("genesisId invalid: %v", err)
+		logger.Log.Info("genesisId invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "genesisId invalid"})
 		return
 	}
@@ -219,14 +220,14 @@ func GetUtxoByCodeHashGenesisAddress(ctx *gin.Context, isNFT bool) {
 	// check
 	addressPkh, err := utils.DecodeAddress(address)
 	if err != nil {
-		log.Printf("address invalid: %v", err)
+		logger.Log.Info("address invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "address invalid"})
 		return
 	}
 
 	result, err := service.GetUtxoByCodeHashGenesisAddress(cursor, size, codeHash, genesisId, addressPkh, isNFT)
 	if err != nil {
-		log.Printf("get block failed: %v", err)
+		logger.Log.Info("get block failed", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get txo failed"})
 		return
 	}

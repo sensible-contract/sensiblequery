@@ -2,14 +2,15 @@ package controller
 
 import (
 	"encoding/hex"
-	"log"
 	"net/http"
 	"satosensible/lib/utils"
+	"satosensible/logger"
 	"satosensible/model"
 	"satosensible/service"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
 // GetTxOutputsByTxId
@@ -22,20 +23,20 @@ import (
 // @Success 200 {object} model.Response{data=[]model.TxOutStatusResp} "{"code": 0, "data": [{}], "msg": "ok"}"
 // @Router /tx/{txid}/outs [get]
 func GetTxOutputsByTxId(ctx *gin.Context) {
-	log.Printf("GetTxOutputsByTxId enter")
+	logger.Log.Info("GetTxOutputsByTxId enter")
 
 	// get cursor/size
 	cursorString := ctx.DefaultQuery("cursor", "0")
 	cursor, err := strconv.Atoi(cursorString)
 	if err != nil || cursor < 0 {
-		log.Printf("cursor invalid: %v", err)
+		logger.Log.Info("cursor invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "cursor invalid"})
 		return
 	}
 	sizeString := ctx.DefaultQuery("size", "16")
 	size, err := strconv.Atoi(sizeString)
 	if err != nil || size < 0 {
-		log.Printf("size invalid: %v", err)
+		logger.Log.Info("size invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "size invalid"})
 		return
 	}
@@ -44,7 +45,7 @@ func GetTxOutputsByTxId(ctx *gin.Context) {
 	// check
 	txIdReverse, err := hex.DecodeString(txIdHex)
 	if err != nil {
-		log.Printf("txid invalid: %v", err)
+		logger.Log.Info("txid invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "txid invalid"})
 		return
 	}
@@ -52,7 +53,7 @@ func GetTxOutputsByTxId(ctx *gin.Context) {
 
 	result, err := service.GetTxOutputsByTxId(cursor, size, hex.EncodeToString(txId))
 	if err != nil {
-		log.Printf("get txouts failed: %v", err)
+		logger.Log.Info("get txouts failed", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get txo failed"})
 		return
 	}
@@ -75,20 +76,20 @@ func GetTxOutputsByTxId(ctx *gin.Context) {
 // @Success 200 {object} model.Response{data=[]model.TxOutStatusResp} "{"code": 0, "data": [{}], "msg": "ok"}"
 // @Router /height/{height}/tx/{txid}/outs [get]
 func GetTxOutputsByTxIdInsideHeight(ctx *gin.Context) {
-	log.Printf("GetTxOutputsByTxId enter")
+	logger.Log.Info("GetTxOutputsByTxId enter")
 
 	// get cursor/size
 	cursorString := ctx.DefaultQuery("cursor", "0")
 	cursor, err := strconv.Atoi(cursorString)
 	if err != nil || cursor < 0 {
-		log.Printf("cursor invalid: %v", err)
+		logger.Log.Info("cursor invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "cursor invalid"})
 		return
 	}
 	sizeString := ctx.DefaultQuery("size", "16")
 	size, err := strconv.Atoi(sizeString)
 	if err != nil || size < 0 {
-		log.Printf("size invalid: %v", err)
+		logger.Log.Info("size invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "size invalid"})
 		return
 	}
@@ -96,7 +97,7 @@ func GetTxOutputsByTxIdInsideHeight(ctx *gin.Context) {
 	blkHeightString := ctx.Param("height")
 	blkHeight, err := strconv.Atoi(blkHeightString)
 	if err != nil {
-		log.Printf("height invalid: %v", err)
+		logger.Log.Info("height invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "height invalid"})
 		return
 	}
@@ -105,7 +106,7 @@ func GetTxOutputsByTxIdInsideHeight(ctx *gin.Context) {
 	// check
 	txIdReverse, err := hex.DecodeString(txIdHex)
 	if err != nil {
-		log.Printf("txid invalid: %v", err)
+		logger.Log.Info("txid invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "txid invalid"})
 		return
 	}
@@ -113,7 +114,7 @@ func GetTxOutputsByTxIdInsideHeight(ctx *gin.Context) {
 
 	result, err := service.GetTxOutputsByTxIdInsideHeight(cursor, size, blkHeight, hex.EncodeToString(txId))
 	if err != nil {
-		log.Printf("get txout with height failed: %v", err)
+		logger.Log.Info("get txout with height failed", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get txo failed"})
 		return
 	}
@@ -134,13 +135,13 @@ func GetTxOutputsByTxIdInsideHeight(ctx *gin.Context) {
 // @Success 200 {object} model.Response{data=model.TxOutStatusResp} "{"code": 0, "data": {}, "msg": "ok"}"
 // @Router /tx/{txid}/out/{index} [get]
 func GetTxOutputByTxIdAndIdx(ctx *gin.Context) {
-	log.Printf("GetTxOutputByTxIdAndIdx enter")
+	logger.Log.Info("GetTxOutputByTxIdAndIdx enter")
 
 	// check tx
 	txIdHex := ctx.Param("txid")
 	txIdReverse, err := hex.DecodeString(txIdHex)
 	if err != nil {
-		log.Printf("txid invalid: %v", err)
+		logger.Log.Info("txid invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "txid invalid"})
 		return
 	}
@@ -150,14 +151,14 @@ func GetTxOutputByTxIdAndIdx(ctx *gin.Context) {
 	txIndexString := ctx.Param("index")
 	txIndex, err := strconv.Atoi(txIndexString)
 	if err != nil || txIndex < 0 {
-		log.Printf("txindex invalid: %v", err)
+		logger.Log.Info("txindex invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "txindex invalid"})
 		return
 	}
 
 	result, err := service.GetTxOutputByTxIdAndIdx(hex.EncodeToString(txId), txIndex)
 	if err != nil {
-		log.Printf("get txout failed: %v", err)
+		logger.Log.Info("get txout failed", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get txo failed"})
 		return
 	}
@@ -179,12 +180,12 @@ func GetTxOutputByTxIdAndIdx(ctx *gin.Context) {
 // @Success 200 {object} model.Response{data=model.TxOutStatusResp} "{"code": 0, "data": {}, "msg": "ok"}"
 // @Router /height/{height}/tx/{txid}/out/{index} [get]
 func GetTxOutputByTxIdAndIdxInsideHeight(ctx *gin.Context) {
-	log.Printf("GetTxOutputByTxIdAndIdxInsideHeight enter")
+	logger.Log.Info("GetTxOutputByTxIdAndIdxInsideHeight enter")
 
 	blkHeightString := ctx.Param("height")
 	blkHeight, err := strconv.Atoi(blkHeightString)
 	if err != nil {
-		log.Printf("height invalid: %v", err)
+		logger.Log.Info("height invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "height invalid"})
 		return
 	}
@@ -193,7 +194,7 @@ func GetTxOutputByTxIdAndIdxInsideHeight(ctx *gin.Context) {
 	txIdHex := ctx.Param("txid")
 	txIdReverse, err := hex.DecodeString(txIdHex)
 	if err != nil {
-		log.Printf("txid invalid: %v", err)
+		logger.Log.Info("txid invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "txid invalid"})
 		return
 	}
@@ -203,14 +204,14 @@ func GetTxOutputByTxIdAndIdxInsideHeight(ctx *gin.Context) {
 	txIndexString := ctx.Param("index")
 	txIndex, err := strconv.Atoi(txIndexString)
 	if err != nil || txIndex < 0 {
-		log.Printf("txindex invalid: %v", err)
+		logger.Log.Info("txindex invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "txindex invalid"})
 		return
 	}
 
 	result, err := service.GetTxOutputByTxIdAndIdxInsideHeight(blkHeight, hex.EncodeToString(txId), txIndex)
 	if err != nil {
-		log.Printf("get txout with height failed: %v", err)
+		logger.Log.Info("get txout with height failed", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get txo failed"})
 		return
 	}
@@ -231,13 +232,13 @@ func GetTxOutputByTxIdAndIdxInsideHeight(ctx *gin.Context) {
 // @Success 200 {object} model.Response{data=model.TxInSpentResp} "{"code": 0, "data": {}, "msg": "ok"}"
 // @Router /tx/{txid}/out/{index}/spent [get]
 func GetTxOutputSpentStatusByTxIdAndIdx(ctx *gin.Context) {
-	log.Printf("GetTxOutputSpentStatusByTxIdAndIdx enter")
+	logger.Log.Info("GetTxOutputSpentStatusByTxIdAndIdx enter")
 
 	// check tx
 	txIdHex := ctx.Param("txid")
 	txIdReverse, err := hex.DecodeString(txIdHex)
 	if err != nil {
-		log.Printf("txid invalid: %v", err)
+		logger.Log.Info("txid invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "txid invalid"})
 		return
 	}
@@ -247,14 +248,14 @@ func GetTxOutputSpentStatusByTxIdAndIdx(ctx *gin.Context) {
 	txIndexString := ctx.Param("index")
 	txIndex, err := strconv.Atoi(txIndexString)
 	if err != nil || txIndex < 0 {
-		log.Printf("txindex invalid: %v", err)
+		logger.Log.Info("txindex invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "txindex invalid"})
 		return
 	}
 
 	result, err := service.GetTxOutputSpentStatusByTxIdAndIdx(hex.EncodeToString(txId), txIndex)
 	if err != nil {
-		log.Printf("get txout spent status failed: %v", err)
+		logger.Log.Info("get txout spent status failed", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get vout failed"})
 		return
 	}

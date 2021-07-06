@@ -2,15 +2,16 @@ package controller
 
 import (
 	"encoding/hex"
-	"log"
 	"net/http"
 	"satosensible/lib/utils"
+	"satosensible/logger"
 	"satosensible/model"
 	"satosensible/service"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 	scriptDecoder "github.com/sensible-contract/sensible-script-decoder"
+	"go.uber.org/zap"
 )
 
 // ListAllNFTCodeHash
@@ -20,11 +21,11 @@ import (
 // @Success 200 {object} model.Response{data=[]model.TokenCodeHashResp} "{"code": 0, "data": [{}], "msg": "ok"}"
 // @Router /nft/codehash/all [get]
 func ListAllNFTCodeHash(ctx *gin.Context) {
-	log.Printf("ListAllNFTCodeHash enter")
+	logger.Log.Info("ListAllNFTCodeHash enter")
 
 	result, err := service.GetTokenCodeHash(scriptDecoder.CodeType_NFT)
 	if err != nil {
-		log.Printf("get dummy failed: %v", err)
+		logger.Log.Info("get dummy failed", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get dummy failed"})
 		return
 	}
@@ -43,11 +44,11 @@ func ListAllNFTCodeHash(ctx *gin.Context) {
 // @Success 200 {object} model.Response{data=[]model.NFTInfoResp} "{"code": 0, "data": [{}], "msg": "ok"}"
 // @Router /nft/info/all [get]
 func ListAllNFTInfo(ctx *gin.Context) {
-	log.Printf("ListNFTInfo enter")
+	logger.Log.Info("ListNFTInfo enter")
 
 	result, err := service.GetNFTInfo()
 	if err != nil {
-		log.Printf("get dummy failed: %v", err)
+		logger.Log.Info("get dummy failed", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get dummy failed"})
 		return
 	}
@@ -67,20 +68,20 @@ func ListAllNFTInfo(ctx *gin.Context) {
 // @Success 200 {object} model.Response{data=[]model.NFTInfoResp} "{"code": 0, "data": [{}], "msg": "ok"}"
 // @Router /nft/codehash-info/{codehash} [get]
 func ListNFTSummary(ctx *gin.Context) {
-	log.Printf("ListNFTSummary enter")
+	logger.Log.Info("ListNFTSummary enter")
 
 	codeHashHex := ctx.Param("codehash")
 	// check
 	_, err := hex.DecodeString(codeHashHex)
 	if err != nil {
-		log.Printf("codeHash invalid: %v", err)
+		logger.Log.Info("codeHash invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "codeHash invalid"})
 		return
 	}
 
 	result, err := service.GetNFTSummary(codeHashHex)
 	if err != nil {
-		log.Printf("get dummy failed: %v", err)
+		logger.Log.Info("get dummy failed", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get dummy failed"})
 		return
 	}
@@ -104,13 +105,13 @@ func ListNFTSummary(ctx *gin.Context) {
 // @Success 200 {object} model.Response{data=[]model.BlockTokenVolumeResp} "{"code": 0, "data": [{}], "msg": "ok"}"
 // @Router /nft/transfer-times/{codehash}/{genesis}/{tokenid} [get]
 func GetNFTTransferTimesInBlockRange(ctx *gin.Context) {
-	log.Printf("GetNFTTransferTimesInBlockRange enter")
+	logger.Log.Info("GetNFTTransferTimesInBlockRange enter")
 
 	// check height
 	blkStartHeightString := ctx.DefaultQuery("start", "0")
 	blkStartHeight, err := strconv.Atoi(blkStartHeightString)
 	if err != nil || blkStartHeight < 0 {
-		log.Printf("blk start height invalid: %v", err)
+		logger.Log.Info("blk start height invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "blk start height invalid"})
 		return
 	}
@@ -118,13 +119,13 @@ func GetNFTTransferTimesInBlockRange(ctx *gin.Context) {
 	blkEndHeightString := ctx.DefaultQuery("end", "0")
 	blkEndHeight, err := strconv.Atoi(blkEndHeightString)
 	if err != nil || blkEndHeight < 0 {
-		log.Printf("blk end height invalid: %v", err)
+		logger.Log.Info("blk end height invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "blk end height invalid"})
 		return
 	}
 
 	if blkEndHeight <= blkStartHeight || (blkEndHeight-blkStartHeight > 1000) {
-		log.Printf("blk end height invalid: %v", err)
+		logger.Log.Info("blk end height invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "blk end height invalid"})
 		return
 	}
@@ -133,7 +134,7 @@ func GetNFTTransferTimesInBlockRange(ctx *gin.Context) {
 	// check
 	_, err = hex.DecodeString(codeHashHex)
 	if err != nil {
-		log.Printf("codeHash invalid: %v", err)
+		logger.Log.Info("codeHash invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "codeHash invalid"})
 		return
 	}
@@ -142,7 +143,7 @@ func GetNFTTransferTimesInBlockRange(ctx *gin.Context) {
 	// check
 	_, err = hex.DecodeString(genesisIdHex)
 	if err != nil {
-		log.Printf("genesisId invalid: %v", err)
+		logger.Log.Info("genesisId invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "genesisId invalid"})
 		return
 	}
@@ -150,14 +151,14 @@ func GetNFTTransferTimesInBlockRange(ctx *gin.Context) {
 	tokenIdxString := ctx.Param("tokenid")
 	tokenIdx, err := strconv.Atoi(tokenIdxString)
 	if err != nil || tokenIdx < 0 {
-		log.Printf("tokenIdx invalid: %v", err)
+		logger.Log.Info("tokenIdx invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "tokenIdx invalid"})
 		return
 	}
 
 	result, err := service.GetTokenVolumesInBlocksByHeightRange(blkStartHeight, blkEndHeight, codeHashHex, genesisIdHex, scriptDecoder.CodeType_NFT, tokenIdx)
 	if err != nil {
-		log.Printf("GetNFTTransferTimesInBlockRange failed: %v", err)
+		logger.Log.Info("GetNFTTransferTimesInBlockRange failed", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "data failed"})
 		return
 	}
@@ -180,20 +181,20 @@ func GetNFTTransferTimesInBlockRange(ctx *gin.Context) {
 // @Success 200 {object} model.Response{data=[]model.NFTOwnerResp} "{"code": 0, "data": [{}], "msg": "ok"}"
 // @Router /nft/owners/{codehash}/{genesis} [get]
 func ListNFTOwners(ctx *gin.Context) {
-	log.Printf("ListNFTOwners enter")
+	logger.Log.Info("ListNFTOwners enter")
 
 	// get cursor/size
 	cursorString := ctx.DefaultQuery("cursor", "0")
 	cursor, err := strconv.Atoi(cursorString)
 	if err != nil || cursor < 0 {
-		log.Printf("cursor invalid: %v", err)
+		logger.Log.Info("cursor invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "cursor invalid"})
 		return
 	}
 	sizeString := ctx.DefaultQuery("size", "16")
 	size, err := strconv.Atoi(sizeString)
 	if err != nil || size < 0 {
-		log.Printf("size invalid: %v", err)
+		logger.Log.Info("size invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "size invalid"})
 		return
 	}
@@ -202,7 +203,7 @@ func ListNFTOwners(ctx *gin.Context) {
 	// check
 	codeHash, err := hex.DecodeString(codeHashHex)
 	if err != nil {
-		log.Printf("codeHash invalid: %v", err)
+		logger.Log.Info("codeHash invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "codeHash invalid"})
 		return
 	}
@@ -211,14 +212,14 @@ func ListNFTOwners(ctx *gin.Context) {
 	// check
 	genesisId, err := hex.DecodeString(genesisIdHex)
 	if err != nil {
-		log.Printf("genesisId invalid: %v", err)
+		logger.Log.Info("genesisId invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "genesisId invalid"})
 		return
 	}
 
 	result, err := service.GetNFTOwnersByCodeHashGenesis(cursor, size, codeHash, genesisId)
 	if err != nil {
-		log.Printf("ListNFTOwners failed: %v", err)
+		logger.Log.Info("ListNFTOwners failed", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "ListNFTOwners failed"})
 		return
 	}
@@ -241,20 +242,20 @@ func ListNFTOwners(ctx *gin.Context) {
 // @Success 200 {object} model.Response{data=[]model.NFTSummaryByAddressResp} "{"code": 0, "data": [{}], "msg": "ok"}"
 // @Router /nft/summary/{address} [get]
 func ListAllNFTByOwner(ctx *gin.Context) {
-	log.Printf("ListAllNFTOwners enter")
+	logger.Log.Info("ListAllNFTOwners enter")
 
 	// get cursor/size
 	cursorString := ctx.DefaultQuery("cursor", "0")
 	cursor, err := strconv.Atoi(cursorString)
 	if err != nil || cursor < 0 {
-		log.Printf("cursor invalid: %v", err)
+		logger.Log.Info("cursor invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "cursor invalid"})
 		return
 	}
 	sizeString := ctx.DefaultQuery("size", "16")
 	size, err := strconv.Atoi(sizeString)
 	if err != nil || size < 0 {
-		log.Printf("size invalid: %v", err)
+		logger.Log.Info("size invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "size invalid"})
 		return
 	}
@@ -263,14 +264,14 @@ func ListAllNFTByOwner(ctx *gin.Context) {
 	// check
 	addressPkh, err := utils.DecodeAddress(address)
 	if err != nil {
-		log.Printf("address invalid: %v", err)
+		logger.Log.Info("address invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "address invalid"})
 		return
 	}
 
 	result, err := service.GetAllNFTBalanceByAddress(cursor, size, addressPkh)
 	if err != nil {
-		log.Printf("ListAllNFTByOwner failed: %v", err)
+		logger.Log.Info("ListAllNFTByOwner failed", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "ListAllNFTByOwner failed"})
 		return
 	}
@@ -294,13 +295,13 @@ func ListAllNFTByOwner(ctx *gin.Context) {
 // @Success 200 {object} model.Response{data=model.NFTOwnerResp} "{"code": 0, "data": [{}], "msg": "ok"}"
 // @Router /nft/detail/{codehash}/{genesis}/{address} [get]
 func ListNFTCountByOwner(ctx *gin.Context) {
-	log.Printf("ListNFTCountByOwner enter")
+	logger.Log.Info("ListNFTCountByOwner enter")
 
 	codeHashHex := ctx.Param("codehash")
 	// check
 	codeHash, err := hex.DecodeString(codeHashHex)
 	if err != nil {
-		log.Printf("codeHash invalid: %v", err)
+		logger.Log.Info("codeHash invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "codeHash invalid"})
 		return
 	}
@@ -309,7 +310,7 @@ func ListNFTCountByOwner(ctx *gin.Context) {
 	// check
 	genesisId, err := hex.DecodeString(genesisIdHex)
 	if err != nil {
-		log.Printf("genesisId invalid: %v", err)
+		logger.Log.Info("genesisId invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "genesisId invalid"})
 		return
 	}
@@ -318,14 +319,14 @@ func ListNFTCountByOwner(ctx *gin.Context) {
 	// check
 	addressPkh, err := utils.DecodeAddress(address)
 	if err != nil {
-		log.Printf("address invalid: %v", err)
+		logger.Log.Info("address invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "address invalid"})
 		return
 	}
 
 	result, err := service.GetNFTCountByCodeHashGenesisAddress(codeHash, genesisId, addressPkh)
 	if err != nil {
-		log.Printf("ListNFTCountByOwner failed: %v", err)
+		logger.Log.Info("ListNFTCountByOwner failed", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "ListNFTCountByOwner failed"})
 		return
 	}

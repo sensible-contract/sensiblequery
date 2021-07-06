@@ -2,14 +2,15 @@ package controller
 
 import (
 	"encoding/hex"
-	"log"
 	"net/http"
 	"satosensible/lib/utils"
+	"satosensible/logger"
 	"satosensible/model"
 	"satosensible/service"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
 // GetBlocksByHeightRange
@@ -21,33 +22,33 @@ import (
 // @Success 200 {object} model.Response{data=[]model.BlockInfoResp} "{"code": 0, "data": [{}], "msg": "ok"}"
 // @Router /blocks [get]
 func GetBlocksByHeightRange(ctx *gin.Context) {
-	log.Printf("GetBlocksByHeightRange enter")
+	logger.Log.Info("GetBlocksByHeightRange enter")
 
 	// check height
 	blkStartHeightString := ctx.DefaultQuery("start", "0")
 	blkStartHeight, err := strconv.Atoi(blkStartHeightString)
 	if err != nil || blkStartHeight < 0 {
-		log.Printf("blk start height invalid: %v", err)
+		logger.Log.Info("blk start height invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "blk start height invalid"})
 		return
 	}
 	blkEndHeightString := ctx.DefaultQuery("end", "0")
 	blkEndHeight, err := strconv.Atoi(blkEndHeightString)
 	if err != nil || blkEndHeight < 0 {
-		log.Printf("blk end height invalid: %v", err)
+		logger.Log.Info("blk end height invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "blk end height invalid"})
 		return
 	}
 
 	if blkEndHeight <= blkStartHeight || (blkEndHeight-blkStartHeight > 1000) {
-		log.Printf("blk end height invalid: %v", err)
+		logger.Log.Info("blk end height invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "blk end height invalid"})
 		return
 	}
 
 	result, err := service.GetBlocksByHeightRange(blkStartHeight, blkEndHeight)
 	if err != nil {
-		log.Printf("get blocks failed: %v", err)
+		logger.Log.Info("get blocks failed", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get blocks failed"})
 		return
 	}
@@ -67,20 +68,20 @@ func GetBlocksByHeightRange(ctx *gin.Context) {
 // @Success 200 {object} model.Response{data=model.BlockInfoResp} "{"code": 0, "data": {}, "msg": "ok"}"
 // @Router /height/{height}/block [get]
 func GetBlockByHeight(ctx *gin.Context) {
-	log.Printf("GetBlockByHeight enter")
+	logger.Log.Info("GetBlockByHeight enter")
 
 	// check height
 	blkHeightString := ctx.Param("height")
 	blkHeight, err := strconv.Atoi(blkHeightString)
 	if err != nil || blkHeight < 0 {
-		log.Printf("blk height invalid: %v", err)
+		logger.Log.Info("blk height invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "blk height invalid"})
 		return
 	}
 
 	result, err := service.GetBlockByHeight(blkHeight)
 	if err != nil {
-		log.Printf("get block failed: %v", err)
+		logger.Log.Info("get block failed", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get block failed"})
 		return
 	}
@@ -100,13 +101,13 @@ func GetBlockByHeight(ctx *gin.Context) {
 // @Success 200 {object} model.Response{data=model.BlockInfoResp} "{"code": 0, "data": {}, "msg": "ok"}"
 // @Router /block/id/{blkid} [get]
 func GetBlockById(ctx *gin.Context) {
-	log.Printf("GetBlockById enter")
+	logger.Log.Info("GetBlockById enter")
 
 	blkIdHex := ctx.Param("blkid")
 	// check
 	blkIdReverse, err := hex.DecodeString(blkIdHex)
 	if err != nil {
-		log.Printf("blkid invalid: %v", err)
+		logger.Log.Info("blkid invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "blkid invalid"})
 		return
 	}
@@ -114,7 +115,7 @@ func GetBlockById(ctx *gin.Context) {
 
 	result, err := service.GetBlockById(hex.EncodeToString(blkId))
 	if err != nil {
-		log.Printf("get block failed: %v", err)
+		logger.Log.Info("get block failed", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get block failed"})
 		return
 	}

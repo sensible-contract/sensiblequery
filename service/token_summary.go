@@ -5,9 +5,11 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
-	"log"
 	"satosensible/dao/clickhouse"
+	"satosensible/logger"
 	"satosensible/model"
+
+	"go.uber.org/zap"
 )
 
 // "height, codehash, genesis, code_type, nft_idx, in_data_value, out_data_value, invalue, outvalue, blkid"
@@ -34,7 +36,7 @@ GROUP BY codehash, genesis
 
 	blksRet, err := clickhouse.ScanAll(psql, tokenInfoResultSRF)
 	if err != nil {
-		log.Printf("query blk failed: %v", err)
+		logger.Log.Info("query blk failed", zap.Error(err))
 		return nil, err
 	}
 	if blksRet == nil {
@@ -70,7 +72,7 @@ ORDER BY count(1) DESC
 `, codeType)
 	blksRet, err := clickhouse.ScanAll(psql, tokenCodeHashResultSRF)
 	if err != nil {
-		log.Printf("query nft codehash failed: %v", err)
+		logger.Log.Info("query nft codehash failed", zap.Error(err))
 		return nil, err
 	}
 	if blksRet == nil {

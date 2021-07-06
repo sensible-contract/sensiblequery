@@ -2,19 +2,21 @@ package main
 
 import (
 	"context"
-	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"satosensible/controller"
 	_ "satosensible/docs"
+	"satosensible/logger"
 	"syscall"
 	"time"
 
 	"github.com/gin-contrib/gzip"
+	ginzap "github.com/gin-contrib/zap"
 	"github.com/gin-gonic/gin"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"github.com/swaggo/gin-swagger/swaggerFiles"
+	"go.uber.org/zap"
 )
 
 var (
@@ -34,7 +36,9 @@ var (
 // @license.name MIT License
 // @license.url https://opensource.org/licenses/MIT
 func main() {
-	router := gin.Default()
+	router := gin.New()
+	router.Use(ginzap.Ginzap(logger.Log, time.RFC3339, true))
+	router.Use(ginzap.RecoveryWithZap(logger.Log, true))
 	router.Use(gzip.Gzip(gzip.DefaultCompression, gzip.WithDecompressFn(gzip.DefaultDecompressHandle)))
 
 	// go get -u github.com/swaggo/swag/cmd/swag@v1.6.7
@@ -118,7 +122,9 @@ func main() {
 		heightAPI.GET("/tx/:txid/out/:index", controller.GetTxOutputByTxIdAndIdxInsideHeight)
 	}
 
-	log.Printf("LISTEN: %s", listen_address)
+	logger.Log.Info("LISTEN:",
+		zap.String("address", listen_address),
+	)
 	svr := &http.Server{
 		Addr:    listen_address,
 		Handler: router,
@@ -127,7 +133,9 @@ func main() {
 	go func() {
 		err := svr.ListenAndServe()
 		if err != nil && err != http.ErrServerClosed {
-			log.Fatalln(err)
+			logger.Log.Fatal("ListenAndServe:",
+				zap.Error(err),
+			)
 		}
 	}()
 
@@ -140,6 +148,9 @@ func main() {
 	defer cancel()
 
 	if err := svr.Shutdown(ctx); err != nil {
-		log.Fatalln(err)
+		logger.Log.Fatal("Shutdown:",
+			zap.Error(err),
+		)
+
 	}
 }

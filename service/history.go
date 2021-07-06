@@ -5,11 +5,13 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
-	"log"
 	"satosensible/dao/clickhouse"
 	"satosensible/lib/blkparser"
 	"satosensible/lib/utils"
+	"satosensible/logger"
 	"satosensible/model"
+
+	"go.uber.org/zap"
 )
 
 const (
@@ -57,7 +59,7 @@ LIMIT 128
 
 //////////////// genesis
 func GetHistoryByGenesis(cursor, size int, codeHashHex, genesisHex, addressHex string) (txOutsRsp []*model.TxOutHistoryResp, err error) {
-	log.Printf("query tx history by codehash/genesis for address(%s)", addressHex)
+	logger.Log.Info("query tx history by codehash/genesis for", zap.String("address", addressHex))
 	psql := fmt.Sprintf(`
 SELECT txid, idx, address, genesis, satoshi, script_type, height, txidx, io_type FROM
 (
@@ -93,7 +95,7 @@ LIMIT 128
 func GetHistoryBySql(psql string) (txOutsRsp []*model.TxOutHistoryResp, err error) {
 	txOutsRet, err := clickhouse.ScanAll(psql, txOutHistoryResultSRF)
 	if err != nil {
-		log.Printf("query tx history by genesis failed: %v", err)
+		logger.Log.Info("query tx history by genesis failed", zap.Error(err))
 		return nil, err
 	}
 	if txOutsRet == nil {

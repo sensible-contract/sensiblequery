@@ -6,15 +6,16 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
-	"log"
 	"satosensible/lib/blkparser"
 	"satosensible/lib/utils"
+	"satosensible/logger"
 	"satosensible/model"
 	"strconv"
 
 	"github.com/go-redis/redis/v8"
 	scriptDecoder "github.com/sensible-contract/sensible-script-decoder"
 	"github.com/spf13/viper"
+	"go.uber.org/zap"
 )
 
 var (
@@ -71,10 +72,10 @@ func GetBalanceByAddress(addressPkh []byte) (balanceRsp *model.BalanceResp, err 
 	if err == redis.Nil {
 		balance = 0
 	} else if err != nil {
-		log.Printf("GetBalanceByAddress redis failed: %v", err)
+		logger.Log.Info("GetBalanceByAddress redis failed", zap.Error(err))
 		return
 	}
-	log.Printf("GetBalanceByAddress balance: %f", balance)
+	logger.Log.Info("GetBalanceByAddress", zap.Float64("balance", balance))
 	balanceRsp.Satoshi = int(balance)
 
 	// 待确认余额
@@ -82,10 +83,10 @@ func GetBalanceByAddress(addressPkh []byte) (balanceRsp *model.BalanceResp, err 
 	if err == redis.Nil {
 		mpBalance = 0
 	} else if err != nil {
-		log.Printf("GetBalanceByAddress redis failed: %v", err)
+		logger.Log.Info("GetBalanceByAddress redis failed", zap.Error(err))
 		return
 	}
-	log.Printf("GetBalanceByAddress pending: %f", mpBalance)
+	logger.Log.Info("GetBalanceByAddress", zap.Float64("pending", mpBalance))
 	balanceRsp.PendingSatoshi = int(mpBalance)
 
 	return balanceRsp, nil
@@ -112,7 +113,7 @@ func GetNFTUtxoByTokenId(key string, tokenId string) (txOutsRsp *model.TxOutResp
 	}
 	utxoOutpoints, err := rdb.ZRangeByScore(ctx, key, op).Result()
 	if err != nil {
-		log.Printf("GetUtxoByTokenId redis failed: %v", err)
+		logger.Log.Info("GetUtxoByTokenId redis failed", zap.Error(err))
 		return
 	}
 	result, err := getUtxoFromRedis(utxoOutpoints)
@@ -155,10 +156,10 @@ func mergeUtxoByCodeHashGenesisAddress(codeHash, genesisId, addressPkh []byte, i
 	}
 	nDiff, err := rdb.ZDiffStore(ctx, oldUtxoKey, tmpZs).Result()
 	if err != nil {
-		log.Printf("ZDiffStore redis failed: %v", err)
+		logger.Log.Info("ZDiffStore redis failed", zap.Error(err))
 		return
 	}
-	log.Printf("ZDiffStore : %v", nDiff)
+	logger.Log.Info("ZDiffStore", zap.Int64("n", nDiff))
 
 	finalZs := &redis.ZStore{
 		Keys: []string{
@@ -167,10 +168,10 @@ func mergeUtxoByCodeHashGenesisAddress(codeHash, genesisId, addressPkh []byte, i
 	}
 	nUnion, err := rdb.ZUnionStore(ctx, finalKey, finalZs).Result()
 	if err != nil {
-		log.Printf("ZDiffStore redis failed: %v", err)
+		logger.Log.Info("ZDiffStore redis failed", zap.Error(err))
 		return
 	}
-	log.Printf("ZUnionStore : %v", nUnion)
+	logger.Log.Info("ZUnionStore", zap.Int64("n", nUnion))
 
 	return finalKey, nil
 }
@@ -187,7 +188,7 @@ func GetUtxoByCodeHashGenesisAddress(cursor, size int, codeHash, genesisId, addr
 	if err == redis.Nil {
 		utxoOutpoints = nil
 	} else if err != nil {
-		log.Printf("GetUtxoByCodeHashGenesisAddress redis failed: %v", err)
+		logger.Log.Info("GetUtxoByCodeHashGenesisAddress redis failed", zap.Error(err))
 		return
 	}
 	return getUtxoFromRedis(utxoOutpoints)
@@ -195,7 +196,7 @@ func GetUtxoByCodeHashGenesisAddress(cursor, size int, codeHash, genesisId, addr
 
 ////////////////
 func getUtxoFromRedis(utxoOutpoints []string) (txOutsRsp []*model.TxOutResp, err error) {
-	log.Printf("getUtxoFromRedis redis: %d", len(utxoOutpoints))
+	logger.Log.Info("getUtxoFromRedis redis", zap.Int("nUTXO", len(utxoOutpoints)))
 	txOutsRsp = make([]*model.TxOutResp, 0)
 	pipe := rdbBlock.Pipeline()
 
@@ -212,7 +213,7 @@ func getUtxoFromRedis(utxoOutpoints []string) (txOutsRsp []*model.TxOutResp, err
 		outpoint := utxoOutpoints[outpointIdx]
 		res, err := data.Result()
 		if err == redis.Nil {
-			log.Printf("redis not found outpoint: %s", hex.EncodeToString([]byte(outpoint)))
+			logger.Log.Info("redis not found", zap.String("outpoint", hex.EncodeToString([]byte(outpoint))))
 			continue
 		} else if err != nil {
 			panic(err)
@@ -229,7 +230,7 @@ func getUtxoFromRedis(utxoOutpoints []string) (txOutsRsp []*model.TxOutResp, err
 		tokenId := ""
 		if len(txo.GenesisId) >= 20 {
 			if txo.CodeType == scriptDecoder.CodeType_NFT {
-				tokenId = strconv.Itoa(int(txo.TokenIdx))
+				tokenId = strconv.FormatUint(txo.TokenIdx, 10)
 			} else if txo.CodeType == scriptDecoder.CodeType_FT || txo.CodeType == scriptDecoder.CodeType_UNIQUE {
 				tokenId = hex.EncodeToString(txo.GenesisId)
 			}
@@ -247,7 +248,7 @@ func getUtxoFromRedis(utxoOutpoints []string) (txOutsRsp []*model.TxOutResp, err
 			MetaTxId:      hex.EncodeToString(txo.MetaTxId),
 			TokenName:     txo.Name,
 			TokenSymbol:   txo.Symbol,
-			TokenAmount:   strconv.Itoa(int(txo.Amount)),
+			TokenAmount:   strconv.FormatUint(txo.Amount, 10),
 			TokenDecimal:  int(txo.Decimal),
 			CodeHashHex:   hex.EncodeToString(txo.CodeHash),
 			GenesisHex:    hex.EncodeToString(txo.GenesisId),
@@ -264,7 +265,7 @@ func getUtxoFromRedis(utxoOutpoints []string) (txOutsRsp []*model.TxOutResp, err
 
 //////////////// address utxo
 func GetUtxoByAddress(cursor, size int, addressPkh []byte) (txOutsRsp []*model.TxStandardOutResp, err error) {
-	log.Printf("GetUtxoByAddress: %s", hex.EncodeToString(addressPkh))
+	logger.Log.Info("GetUtxoByAddress", zap.String("addressHex", hex.EncodeToString(addressPkh)))
 
 	addressUtxoConfirmed := "au" + string(addressPkh)
 	addressUtxoSpentUnconfirmed := "mp:s:au" + string(addressPkh)
@@ -279,10 +280,10 @@ func GetUtxoByAddress(cursor, size int, addressPkh []byte) (txOutsRsp []*model.T
 	}
 	nDiff, err := rdb.ZDiffStore(ctx, oldUtxoKey, tmpZs).Result()
 	if err != nil {
-		log.Printf("ZDiffStore redis failed: %v", err)
+		logger.Log.Info("ZDiffStore redis failed", zap.Error(err))
 		return
 	}
-	log.Printf("ZDiffStore : %v", nDiff)
+	logger.Log.Info("ZDiffStore", zap.Int64("n", nDiff))
 
 	finalZs := &redis.ZStore{
 		Keys: []string{
@@ -291,15 +292,15 @@ func GetUtxoByAddress(cursor, size int, addressPkh []byte) (txOutsRsp []*model.T
 	}
 	nUnion, err := rdb.ZUnionStore(ctx, finalKey, finalZs).Result()
 	if err != nil {
-		log.Printf("ZUnionStore redis failed: %v", err)
+		logger.Log.Info("ZUnionStore redis failed", zap.Error(err))
 		return
 	}
-	log.Printf("ZUnionStore : %v", nUnion)
+	logger.Log.Info("ZUnionStore", zap.Int64("n", nUnion))
 	utxoOutpoints, err := rdb.ZRevRange(ctx, finalKey, int64(cursor), int64(cursor+size-1)).Result()
 	if err == redis.Nil {
 		utxoOutpoints = nil
 	} else if err != nil {
-		log.Printf("GetUtxoByAddress redis failed: %v", err)
+		logger.Log.Info("GetUtxoByAddress redis failed", zap.Error(err))
 		return
 	}
 	return getNonTokenUtxoFromRedis(utxoOutpoints)
@@ -307,7 +308,7 @@ func GetUtxoByAddress(cursor, size int, addressPkh []byte) (txOutsRsp []*model.T
 
 ////////////////
 func getNonTokenUtxoFromRedis(utxoOutpoints []string) (txOutsRsp []*model.TxStandardOutResp, err error) {
-	log.Printf("getUtxoFromRedis redis: %d", len(utxoOutpoints))
+	logger.Log.Info("getUtxoFromRedis", zap.Int("nOutpoints", len(utxoOutpoints)))
 	txOutsRsp = make([]*model.TxStandardOutResp, 0)
 	pipe := rdbBlock.Pipeline()
 
@@ -324,7 +325,7 @@ func getNonTokenUtxoFromRedis(utxoOutpoints []string) (txOutsRsp []*model.TxStan
 		outpoint := utxoOutpoints[outpointIdx]
 		res, err := data.Result()
 		if err == redis.Nil {
-			log.Printf("redis not found outpoint: %s", hex.EncodeToString([]byte(outpoint)))
+			logger.Log.Info("redis not found", zap.String("outpoint", hex.EncodeToString([]byte(outpoint))))
 			continue
 		} else if err != nil {
 			panic(err)

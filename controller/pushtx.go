@@ -6,11 +6,13 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"satosensible/logger"
 	"satosensible/model"
 
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 	"github.com/ybbus/jsonrpc/v2"
+	"go.uber.org/zap"
 )
 
 var rpcClient jsonrpc.RPCClient
@@ -46,24 +48,24 @@ type TxRequest struct {
 // @Success 200 {object} model.Response{data=string} "{"code": 0, "data": "<txid>", "msg": "ok"}"
 // @Router /pushtx [post]
 func PushTx(ctx *gin.Context) {
-	log.Printf("PushTx enter")
+	logger.Log.Info("PushTx enter")
 
 	// check body
 	req := TxRequest{}
 	if err := ctx.BindJSON(&req); err != nil {
-		log.Printf("Bind json failed: %v", err)
+		logger.Log.Info("Bind json failed", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "json error"})
 		return
 	}
 
 	_, err := hex.DecodeString(req.TxHex)
 	if err != nil {
-		log.Printf("txRaw invalid: %v", err)
+		logger.Log.Info("txRaw invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "tx invalid"})
 		return
 	}
 
-	log.Printf("rawtx: %s:", req.TxHex)
+	logger.Log.Info("send", zap.String("rawtx", req.TxHex))
 	response, err := rpcClient.Call("sendrawtransaction", []string{req.TxHex})
 	if err != nil {
 		log.Println("call failed:", err)
@@ -99,12 +101,12 @@ type TxsRequest struct {
 // @Success 200 {object} model.Response{data=[]string} "{"code": 0, "data": ["<txid>", "<txid>"...], "msg": "ok"}"
 // @Router /pushtxs [post]
 func PushTxs(ctx *gin.Context) {
-	log.Printf("PushTxs enter")
+	logger.Log.Info("PushTxs enter")
 
 	// check body
 	req := TxsRequest{}
 	if err := ctx.BindJSON(&req); err != nil {
-		log.Printf("Bind json failed: %v", err)
+		logger.Log.Info("Bind json failed", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "json error"})
 		return
 	}
@@ -115,7 +117,7 @@ func PushTxs(ctx *gin.Context) {
 		}
 		_, err := hex.DecodeString(txHex)
 		if err != nil {
-			log.Printf("txRaw invalid: %v", err)
+			logger.Log.Info("txRaw invalid", zap.Error(err))
 			ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: fmt.Sprintf("tx[%d] invalid", idx)})
 			return
 		}
@@ -127,7 +129,7 @@ func PushTxs(ctx *gin.Context) {
 			continue
 		}
 
-		log.Printf("rawtx: %s:", txHex)
+		logger.Log.Info("send", zap.String("rawtx", txHex))
 		response, err := rpcClient.Call("sendrawtransaction", []string{txHex})
 		if err != nil {
 			log.Println("call failed:", err)
