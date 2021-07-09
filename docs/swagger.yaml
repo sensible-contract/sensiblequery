@@ -369,6 +369,9 @@ definitions:
       isNFT:
         description: 当前输入花费是否为NFT
         type: boolean
+      metaOutputIndex:
+        description: 当前输入的nft metaOutputIndex
+        type: integer
       metaTxId:
         description: 当前输入的nft metaTxId
         type: string
@@ -397,7 +400,10 @@ definitions:
         description: 当前输入花费的outpoint的ft decimal
         type: integer
       tokenId:
-        description: 当前输入的nft tokenId
+        description: 当前输入的ft tokenId
+        type: string
+      tokenIndex:
+        description: 当前输入的nft tokenIndex
         type: string
       tokenName:
         description: 当前输入的ft tokenName
@@ -494,6 +500,9 @@ definitions:
       isNFT:
         description: 当前输出是否为NFT
         type: boolean
+      metaOutputIndex:
+        description: 当前输出的nft metaOutputIndex
+        type: integer
       metaTxId:
         description: 当前输出的nft metaTxId
         type: string
@@ -510,7 +519,10 @@ definitions:
         description: 当前输出花费的outpoint的ft decimal
         type: integer
       tokenId:
-        description: 当前输出的nft tokenId
+        description: 当前输出的ft tokenId
+        type: string
+      tokenIndex:
+        description: 当前输出的nft tokenIndex
         type: string
       tokenName:
         description: 当前输出的ft tokenName
@@ -548,6 +560,9 @@ definitions:
       isNFT:
         description: 当前输出是否为NFT
         type: boolean
+      metaOutputIndex:
+        description: 当前输出的nft metaOutputIndex
+        type: integer
       metaTxId:
         description: 当前输出的nft metaTxId
         type: string
@@ -570,7 +585,10 @@ definitions:
         description: 当前输出花费的outpoint的ft decimal
         type: integer
       tokenId:
-        description: 当前输出的nft tokenId
+        description: 当前输出的ft tokenId
+        type: string
+      tokenIndex:
+        description: 当前输出的nft tokenIndex
         type: string
       tokenName:
         description: 当前输出的ft tokenName
@@ -608,6 +626,9 @@ definitions:
       isNFT:
         description: 当前输出是否为NFT
         type: boolean
+      metaOutputIndex:
+        description: 当前输出的nft metaOutputIndex
+        type: integer
       metaTxId:
         description: 当前输出的nft metaTxId
         type: string
@@ -630,7 +651,10 @@ definitions:
         description: 当前输出花费的outpoint的ft decimal
         type: integer
       tokenId:
-        description: 当前输出的nft tokenId
+        description: 当前输出的ft tokenId
+        type: string
+      tokenIndex:
+        description: 当前输出的nft tokenIndex
         type: string
       tokenName:
         description: 当前输出的ft tokenName
@@ -1875,7 +1899,7 @@ paths:
       summary: 查询NFT Token在区块中的转移次数，以合约CodeHash+GenesisID，和tokenId来确认一种NFT。
       tags:
       - token NFT
-  /nft/utxo-detail/{codehash}/{genesis}/{tokenid}:
+  /nft/utxo-detail/{codehash}/{genesis}/{token_index}:
     get:
       parameters:
       - default: 844c56bb99afc374967a27ce3b46244e2e1fba60
@@ -1891,9 +1915,9 @@ paths:
         required: true
         type: string
       - default: 3
-        description: Token ID
+        description: Token Index
         in: path
-        name: tokenid
+        name: token_index
         required: true
         type: integer
       produces:

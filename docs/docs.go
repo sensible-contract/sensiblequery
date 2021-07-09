@@ -1924,7 +1924,7 @@ var doc = `{
                 }
             }
         },
-        "/nft/utxo-detail/{codehash}/{genesis}/{tokenid}": {
+        "/nft/utxo-detail/{codehash}/{genesis}/{token_index}": {
             "get": {
                 "produces": [
                     "application/json"
@@ -1954,8 +1954,8 @@ var doc = `{
                     {
                         "type": "integer",
                         "default": 3,
-                        "description": "Token ID",
-                        "name": "tokenid",
+                        "description": "Token Index",
+                        "name": "token_index",
                         "in": "path",
                         "required": true
                     }
@@ -3083,6 +3083,10 @@ var doc = `{
                     "description": "当前输入花费是否为NFT",
                     "type": "boolean"
                 },
+                "metaOutputIndex": {
+                    "description": "当前输入的nft metaOutputIndex",
+                    "type": "integer"
+                },
                 "metaTxId": {
                     "description": "当前输入的nft metaTxId",
                     "type": "string"
@@ -3120,7 +3124,11 @@ var doc = `{
                     "type": "integer"
                 },
                 "tokenId": {
-                    "description": "当前输入的nft tokenId",
+                    "description": "当前输入的ft tokenId",
+                    "type": "string"
+                },
+                "tokenIndex": {
+                    "description": "当前输入的nft tokenIndex",
                     "type": "string"
                 },
                 "tokenName": {
@@ -3253,6 +3261,10 @@ var doc = `{
                     "description": "当前输出是否为NFT",
                     "type": "boolean"
                 },
+                "metaOutputIndex": {
+                    "description": "当前输出的nft metaOutputIndex",
+                    "type": "integer"
+                },
                 "metaTxId": {
                     "description": "当前输出的nft metaTxId",
                     "type": "string"
@@ -3274,7 +3286,11 @@ var doc = `{
                     "type": "integer"
                 },
                 "tokenId": {
-                    "description": "当前输出的nft tokenId",
+                    "description": "当前输出的ft tokenId",
+                    "type": "string"
+                },
+                "tokenIndex": {
+                    "description": "当前输出的nft tokenIndex",
                     "type": "string"
                 },
                 "tokenName": {
@@ -3326,6 +3342,10 @@ var doc = `{
                     "description": "当前输出是否为NFT",
                     "type": "boolean"
                 },
+                "metaOutputIndex": {
+                    "description": "当前输出的nft metaOutputIndex",
+                    "type": "integer"
+                },
                 "metaTxId": {
                     "description": "当前输出的nft metaTxId",
                     "type": "string"
@@ -3355,7 +3375,11 @@ var doc = `{
                     "type": "integer"
                 },
                 "tokenId": {
-                    "description": "当前输出的nft tokenId",
+                    "description": "当前输出的ft tokenId",
+                    "type": "string"
+                },
+                "tokenIndex": {
+                    "description": "当前输出的nft tokenIndex",
                     "type": "string"
                 },
                 "tokenName": {
@@ -3407,6 +3431,10 @@ var doc = `{
                     "description": "当前输出是否为NFT",
                     "type": "boolean"
                 },
+                "metaOutputIndex": {
+                    "description": "当前输出的nft metaOutputIndex",
+                    "type": "integer"
+                },
                 "metaTxId": {
                     "description": "当前输出的nft metaTxId",
                     "type": "string"
@@ -3436,7 +3464,11 @@ var doc = `{
                     "type": "integer"
                 },
                 "tokenId": {
-                    "description": "当前输出的nft tokenId",
+                    "description": "当前输出的ft tokenId",
+                    "type": "string"
+                },
+                "tokenIndex": {
+                    "description": "当前输出的nft tokenIndex",
                     "type": "string"
                 },
                 "tokenName": {
