@@ -115,14 +115,6 @@ func GetTxOutputsBySql(psql string) (txOutsRsp []*model.TxOutStatusResp, err err
 		}
 
 		txo := scriptDecoder.ExtractPkScriptForTxo(txOut.ScriptPk, txOut.ScriptType)
-		tokenId := ""
-		if len(txOut.Genesis) >= 20 {
-			if txo.CodeType == scriptDecoder.CodeType_NFT {
-				tokenId = strconv.FormatUint(txo.TokenIdx, 10)
-			} else if txo.CodeType == scriptDecoder.CodeType_FT || txo.CodeType == scriptDecoder.CodeType_UNIQUE {
-				tokenId = hex.EncodeToString(txOut.Genesis)
-			}
-		}
 
 		txOutsRsp = append(txOutsRsp, &model.TxOutStatusResp{
 			TxIdHex: blkparser.HashString(txOut.TxId),
@@ -130,20 +122,22 @@ func GetTxOutputsBySql(psql string) (txOutsRsp []*model.TxOutStatusResp, err err
 			Address: address,
 			Satoshi: int(txOut.Satoshi),
 
-			IsNFT:         (txo.CodeType == scriptDecoder.CodeType_NFT),
-			CodeType:      int(txo.CodeType),
-			TokenId:       tokenId,
-			MetaTxId:      hex.EncodeToString(txo.MetaTxId),
-			TokenName:     txo.Name,
-			TokenSymbol:   txo.Symbol,
-			TokenAmount:   strconv.FormatUint(txo.Amount, 10),
-			TokenDecimal:  int(txo.Decimal),
-			CodeHashHex:   hex.EncodeToString(txOut.CodeHash),
-			GenesisHex:    hex.EncodeToString(txOut.Genesis),
-			SensibleIdHex: hex.EncodeToString(txo.SensibleId),
-			ScriptTypeHex: hex.EncodeToString(txOut.ScriptType),
-			ScriptPkHex:   hex.EncodeToString(txOut.ScriptPk),
-			Height:        int(txOut.Height),
+			IsNFT:           (txo.CodeType == scriptDecoder.CodeType_NFT),
+			CodeType:        int(txo.CodeType),
+			TokenIndex:      strconv.FormatUint(txo.TokenIndex, 10),
+			MetaTxId:        hex.EncodeToString(txo.MetaTxId),
+			MetaOutputIndex: int(txo.MetaOutputIndex),
+			TokenId:         hex.EncodeToString(txOut.Genesis),
+			TokenName:       txo.Name,
+			TokenSymbol:     txo.Symbol,
+			TokenAmount:     strconv.FormatUint(txo.Amount, 10),
+			TokenDecimal:    int(txo.Decimal),
+			CodeHashHex:     hex.EncodeToString(txOut.CodeHash),
+			GenesisHex:      hex.EncodeToString(txOut.Genesis),
+			SensibleIdHex:   hex.EncodeToString(txo.SensibleId),
+			ScriptTypeHex:   hex.EncodeToString(txOut.ScriptType),
+			ScriptPkHex:     hex.EncodeToString(txOut.ScriptPk),
+			Height:          int(txOut.Height),
 
 			TxIdSpentHex: blkparser.HashString(txOut.TxIdSpent),
 			HeightSpent:  int(txOut.HeightSpent),
@@ -201,33 +195,28 @@ func GetTxOutputBySql(psql string) (txOutRsp *model.TxOutResp, err error) {
 	}
 
 	txo := scriptDecoder.ExtractPkScriptForTxo(txOut.ScriptPk, txOut.ScriptType)
-	tokenId := ""
-	if len(txOut.Genesis) >= 20 {
-		if txo.CodeType == scriptDecoder.CodeType_NFT {
-			tokenId = strconv.FormatUint(txo.TokenIdx, 10)
-		} else {
-			tokenId = hex.EncodeToString(txOut.Genesis)
-		}
-	}
+
 	txOutRsp = &model.TxOutResp{
 		TxIdHex: blkparser.HashString(txOut.TxId),
 		Vout:    int(txOut.Vout),
 		Address: address,
 		Satoshi: int(txOut.Satoshi),
 
-		IsNFT:         (txo.CodeType == scriptDecoder.CodeType_NFT),
-		CodeType:      int(txo.CodeType),
-		TokenId:       tokenId,
-		MetaTxId:      hex.EncodeToString(txo.MetaTxId),
-		TokenName:     txo.Name,
-		TokenSymbol:   txo.Symbol,
-		TokenAmount:   strconv.FormatUint(txo.Amount, 10),
-		TokenDecimal:  int(txo.Decimal),
-		CodeHashHex:   hex.EncodeToString(txOut.CodeHash),
-		GenesisHex:    hex.EncodeToString(txOut.Genesis),
-		ScriptTypeHex: hex.EncodeToString(txOut.ScriptType),
-		ScriptPkHex:   hex.EncodeToString(txOut.ScriptPk),
-		Height:        int(txOut.Height),
+		IsNFT:           (txo.CodeType == scriptDecoder.CodeType_NFT),
+		CodeType:        int(txo.CodeType),
+		TokenIndex:      strconv.FormatUint(txo.TokenIndex, 10),
+		MetaTxId:        hex.EncodeToString(txo.MetaTxId),
+		MetaOutputIndex: int(txo.MetaOutputIndex),
+		TokenId:         hex.EncodeToString(txOut.Genesis),
+		TokenName:       txo.Name,
+		TokenSymbol:     txo.Symbol,
+		TokenAmount:     strconv.FormatUint(txo.Amount, 10),
+		TokenDecimal:    int(txo.Decimal),
+		CodeHashHex:     hex.EncodeToString(txOut.CodeHash),
+		GenesisHex:      hex.EncodeToString(txOut.Genesis),
+		ScriptTypeHex:   hex.EncodeToString(txOut.ScriptType),
+		ScriptPkHex:     hex.EncodeToString(txOut.ScriptPk),
+		Height:          int(txOut.Height),
 	}
 	return
 }

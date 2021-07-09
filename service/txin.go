@@ -92,14 +92,6 @@ func GetTxInputsBySql(psql string) (txInsRsp []*model.TxInResp, err error) {
 
 		txo := scriptDecoder.ExtractPkScriptForTxo(txin.ScriptPk, txin.ScriptType)
 
-		tokenId := ""
-		if len(txin.Genesis) >= 20 {
-			if txo.CodeType == scriptDecoder.CodeType_NFT {
-				tokenId = strconv.FormatUint(txo.TokenIdx, 10)
-			} else if txo.CodeType == scriptDecoder.CodeType_FT || txo.CodeType == scriptDecoder.CodeType_UNIQUE {
-				tokenId = hex.EncodeToString(txin.Genesis)
-			}
-		}
 		txInsRsp = append(txInsRsp, &model.TxInResp{
 			Height:       int(txin.Height),
 			TxIdHex:      blkparser.HashString(txin.TxId),
@@ -107,24 +99,26 @@ func GetTxInputsBySql(psql string) (txInsRsp []*model.TxInResp, err error) {
 			ScriptSigHex: hex.EncodeToString(txin.ScriptSig),
 			Sequence:     int(txin.Sequence),
 
-			HeightTxo:     int(txin.HeightTxo),
-			UtxIdHex:      blkparser.HashString(txin.UtxId),
-			Vout:          int(txin.Vout),
-			Address:       address,
-			IsNFT:         txo.CodeType == scriptDecoder.CodeType_NFT,
-			CodeType:      int(txo.CodeType),
-			TokenId:       tokenId,
-			MetaTxId:      hex.EncodeToString(txo.MetaTxId),
-			TokenName:     txo.Name,
-			TokenSymbol:   txo.Symbol,
-			TokenAmount:   strconv.FormatUint(txo.Amount, 10),
-			TokenDecimal:  int(txo.Decimal),
-			CodeHashHex:   hex.EncodeToString(txin.CodeHash),
-			GenesisHex:    hex.EncodeToString(txin.Genesis),
-			SensibleIdHex: hex.EncodeToString(txo.SensibleId),
-			Satoshi:       int(txin.Satoshi),
-			ScriptTypeHex: hex.EncodeToString(txin.ScriptType),
-			ScriptPkHex:   hex.EncodeToString(txin.ScriptPk),
+			HeightTxo:       int(txin.HeightTxo),
+			UtxIdHex:        blkparser.HashString(txin.UtxId),
+			Vout:            int(txin.Vout),
+			Address:         address,
+			IsNFT:           txo.CodeType == scriptDecoder.CodeType_NFT,
+			CodeType:        int(txo.CodeType),
+			TokenIndex:      strconv.FormatUint(txo.TokenIndex, 10),
+			MetaTxId:        hex.EncodeToString(txo.MetaTxId),
+			MetaOutputIndex: int(txo.MetaOutputIndex),
+			TokenId:         hex.EncodeToString(txin.Genesis),
+			TokenName:       txo.Name,
+			TokenSymbol:     txo.Symbol,
+			TokenAmount:     strconv.FormatUint(txo.Amount, 10),
+			TokenDecimal:    int(txo.Decimal),
+			CodeHashHex:     hex.EncodeToString(txin.CodeHash),
+			GenesisHex:      hex.EncodeToString(txin.Genesis),
+			SensibleIdHex:   hex.EncodeToString(txo.SensibleId),
+			Satoshi:         int(txin.Satoshi),
+			ScriptTypeHex:   hex.EncodeToString(txin.ScriptType),
+			ScriptPkHex:     hex.EncodeToString(txin.ScriptPk),
 		})
 	}
 	return
@@ -171,14 +165,6 @@ func GetTxInputBySql(psql string) (txInRsp *model.TxInResp, err error) {
 		address = utils.EncodeAddress(txin.Address, utils.PubKeyHashAddrID)
 	}
 	txo := scriptDecoder.ExtractPkScriptForTxo(txin.ScriptPk, txin.ScriptType)
-	tokenId := ""
-	if len(txin.Genesis) >= 20 {
-		if txo.CodeType == scriptDecoder.CodeType_NFT {
-			tokenId = strconv.FormatUint(txo.TokenIdx, 10)
-		} else if txo.CodeType == scriptDecoder.CodeType_FT || txo.CodeType == scriptDecoder.CodeType_UNIQUE {
-			tokenId = hex.EncodeToString(txin.Genesis)
-		}
-	}
 
 	txInRsp = &model.TxInResp{
 		Height:       int(txin.Height),
@@ -186,23 +172,25 @@ func GetTxInputBySql(psql string) (txInRsp *model.TxInResp, err error) {
 		Idx:          int(txin.Idx),
 		ScriptSigHex: hex.EncodeToString(txin.ScriptSig),
 
-		HeightTxo:     int(txin.HeightTxo),
-		UtxIdHex:      blkparser.HashString(txin.UtxId),
-		Vout:          int(txin.Vout),
-		Address:       address,
-		IsNFT:         txo.CodeType == scriptDecoder.CodeType_NFT,
-		CodeType:      int(txo.CodeType),
-		TokenId:       tokenId,
-		MetaTxId:      hex.EncodeToString(txo.MetaTxId),
-		TokenName:     txo.Name,
-		TokenSymbol:   txo.Symbol,
-		TokenAmount:   strconv.FormatUint(txo.Amount, 10),
-		TokenDecimal:  int(txo.Decimal),
-		CodeHashHex:   hex.EncodeToString(txin.CodeHash),
-		GenesisHex:    hex.EncodeToString(txin.Genesis),
-		SensibleIdHex: hex.EncodeToString(txo.SensibleId),
-		Satoshi:       int(txin.Satoshi),
-		ScriptTypeHex: hex.EncodeToString(txin.ScriptType),
+		HeightTxo:       int(txin.HeightTxo),
+		UtxIdHex:        blkparser.HashString(txin.UtxId),
+		Vout:            int(txin.Vout),
+		Address:         address,
+		IsNFT:           txo.CodeType == scriptDecoder.CodeType_NFT,
+		CodeType:        int(txo.CodeType),
+		TokenIndex:      strconv.FormatUint(txo.TokenIndex, 10),
+		MetaTxId:        hex.EncodeToString(txo.MetaTxId),
+		MetaOutputIndex: int(txo.MetaOutputIndex),
+		TokenId:         hex.EncodeToString(txin.Genesis),
+		TokenName:       txo.Name,
+		TokenSymbol:     txo.Symbol,
+		TokenAmount:     strconv.FormatUint(txo.Amount, 10),
+		TokenDecimal:    int(txo.Decimal),
+		CodeHashHex:     hex.EncodeToString(txin.CodeHash),
+		GenesisHex:      hex.EncodeToString(txin.Genesis),
+		SensibleIdHex:   hex.EncodeToString(txo.SensibleId),
+		Satoshi:         int(txin.Satoshi),
+		ScriptTypeHex:   hex.EncodeToString(txin.ScriptType),
 	}
 	return
 }

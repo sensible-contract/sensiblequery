@@ -97,17 +97,17 @@ func GetUtxoByAddress(ctx *gin.Context) {
 	})
 }
 
-// GetNFTUtxoDetailByTokenId
+// GetNFTUtxoDetailByTokenIndex
 // @Summary 通过NFT合约CodeHash+溯源genesis获取某tokenId的utxo
 // @Tags UTXO, token NFT
 // @Produce  json
 // @Param codehash path string true "Code Hash160" default(844c56bb99afc374967a27ce3b46244e2e1fba60)
 // @Param genesis path string true "Genesis ID" default(74967a27ce3b46244e2e1fba60844c56bb99afc3)
-// @Param tokenid path int true "Token ID" default(3)
+// @Param token_index path int true "Token Index" default(3)
 // @Success 200 {object} model.Response{data=[]model.TxOutResp} "{"code": 0, "data": [{}], "msg": "ok"}"
-// @Router /nft/utxo-detail/{codehash}/{genesis}/{tokenid} [get]
-func GetNFTUtxoDetailByTokenId(ctx *gin.Context) {
-	logger.Log.Info("GetNFTUtxoDetailByTokenId enter")
+// @Router /nft/utxo-detail/{codehash}/{genesis}/{token_index} [get]
+func GetNFTUtxoDetailByTokenIndex(ctx *gin.Context) {
+	logger.Log.Info("GetNFTUtxoDetailByTokenIndex enter")
 
 	codeHashHex := ctx.Param("codehash")
 	// check
@@ -127,15 +127,15 @@ func GetNFTUtxoDetailByTokenId(ctx *gin.Context) {
 		return
 	}
 
-	tokenIdxString := ctx.Param("tokenid")
-	tokenIdx, err := strconv.Atoi(tokenIdxString)
-	if err != nil || tokenIdx < 0 {
-		logger.Log.Info("tokenIdx invalid", zap.Error(err))
-		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "tokenIdx invalid"})
+	tokenIndexString := ctx.Param("token_index")
+	tokenIndex, err := strconv.Atoi(tokenIndexString)
+	if err != nil || tokenIndex < 0 {
+		logger.Log.Info("tokenIndex invalid", zap.Error(err))
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "tokenIndex invalid"})
 		return
 	}
 
-	result, err := service.GetUtxoByTokenId(codeHash, genesisId, tokenIdxString)
+	result, err := service.GetUtxoByTokenIndex(codeHash, genesisId, tokenIndexString)
 	if err != nil {
 		logger.Log.Info("get nft utxo detail failed", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get txo failed"})

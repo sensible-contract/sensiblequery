@@ -79,7 +79,7 @@ func main() {
 
 	router.GET("/ft/utxo/:codehash/:genesis/:address", controller.GetFTUtxo)
 	router.GET("/nft/utxo/:codehash/:genesis/:address", controller.GetNFTUtxo)
-	router.GET("/nft/utxo-detail/:codehash/:genesis/:tokenid", controller.GetNFTUtxoDetailByTokenId)
+	router.GET("/nft/utxo-detail/:codehash/:genesis/:token_index", controller.GetNFTUtxoDetailByTokenIndex)
 
 	router.GET("/address/:address/balance", controller.GetBalanceByAddress)
 

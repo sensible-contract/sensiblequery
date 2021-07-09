@@ -93,27 +93,27 @@ func GetBalanceByAddress(addressPkh []byte) (balanceRsp *model.BalanceResp, err 
 }
 
 //////////////// address utxo
-func GetUtxoByTokenId(codeHash, genesisId []byte, tokenId string) (txOutsRsp *model.TxOutResp, err error) {
+func GetUtxoByTokenIndex(codeHash, genesisId []byte, tokenIndex string) (txOutsRsp *model.TxOutResp, err error) {
 	key := "mp:nd" + string(codeHash) + string(genesisId)
-	resp, err := GetNFTUtxoByTokenId(key, tokenId)
+	resp, err := GetNFTUtxoByTokenIndex(key, tokenIndex)
 	if err == nil {
 		return resp, nil
 	}
 
 	key = "nd" + string(codeHash) + string(genesisId)
-	return GetNFTUtxoByTokenId(key, tokenId)
+	return GetNFTUtxoByTokenIndex(key, tokenIndex)
 }
 
-func GetNFTUtxoByTokenId(key string, tokenId string) (txOutsRsp *model.TxOutResp, err error) {
+func GetNFTUtxoByTokenIndex(key string, tokenIndex string) (txOutsRsp *model.TxOutResp, err error) {
 	op := &redis.ZRangeBy{
-		Min:    tokenId, // 最小分数
-		Max:    tokenId, // 最大分数
-		Offset: 0,       // 类似sql的limit, 表示开始偏移量
-		Count:  1,       // 一次返回多少数据
+		Min:    tokenIndex, // 最小分数
+		Max:    tokenIndex, // 最大分数
+		Offset: 0,          // 类似sql的limit, 表示开始偏移量
+		Count:  1,          // 一次返回多少数据
 	}
 	utxoOutpoints, err := rdb.ZRangeByScore(ctx, key, op).Result()
 	if err != nil {
-		logger.Log.Info("GetUtxoByTokenId redis failed", zap.Error(err))
+		logger.Log.Info("GetUtxoByTokenIndex redis failed", zap.Error(err))
 		return
 	}
 	result, err := getUtxoFromRedis(utxoOutpoints)
@@ -227,14 +227,6 @@ func getUtxoFromRedis(utxoOutpoints []string) (txOutsRsp []*model.TxOutResp, err
 		txout.ScriptType = scriptDecoder.GetLockingScriptType(txout.Script)
 
 		txo := scriptDecoder.ExtractPkScriptForTxo(txout.Script, txout.ScriptType)
-		tokenId := ""
-		if len(txo.GenesisId) >= 20 {
-			if txo.CodeType == scriptDecoder.CodeType_NFT {
-				tokenId = strconv.FormatUint(txo.TokenIdx, 10)
-			} else if txo.CodeType == scriptDecoder.CodeType_FT || txo.CodeType == scriptDecoder.CodeType_UNIQUE {
-				tokenId = hex.EncodeToString(txo.GenesisId)
-			}
-		}
 
 		txOutsRsp = append(txOutsRsp, &model.TxOutResp{
 			TxIdHex: blkparser.HashString(txout.UTxid),
@@ -242,18 +234,20 @@ func getUtxoFromRedis(utxoOutpoints []string) (txOutsRsp []*model.TxOutResp, err
 			Address: utils.EncodeAddress(txo.AddressPkh, utils.PubKeyHashAddrID),
 			Satoshi: int(txout.Satoshi),
 
-			IsNFT:         (txo.CodeType == scriptDecoder.CodeType_NFT),
-			CodeType:      int(txo.CodeType),
-			TokenId:       tokenId,
-			MetaTxId:      hex.EncodeToString(txo.MetaTxId),
-			TokenName:     txo.Name,
-			TokenSymbol:   txo.Symbol,
-			TokenAmount:   strconv.FormatUint(txo.Amount, 10),
-			TokenDecimal:  int(txo.Decimal),
-			CodeHashHex:   hex.EncodeToString(txo.CodeHash),
-			GenesisHex:    hex.EncodeToString(txo.GenesisId),
-			SensibleIdHex: hex.EncodeToString(txo.SensibleId),
-			ScriptTypeHex: hex.EncodeToString(txout.ScriptType),
+			IsNFT:           (txo.CodeType == scriptDecoder.CodeType_NFT),
+			CodeType:        int(txo.CodeType),
+			TokenIndex:      strconv.FormatUint(txo.TokenIndex, 10),
+			MetaTxId:        hex.EncodeToString(txo.MetaTxId),
+			MetaOutputIndex: int(txo.MetaOutputIndex),
+			TokenId:         hex.EncodeToString(txo.GenesisId),
+			TokenName:       txo.Name,
+			TokenSymbol:     txo.Symbol,
+			TokenAmount:     strconv.FormatUint(txo.Amount, 10),
+			TokenDecimal:    int(txo.Decimal),
+			CodeHashHex:     hex.EncodeToString(txo.CodeHash),
+			GenesisHex:      hex.EncodeToString(txo.GenesisId),
+			SensibleIdHex:   hex.EncodeToString(txo.SensibleId),
+			ScriptTypeHex:   hex.EncodeToString(txout.ScriptType),
 			// ScriptPkHex:   hex.EncodeToString(txout.Script),
 			Height: int(txout.BlockHeight),
 			Idx:    int(txout.TxIdx),
