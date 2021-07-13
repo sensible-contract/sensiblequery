@@ -1,7 +1,7 @@
 # 地址(必需). 多值用逗号分隔
-address: "192.168.31.236:9000"
+address: "192.168.31.236:19000"
 # DB名字(必需)
-database: "bitcoin"
+database: "bsv"
 # 用户名(可选)
 username: ""
 # 密码(可选)
