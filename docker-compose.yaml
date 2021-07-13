@@ -1,0 +1,17 @@
+version: '3'
+services:
+
+   satosensible:
+     build: .
+     image: satosensible:latest
+     volumes:
+       - ./conf:/data/conf:ro
+     ports:
+       - "5555:8000"
+     restart: always
+     environment:
+       LISTEN: 0.0.0.0:8000
+     logging:
+       driver: "local"
+       options:
+         max-size: "5g"
