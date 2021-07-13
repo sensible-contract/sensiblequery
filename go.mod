@@ -5,6 +5,7 @@ go 1.15
 require (
 	github.com/ClickHouse/clickhouse-go v1.4.3
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
+	github.com/gin-contrib/cache v1.1.0 // indirect
 	github.com/gin-contrib/gzip v0.0.3
 	github.com/gin-contrib/zap v0.0.1
 	github.com/gin-gonic/gin v1.6.3

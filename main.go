@@ -11,6 +11,8 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/gin-contrib/cache"
+	"github.com/gin-contrib/cache/persistence"
 	"github.com/gin-contrib/gzip"
 	ginzap "github.com/gin-contrib/zap"
 	"github.com/gin-gonic/gin"
@@ -47,6 +49,8 @@ func main() {
 		url = ginSwagger.URL("/test/swagger/doc.json")
 	}
 
+	store := persistence.NewInMemoryStore(time.Second)
+
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
 
 	router.GET("/", controller.Satotx)
@@ -75,7 +79,7 @@ func main() {
 
 	router.GET("/tx/:txid/out/:index/spent", controller.GetTxOutputSpentStatusByTxIdAndIdx)
 
-	router.GET("/address/:address/utxo", controller.GetUtxoByAddress)
+	router.GET("/address/:address/utxo", cache.CachePageAtomic(store, 2*time.Second, controller.GetUtxoByAddress))
 
 	router.GET("/ft/utxo/:codehash/:genesis/:address", controller.GetFTUtxo)
 	router.GET("/nft/utxo/:codehash/:genesis/:address", controller.GetNFTUtxo)
@@ -88,7 +92,7 @@ func main() {
 	router.GET("/ft/info/all", controller.ListAllFTInfo)
 	router.GET("/ft/transfer-times/:codehash/:genesis", controller.GetFTTransferVolumeInBlockRange)
 	router.GET("/ft/owners/:codehash/:genesis", controller.ListFTOwners)
-	router.GET("/ft/summary/:address", controller.ListAllFTBalanceByOwner)
+	router.GET("/ft/summary/:address", cache.CachePageAtomic(store, 2*time.Second, controller.ListAllFTBalanceByOwner))
 	router.GET("/ft/balance/:codehash/:genesis/:address", controller.GetFTBalanceByOwner)
 	router.GET("/ft/history/:codehash/:genesis/:address", controller.GetFTHistoryByGenesis)
 
