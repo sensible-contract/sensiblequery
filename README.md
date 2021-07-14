@@ -68,6 +68,6 @@ satosensible服务可以随时重启，不会造成任何最终数据问题。
 | satomempool          | 20 GB  | 4 GB  |
 | bsv-node + satoblock | 500 GB | 16 GB |
 | clickhouse           | 1.5 TB | 16 GB |
-| redis                | 100GB  | 32GB  |
+| redis                | 50GB  | 32GB  |
 
 其中satosensible用来对外提供API服务，可以部署多实例。其他都是单实例运行。
