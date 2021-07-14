@@ -3,7 +3,7 @@ services:
 
    satosensible:
      build: .
-     image: satosensible:latest
+     image: satosensible:v1
      volumes:
        - ./conf:/data/conf:ro
      ports:
