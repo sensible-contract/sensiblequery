@@ -27,6 +27,13 @@ var (
 	is_testnet     = os.Getenv("TESTNET")
 )
 
+func KeepJsonContentType() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Writer.Header().Set("Content-Type", "application/json; charset=utf-8")
+		c.Next()
+	}
+}
+
 // @title Sensible Browser
 // @version 1.0
 // @description Sensible 区块浏览器
@@ -80,7 +87,7 @@ func main() {
 	router.GET("/tx/:txid/out/:index/spent", controller.GetTxOutputSpentStatusByTxIdAndIdx)
 
 	router.GET("/address/:address/utxo",
-		cache.CachePageWithoutHeader(store, 2*time.Second, controller.GetUtxoByAddress))
+		KeepJsonContentType(), cache.CachePageWithoutHeader(store, 1*time.Second, controller.GetUtxoByAddress))
 
 	router.GET("/ft/utxo/:codehash/:genesis/:address", controller.GetFTUtxo)
 	router.GET("/nft/utxo/:codehash/:genesis/:address", controller.GetNFTUtxo)
@@ -89,38 +96,38 @@ func main() {
 	router.GET("/address/:address/balance", controller.GetBalanceByAddress)
 
 	router.GET("/ft/codehash/all",
-		cache.CachePageWithoutHeader(store, 10*time.Second, controller.ListAllFTCodeHash))
+		KeepJsonContentType(), cache.CachePageWithoutHeader(store, 10*time.Second, controller.ListAllFTCodeHash))
 	router.GET("/ft/codehash-info/:codehash",
-		cache.CachePageWithoutHeader(store, 10*time.Second, controller.ListFTSummary))
+		KeepJsonContentType(), cache.CachePageWithoutHeader(store, 10*time.Second, controller.ListFTSummary))
 	router.GET("/ft/info/all",
-		cache.CachePageWithoutHeader(store, 10*time.Second, controller.ListAllFTInfo))
+		KeepJsonContentType(), cache.CachePageWithoutHeader(store, 10*time.Second, controller.ListAllFTInfo))
 	router.GET("/ft/transfer-times/:codehash/:genesis",
-		cache.CachePageWithoutHeader(store, 10*time.Second, controller.GetFTTransferVolumeInBlockRange))
+		KeepJsonContentType(), cache.CachePageWithoutHeader(store, 10*time.Second, controller.GetFTTransferVolumeInBlockRange))
 	router.GET("/ft/owners/:codehash/:genesis",
-		cache.CachePageWithoutHeader(store, 1*time.Second, controller.ListFTOwners))
+		KeepJsonContentType(), cache.CachePageWithoutHeader(store, 1*time.Second, controller.ListFTOwners))
 	router.GET("/ft/summary/:address",
-		cache.CachePageWithoutHeader(store, 2*time.Second, controller.ListAllFTBalanceByOwner))
+		KeepJsonContentType(), cache.CachePageWithoutHeader(store, 2*time.Second, controller.ListAllFTBalanceByOwner))
 	router.GET("/ft/balance/:codehash/:genesis/:address", controller.GetFTBalanceByOwner)
 	router.GET("/ft/history/:codehash/:genesis/:address",
-		cache.CachePageWithoutHeader(store, 10*time.Second, controller.GetFTHistoryByGenesis))
+		KeepJsonContentType(), cache.CachePageWithoutHeader(store, 10*time.Second, controller.GetFTHistoryByGenesis))
 
 	router.GET("/nft/codehash/all",
-		cache.CachePageWithoutHeader(store, 10*time.Second, controller.ListAllNFTCodeHash))
+		KeepJsonContentType(), cache.CachePageWithoutHeader(store, 10*time.Second, controller.ListAllNFTCodeHash))
 	router.GET("/nft/codehash-info/:codehash",
-		cache.CachePageWithoutHeader(store, 10*time.Second, controller.ListNFTSummary))
+		KeepJsonContentType(), cache.CachePageWithoutHeader(store, 10*time.Second, controller.ListNFTSummary))
 	router.GET("/nft/info/all",
-		cache.CachePageWithoutHeader(store, 10*time.Second, controller.ListAllNFTInfo))
+		KeepJsonContentType(), cache.CachePageWithoutHeader(store, 10*time.Second, controller.ListAllNFTInfo))
 	router.GET("/nft/transfer-times/:codehash/:genesis/:tokenid",
-		cache.CachePageWithoutHeader(store, 10*time.Second, controller.GetNFTTransferTimesInBlockRange))
+		KeepJsonContentType(), cache.CachePageWithoutHeader(store, 10*time.Second, controller.GetNFTTransferTimesInBlockRange))
 	router.GET("/nft/owners/:codehash/:genesis", controller.ListNFTOwners)
 	router.GET("/nft/summary/:address",
-		cache.CachePageWithoutHeader(store, 2*time.Second, controller.ListAllNFTByOwner))
+		KeepJsonContentType(), cache.CachePageWithoutHeader(store, 2*time.Second, controller.ListAllNFTByOwner))
 	router.GET("/nft/detail/:codehash/:genesis/:address", controller.ListNFTCountByOwner)
 	router.GET("/nft/history/:codehash/:genesis/:address",
-		cache.CachePageWithoutHeader(store, 10*time.Second, controller.GetNFTHistoryByGenesis))
+		KeepJsonContentType(), cache.CachePageWithoutHeader(store, 10*time.Second, controller.GetNFTHistoryByGenesis))
 
 	router.GET("/address/:address/history",
-		cache.CachePageWithoutHeader(store, 10*time.Second, controller.GetHistoryByAddress))
+		KeepJsonContentType(), cache.CachePageWithoutHeader(store, 10*time.Second, controller.GetHistoryByAddress))
 	router.GET("/contract/history/:codehash/:genesis/:address", controller.GetHistoryByGenesis)
 
 	router.GET("/token/info", controller.ListAllTokenInfo)

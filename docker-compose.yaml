@@ -3,7 +3,7 @@ services:
 
    satosensible:
      build: .
-     image: satosensible:v1.1
+     image: satosensible:v1.2
      volumes:
        - ./conf:/data/conf:ro
      ports:
@@ -11,7 +11,11 @@ services:
      restart: always
      environment:
        LISTEN: 0.0.0.0:8000
+     labels:
+       - "name=satosensible"
      logging:
-       driver: "local"
+       driver: "json-file"
        options:
-         max-size: "5g"
+         labels: "name"
+         max-size: "1g"
+         max-file: "3"
