@@ -3,7 +3,7 @@ services:
 
    satosensible:
      build: .
-     image: satosensible:v1.2
+     image: satosensible:rdbc-v2
      volumes:
        - ./conf:/data/conf:ro
      ports:
@@ -12,7 +12,7 @@ services:
      environment:
        LISTEN: 0.0.0.0:8000
      labels:
-       - "name=satosensible"
+       - "name=satosensible-rdbc"
      logging:
        driver: "json-file"
        options:

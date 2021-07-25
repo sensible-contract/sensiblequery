@@ -19,9 +19,8 @@ import (
 )
 
 var (
-	rdb      *redis.Client
-	rdbBlock *redis.Client
-	ctx      = context.Background()
+	rdb *redis.ClusterClient
+	ctx = context.Background()
 )
 
 func init() {
@@ -34,28 +33,16 @@ func init() {
 		}
 	}
 
-	address := viper.GetString("address")
+	clusterAddrs := viper.GetStringSlice("clusterAddrs")
 	password := viper.GetString("password")
-	databaseBlock := viper.GetInt("database_block")
-	database := viper.GetInt("database")
 	dialTimeout := viper.GetDuration("dialTimeout")
 	readTimeout := viper.GetDuration("readTimeout")
 	writeTimeout := viper.GetDuration("writeTimeout")
 	poolSize := viper.GetInt("poolSize")
-	rdb = redis.NewClient(&redis.Options{
-		Addr:         address,
-		Password:     password,
-		DB:           database,
-		DialTimeout:  dialTimeout,
-		ReadTimeout:  readTimeout,
-		WriteTimeout: writeTimeout,
-		PoolSize:     poolSize,
-	})
 
-	rdbBlock = redis.NewClient(&redis.Options{
-		Addr:         address,
+	rdb = redis.NewClusterClient(&redis.ClusterOptions{
+		Addrs:        clusterAddrs,
 		Password:     password,
-		DB:           databaseBlock,
 		DialTimeout:  dialTimeout,
 		ReadTimeout:  readTimeout,
 		WriteTimeout: writeTimeout,
@@ -68,26 +55,26 @@ func GetBalanceByAddress(addressPkh []byte) (balanceRsp *model.BalanceResp, err 
 		Address: utils.EncodeAddress(addressPkh, utils.PubKeyHashAddrID),
 	}
 
-	balance, err := rdb.ZScore(ctx, "balance", string(addressPkh)).Result()
+	balance, err := rdb.Get(ctx, "bl"+string(addressPkh)).Int()
 	if err == redis.Nil {
 		balance = 0
 	} else if err != nil {
 		logger.Log.Info("GetBalanceByAddress redis failed", zap.Error(err))
 		return
 	}
-	logger.Log.Info("GetBalanceByAddress", zap.Float64("balance", balance))
-	balanceRsp.Satoshi = int(balance)
+	logger.Log.Info("GetBalanceByAddress", zap.Int("balance", balance))
+	balanceRsp.Satoshi = balance
 
 	// 待确认余额
-	mpBalance, err := rdb.ZScore(ctx, "mp:balance", string(addressPkh)).Result()
+	mpBalance, err := rdb.Get(ctx, "mp:bl"+string(addressPkh)).Int()
 	if err == redis.Nil {
 		mpBalance = 0
 	} else if err != nil {
 		logger.Log.Info("GetBalanceByAddress redis failed", zap.Error(err))
 		return
 	}
-	logger.Log.Info("GetBalanceByAddress", zap.Float64("pending", mpBalance))
-	balanceRsp.PendingSatoshi = int(mpBalance)
+	logger.Log.Info("GetBalanceByAddress", zap.Int("pending", mpBalance))
+	balanceRsp.PendingSatoshi = mpBalance
 
 	return balanceRsp, nil
 }
@@ -129,24 +116,24 @@ func GetNFTUtxoByTokenIndex(key string, tokenIndex string) (txOutsRsp *model.TxO
 //////////////// merge ft utxo
 func mergeUtxoByCodeHashGenesisAddress(codeHash, genesisId, addressPkh []byte, isNFT bool) (finalKey string, err error) {
 	// 注意这里查询需要原子化，可使用pipeline
-	addressKey := string(codeHash) + string(genesisId) + string(addressPkh)
+	addressKey := string(addressPkh) + "}" + string(codeHash) + string(genesisId)
 	addressUtxoConfirmed := ""
 	addressUtxoSpentUnconfirmed := ""
 	oldUtxoKey := ""
 	newUtxoKey := ""
 
 	if isNFT {
-		addressUtxoConfirmed = "nu" + addressKey
-		addressUtxoSpentUnconfirmed = "mp:s:nu" + addressKey
-		oldUtxoKey = "mp:t:nu" + addressKey
-		newUtxoKey = "mp:nu" + addressKey
-		finalKey = "mp:z:nu" + addressKey
+		addressUtxoConfirmed = "{nu" + addressKey
+		addressUtxoSpentUnconfirmed = "mp:s:{nu" + addressKey
+		oldUtxoKey = "mp:t:{nu" + addressKey
+		newUtxoKey = "mp:{nu" + addressKey
+		finalKey = "mp:z:{nu" + addressKey
 	} else {
-		addressUtxoConfirmed = "fu" + addressKey
-		addressUtxoSpentUnconfirmed = "mp:s:fu" + addressKey
-		oldUtxoKey = "mp:t:fu" + addressKey
-		newUtxoKey = "mp:fu" + addressKey
-		finalKey = "mp:z:fu" + addressKey
+		addressUtxoConfirmed = "{fu" + addressKey
+		addressUtxoSpentUnconfirmed = "mp:s:{fu" + addressKey
+		oldUtxoKey = "mp:t:{fu" + addressKey
+		newUtxoKey = "mp:{fu" + addressKey
+		finalKey = "mp:z:{fu" + addressKey
 	}
 
 	tmpZs := &redis.ZStore{
@@ -198,11 +185,11 @@ func GetUtxoByCodeHashGenesisAddress(cursor, size int, codeHash, genesisId, addr
 func getUtxoFromRedis(utxoOutpoints []string) (txOutsRsp []*model.TxOutResp, err error) {
 	logger.Log.Info("getUtxoFromRedis redis", zap.Int("nUTXO", len(utxoOutpoints)))
 	txOutsRsp = make([]*model.TxOutResp, 0)
-	pipe := rdbBlock.Pipeline()
+	pipe := rdb.Pipeline()
 
 	outpointsCmd := make([]*redis.StringCmd, 0)
 	for _, outpoint := range utxoOutpoints {
-		outpointsCmd = append(outpointsCmd, pipe.Get(ctx, outpoint))
+		outpointsCmd = append(outpointsCmd, pipe.Get(ctx, "u"+outpoint))
 	}
 	_, err = pipe.Exec(ctx)
 	if err != nil && err != redis.Nil {
@@ -261,11 +248,11 @@ func getUtxoFromRedis(utxoOutpoints []string) (txOutsRsp []*model.TxOutResp, err
 func GetUtxoByAddress(cursor, size int, addressPkh []byte) (txOutsRsp []*model.TxStandardOutResp, err error) {
 	logger.Log.Info("GetUtxoByAddress", zap.String("addressHex", hex.EncodeToString(addressPkh)))
 
-	addressUtxoConfirmed := "au" + string(addressPkh)
-	addressUtxoSpentUnconfirmed := "mp:s:au" + string(addressPkh)
-	oldUtxoKey := "mp:t:au" + string(addressPkh)
-	newUtxoKey := "mp:au" + string(addressPkh)
-	finalKey := "mp:z:au" + string(addressPkh)
+	addressUtxoConfirmed := "{au" + string(addressPkh) + "}"
+	addressUtxoSpentUnconfirmed := "mp:s:{au" + string(addressPkh) + "}"
+	oldUtxoKey := "mp:t:{au" + string(addressPkh) + "}"
+	newUtxoKey := "mp:{au" + string(addressPkh) + "}"
+	finalKey := "mp:z:{au" + string(addressPkh) + "}"
 
 	tmpZs := &redis.ZStore{
 		Keys: []string{
@@ -302,13 +289,13 @@ func GetUtxoByAddress(cursor, size int, addressPkh []byte) (txOutsRsp []*model.T
 
 ////////////////
 func getNonTokenUtxoFromRedis(utxoOutpoints []string) (txOutsRsp []*model.TxStandardOutResp, err error) {
-	logger.Log.Info("getUtxoFromRedis", zap.Int("nOutpoints", len(utxoOutpoints)))
+	logger.Log.Info("getNonTokenUtxoFromRedis", zap.Int("nOutpoints", len(utxoOutpoints)))
 	txOutsRsp = make([]*model.TxStandardOutResp, 0)
-	pipe := rdbBlock.Pipeline()
+	pipe := rdb.Pipeline()
 
 	outpointsCmd := make([]*redis.StringCmd, 0)
 	for _, outpoint := range utxoOutpoints {
-		outpointsCmd = append(outpointsCmd, pipe.Get(ctx, outpoint))
+		outpointsCmd = append(outpointsCmd, pipe.Get(ctx, "u"+outpoint))
 	}
 	_, err = pipe.Exec(ctx)
 	if err != nil && err != redis.Nil {
