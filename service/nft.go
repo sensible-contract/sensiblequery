@@ -8,7 +8,9 @@ import (
 	"satosensible/dao/clickhouse"
 	"satosensible/logger"
 	"satosensible/model"
+	"strconv"
 
+	"github.com/go-redis/redis/v8"
 	"go.uber.org/zap"
 )
 
@@ -22,7 +24,41 @@ func nftInfoResultSRF(rows *sql.Rows) (interface{}, error) {
 	return &ret, nil
 }
 
-func GetNFTSummary(codeHashHex string) (blksRsp []*model.NFTInfoResp, err error) {
+func getNFTMetaInfo(nftsRsp []*model.NFTInfoResp) {
+	pipe := rdb.Pipeline()
+	nftinfoCmds := make([]*redis.StringStringMapCmd, 0)
+	for _, nft := range nftsRsp {
+		// nftinfo of each token
+		key, _ := hex.DecodeString(nft.CodeHashHex + nft.GenesisHex)
+		nftinfoCmds = append(nftinfoCmds, pipe.HGetAll(ctx, "ni"+string(key)))
+	}
+	_, err := pipe.Exec(ctx)
+	if err != nil && err != redis.Nil {
+		panic(err)
+	}
+	for idx, nft := range nftsRsp {
+		nftinfo, err := nftinfoCmds[idx].Result()
+		if err == redis.Nil {
+			nftinfo = map[string]string{
+				"metatxid":   "",
+				"metavout":   "0",
+				"supply":     "0",
+				"sensibleid": "",
+			}
+			continue
+		} else if err != nil {
+			logger.Log.Info("getNFTDecimal redis failed", zap.Error(err))
+		}
+		supply, _ := strconv.Atoi(nftinfo["supply"])
+		metavout, _ := strconv.Atoi(nftinfo["metavout"])
+		nft.Supply = supply
+		nft.MetaTxIdHex = hex.EncodeToString([]byte(nftinfo["metatxid"]))
+		nft.MetaOutputIndex = metavout
+		nft.SensibleIdHex = hex.EncodeToString([]byte(nftinfo["sensibleid"]))
+	}
+}
+
+func GetNFTSummary(codeHashHex string) (nftsRsp []*model.NFTInfoResp, err error) {
 	psql := fmt.Sprintf(`
 SELECT codehash, genesis, count(1), sum(in_times), sum(out_times), sum(in_satoshi), sum(out_satoshi) FROM (
      SELECT codehash, genesis, nft_idx,
@@ -35,10 +71,16 @@ GROUP BY codehash, genesis
 ORDER BY count(1) DESC
 `, codeHashHex)
 
-	return GetNFTInfoBySQL(psql)
+	nftsRsp, err = GetNFTInfoBySQL(psql)
+	if err != nil {
+		return
+	}
+	getNFTMetaInfo(nftsRsp)
+
+	return
 }
 
-func GetNFTInfo() (blksRsp []*model.NFTInfoResp, err error) {
+func GetNFTInfo() (nftsRsp []*model.NFTInfoResp, err error) {
 	psql := `
 SELECT codehash, genesis, count(1), sum(in_times), sum(out_times), sum(in_satoshi), sum(out_satoshi) FROM (
      SELECT codehash, genesis, nft_idx,
@@ -50,7 +92,13 @@ SELECT codehash, genesis, count(1), sum(in_times), sum(out_times), sum(in_satosh
 GROUP BY codehash, genesis
 ORDER BY count(1) DESC
 `
-	return GetNFTInfoBySQL(psql)
+	nftsRsp, err = GetNFTInfoBySQL(psql)
+	if err != nil {
+		return
+	}
+	getNFTMetaInfo(nftsRsp)
+
+	return
 }
 
 func GetNFTInfoBySQL(psql string) (blksRsp []*model.NFTInfoResp, err error) {

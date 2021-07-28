@@ -127,7 +127,6 @@ func GetAllTokenBalanceByAddress(cursor, size int, addressPkh []byte) (ftOwnersR
 			CodeHashHex: hex.EncodeToString([]byte(val.Member.(string))[:20]),
 			GenesisHex:  hex.EncodeToString([]byte(val.Member.(string))[20:]),
 			Balance:     int(val.Score),
-			Decimal:     0,
 		}
 		ftOwnersRsp = append(ftOwnersRsp, balanceRsp)
 
@@ -144,6 +143,7 @@ func GetAllTokenBalanceByAddress(cursor, size int, addressPkh []byte) (ftOwnersR
 		} else if err != nil {
 			panic(err)
 		}
+
 		decimal, _ := strconv.Atoi(ftinfo["decimal"])
 		balanceRsp.Decimal = decimal
 		balanceRsp.Name = ftinfo["name"]
@@ -303,8 +303,11 @@ func GetAllNFTBalanceByAddress(cursor, size int, addressPkh []byte) (nftOwnersRs
 
 	pipe := rdb.Pipeline()
 	pendingCountCmds := make([]*redis.FloatCmd, 0)
+	nftInfoCmds := make([]*redis.StringStringMapCmd, 0)
 	for _, val := range vals {
 		pendingCountCmds = append(pendingCountCmds, pipe.ZScore(ctx, newKey, val.Member.(string)))
+		// metatx of each token
+		nftInfoCmds = append(nftInfoCmds, pipe.HGetAll(ctx, "ni"+val.Member.(string)))
 	}
 	_, err = pipe.Exec(ctx)
 	if err != nil && err != redis.Nil {
@@ -313,7 +316,6 @@ func GetAllNFTBalanceByAddress(cursor, size int, addressPkh []byte) (nftOwnersRs
 
 	for idx, data := range pendingCountCmds {
 		val := vals[idx]
-
 		countRsp := &model.NFTSummaryByAddressResp{
 			CodeHashHex: hex.EncodeToString([]byte(val.Member.(string))[:20]),
 			GenesisHex:  hex.EncodeToString([]byte(val.Member.(string))[20:]),
@@ -321,6 +323,27 @@ func GetAllNFTBalanceByAddress(cursor, size int, addressPkh []byte) (nftOwnersRs
 		}
 		nftOwnersRsp = append(nftOwnersRsp, countRsp)
 
+		// decimal
+		nftinfo, err := nftInfoCmds[idx].Result()
+		if err == redis.Nil {
+			logger.Log.Info("GetAllTokenBalanceByAddress ftinfo not found")
+			nftinfo = map[string]string{
+				"metatxid":   "",
+				"metavout":   "0",
+				"supply":     "0",
+				"sensibleid": "",
+			}
+		} else if err != nil {
+			panic(err)
+		}
+		supply, _ := strconv.Atoi(nftinfo["supply"])
+		metavout, _ := strconv.Atoi(nftinfo["metavout"])
+		countRsp.Supply = supply
+		countRsp.MetaTxIdHex = hex.EncodeToString([]byte(nftinfo["metatxid"]))
+		countRsp.MetaOutputIndex = metavout
+		countRsp.SensibleIdHex = hex.EncodeToString([]byte(nftinfo["sensibleid"]))
+
+		// count
 		pendingCount, err := data.Result()
 		if err == redis.Nil {
 			continue
