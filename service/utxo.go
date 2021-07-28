@@ -237,7 +237,7 @@ func getUtxoFromRedis(utxoOutpoints []string) (txOutsRsp []*model.TxOutResp, err
 			IsNFT:           (txo.CodeType == scriptDecoder.CodeType_NFT),
 			CodeType:        int(txo.CodeType),
 			TokenIndex:      strconv.FormatUint(txo.TokenIndex, 10),
-			MetaTxId:        hex.EncodeToString(txo.MetaTxId),
+			MetaTxIdHex:     hex.EncodeToString(txo.MetaTxId),
 			MetaOutputIndex: int(txo.MetaOutputIndex),
 			TokenId:         hex.EncodeToString(txo.GenesisId),
 			TokenName:       txo.Name,

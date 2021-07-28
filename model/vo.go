@@ -95,7 +95,7 @@ type TxInResp struct {
 	TokenName       string `json:"tokenName"`       // 当前输入的ft tokenName
 	TokenSymbol     string `json:"tokenSymbol"`     // 当前输入的ft tokenSymbol
 	TokenIndex      string `json:"tokenIndex"`      // 当前输入的nft tokenIndex
-	MetaTxId        string `json:"metaTxId"`        // 当前输入的nft metaTxId
+	MetaTxIdHex     string `json:"metaTxId"`        // 当前输入的nft metaTxId
 	MetaOutputIndex int    `json:"metaOutputIndex"` // 当前输入的nft metaOutputIndex
 	Satoshi         int    `json:"satoshi"`         // 当前输入花费的outpoint的satoshi
 	ScriptTypeHex   string `json:"scriptType"`      // 当前输入锁定脚本类型，Hex编码
@@ -117,7 +117,7 @@ type TxOutResp struct {
 	TokenName       string `json:"tokenName"`       // 当前输出的ft tokenName
 	TokenSymbol     string `json:"tokenSymbol"`     // 当前输出的ft tokenSymbol
 	TokenIndex      string `json:"tokenIndex"`      // 当前输出的nft tokenIndex
-	MetaTxId        string `json:"metaTxId"`        // 当前输出的nft metaTxId
+	MetaTxIdHex     string `json:"metaTxId"`        // 当前输出的nft metaTxId
 	MetaOutputIndex int    `json:"metaOutputIndex"` // 当前输出的nft metaOutputIndex
 	Satoshi         int    `json:"satoshi"`         // 当前输出的satoshi
 	ScriptTypeHex   string `json:"scriptType"`      // 当前输出锁定脚本类型
@@ -150,7 +150,7 @@ type TxOutHistoryResp struct {
 	TokenName       string `json:"tokenName"`       // 当前输出的ft tokenName
 	TokenSymbol     string `json:"tokenSymbol"`     // 当前输出的ft tokenSymbol
 	TokenIndex      string `json:"tokenIndex"`      // 当前输出的nft tokenIndex
-	MetaTxId        string `json:"metaTxId"`        // 当前输出的nft metaTxId
+	MetaTxIdHex     string `json:"metaTxId"`        // 当前输出的nft metaTxId
 	MetaOutputIndex int    `json:"metaOutputIndex"` // 当前输出的nft metaOutputIndex
 	Satoshi         int    `json:"satoshi"`         // 当前输出的satoshi
 	ScriptTypeHex   string `json:"scriptType"`      // 当前输出锁定脚本类型
@@ -174,7 +174,7 @@ type TxOutStatusResp struct {
 	TokenName       string `json:"tokenName"`       // 当前输出的ft tokenName
 	TokenSymbol     string `json:"tokenSymbol"`     // 当前输出的ft tokenSymbol
 	TokenIndex      string `json:"tokenIndex"`      // 当前输出的nft tokenIndex
-	MetaTxId        string `json:"metaTxId"`        // 当前输出的nft metaTxId
+	MetaTxIdHex     string `json:"metaTxId"`        // 当前输出的nft metaTxId
 	MetaOutputIndex int    `json:"metaOutputIndex"` // 当前输出的nft metaOutputIndex
 	Satoshi         int    `json:"satoshi"`         // 当前输出的satoshi
 	ScriptTypeHex   string `json:"scriptType"`      // 当前输出锁定脚本类型
