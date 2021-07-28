@@ -3,7 +3,7 @@ services:
 
    satosensible:
      build: .
-     image: satosensible:rdbc-v2
+     image: satosensible:rdbc-v3
      volumes:
        - ./conf:/data/conf:ro
      ports:
