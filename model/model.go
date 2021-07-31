@@ -29,7 +29,6 @@ func (t *Response) MarshalJSON() ([]byte, error) {
 	return json.Marshal(*t)
 }
 
-// redis›
 type TxoData struct {
 	UTxid       []byte
 	Vout        uint32
