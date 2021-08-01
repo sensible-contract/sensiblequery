@@ -12,15 +12,15 @@ import (
 	"satosensible/model"
 	"strconv"
 
-	"github.com/go-redis/redis/v8"
+	redis "github.com/go-redis/redis/v8"
 	scriptDecoder "github.com/sensible-contract/sensible-script-decoder"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
 )
 
 var (
-	rdb      *redis.Client
-	ctx      = context.Background()
+	rdb redis.UniversalClient
+	ctx = context.Background()
 )
 
 func init() {
@@ -33,15 +33,15 @@ func init() {
 		}
 	}
 
-	address := viper.GetString("address")
+	addrs := viper.GetStringSlice("addrs")
 	password := viper.GetString("password")
 	database := viper.GetInt("database")
 	dialTimeout := viper.GetDuration("dialTimeout")
 	readTimeout := viper.GetDuration("readTimeout")
 	writeTimeout := viper.GetDuration("writeTimeout")
 	poolSize := viper.GetInt("poolSize")
-	rdb = redis.NewClient(&redis.Options{
-		Addr:         address,
+	rdb = redis.NewUniversalClient(&redis.UniversalOptions{
+		Addrs:        addrs,
 		Password:     password,
 		DB:           database,
 		DialTimeout:  dialTimeout,
