@@ -44,9 +44,9 @@ clickhouse数据库配置，主要包括address、database等。
 
 * redis.yaml
 
-redis配置，主要包括address、database等。
+redis配置，主要包括addrs、database等。
 
-需要占用2个database号，database_block存放UTXO原始script，database存放UTXO集合key。需要和satomempool配置保持一致。
+目前同时兼容redis cluster和single-node。addrs配置单个地址将视为single-node。
 
 ## Docker
 

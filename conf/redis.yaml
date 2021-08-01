@@ -1,8 +1,10 @@
 # 地址(必需)
+# 目前同时兼容redis cluster和single-node。addrs配置单个地址将视为single-node。
 addrs: ["192.168.31.236:6390", "192.168.31.236:6391", "192.168.31.236:6392"]
-address: "192.168.31.236:6381"
-# DB名字(必需)
+
+# DB名字(仅single node需要)
 database: 0
+
 # 密码(可选)
 password: ""
 
