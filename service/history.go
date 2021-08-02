@@ -36,7 +36,7 @@ WHERE (utxid, vout, height) in (
     SELECT utxid, vout, height FROM txout_address_height
     WHERE address = unhex('%s')
     ORDER BY height DESC
-    LIMIT 64
+    LIMIT 256
 )
 
 UNION ALL
@@ -46,11 +46,11 @@ WHERE (txid, idx, height) in (
     SELECT txid, idx, height FROM txin_address_height
     WHERE address = unhex('%s')
     ORDER BY height DESC
-    LIMIT 64
+    LIMIT 256
 )
 )
 ORDER BY height DESC, txidx DESC
-LIMIT 128
+LIMIT 512
 `, addressHex, addressHex)
 	return GetHistoryBySql(psql)
 }
@@ -68,7 +68,7 @@ WHERE (utxid, vout, height) in (
           genesis = unhex('%s') AND
           address = unhex('%s')
     ORDER BY height DESC
-    LIMIT 64
+    LIMIT 256
 )
 
 UNION ALL
@@ -80,11 +80,11 @@ WHERE (txid, idx, height) in (
           genesis = unhex('%s') AND
           address = unhex('%s')
     ORDER BY height DESC
-    LIMIT 64
+    LIMIT 256
 )
 )
 ORDER BY height DESC, txidx DESC
-LIMIT 128
+LIMIT 512
 `, codeHashHex, genesisHex, addressHex,
 		codeHashHex, genesisHex, addressHex)
 	return GetHistoryBySql(psql)
