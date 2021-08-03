@@ -86,8 +86,8 @@ func main() {
 
 	router.GET("/tx/:txid/out/:index/spent", controller.GetTxOutputSpentStatusByTxIdAndIdx)
 
-	router.GET("/address/:address/utxo",
-		KeepJsonContentType(), cache.CachePageWithoutHeader(store, 1*time.Second, controller.GetUtxoByAddress))
+	router.GET("/address/:address/utxo", controller.GetUtxoByAddress)
+	// KeepJsonContentType(), cache.CachePageWithoutHeader(store, 1*time.Second, controller.GetUtxoByAddress))
 
 	router.GET("/ft/utxo/:codehash/:genesis/:address", controller.GetFTUtxo)
 	router.GET("/nft/utxo/:codehash/:genesis/:address", controller.GetNFTUtxo)
