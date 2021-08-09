@@ -68,7 +68,7 @@ WHERE (utxid, vout, height) in (
           genesis = unhex('%s') AND
           address = unhex('%s')
     ORDER BY height DESC
-    LIMIT 256
+    LIMIT 1024
 )
 
 UNION ALL
@@ -80,11 +80,11 @@ WHERE (txid, idx, height) in (
           genesis = unhex('%s') AND
           address = unhex('%s')
     ORDER BY height DESC
-    LIMIT 256
+    LIMIT 1024
 )
 )
 ORDER BY height DESC, txidx DESC
-LIMIT 512
+LIMIT 1024
 `, codeHashHex, genesisHex, addressHex,
 		codeHashHex, genesisHex, addressHex)
 	return GetHistoryBySql(psql)
