@@ -42,3 +42,20 @@ type NFTSummaryByAddressResp struct {
 	Count           int    `json:"count"`           // 持有的当前NFT个数
 	PendingCount    int    `json:"pendingCount"`    // 待确认的当前NFT个数
 }
+
+type NFTSellResp struct {
+	Height          int    `json:"height"`          // 当前交易被打包的区块高度
+	Idx             int    `json:"idx"`             // 输出被花费的txid所在区块内序号
+	TxIdHex         string `json:"txid"`            // 售卖合约txid
+	Vout            int    `json:"vout"`            // 售卖合约输出序号
+	Satoshi         int    `json:"satoshi"`         // 售卖合约输出的satoshi
+	Address         string `json:"address"`         // 当前售卖人seller的address
+	CodeHashHex     string `json:"codehash"`        // 当前售卖NFT合约hash160(CodePart)
+	GenesisHex      string `json:"genesis"`         // 当前售卖NFT的genesis
+	SensibleIdHex   string `json:"sensibleId"`      // 当前售卖NFT合约的sensibleId，即genesisTx的outpoint，Hex编码
+	TokenIndex      string `json:"tokenIndex"`      // 当前售卖NFT的tokenIndex
+	MetaTxIdHex     string `json:"metaTxId"`        // 当前售卖NFT的metaTxId
+	MetaOutputIndex int    `json:"metaOutputIndex"` // 当前售卖NFT的metaOutputIndex
+	Price           int    `json:"price"`           // 当前售卖NFT的出售价格(satoshi)
+	IsReady         bool   `json:"isReady"`         // 当前售卖NFT是否已准备好(转出到售卖合约)
+}
