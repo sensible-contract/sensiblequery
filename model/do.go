@@ -132,31 +132,17 @@ type TxOutDO struct {
 	ScriptType []byte `db:"script_type"`
 	ScriptPk   []byte `db:"script_pk"`
 	Height     uint32 `db:"height"`
+	Idx        uint32 `db:"txidx"`
 }
 
 type TxOutHistoryDO struct {
-	TxId       []byte `db:"txid"`
-	Vout       uint32 `db:"vout"`
-	Address    []byte `db:"address"`
-	Genesis    []byte `db:"genesis"`
-	Satoshi    uint64 `db:"satoshi"`
-	ScriptType []byte `db:"script_type"`
-	ScriptPk   []byte `db:"script_pk"`
-	Height     uint32 `db:"height"`
-	Idx        uint32 `db:"txidx"`
-	IOType     uint8  `db:"io_type"` // 0: input; 1: output
+	TxOutDO
+
+	IOType uint8 `db:"io_type"` // 0: input; 1: output
 }
 
 type TxOutStatusDO struct {
-	TxId       []byte `db:"txid"`
-	Vout       uint32 `db:"vout"`
-	Address    []byte `db:"address"`
-	CodeHash   []byte `db:"codehash"`
-	Genesis    []byte `db:"genesis"`
-	Satoshi    uint64 `db:"satoshi"`
-	ScriptType []byte `db:"script_type"`
-	ScriptPk   []byte `db:"script_pk"`
-	Height     uint32 `db:"height"`
+	TxOutDO
 
 	TxIdSpent   []byte `db:"txid_spent"`
 	HeightSpent uint32 `db:"height_spent"`

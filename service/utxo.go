@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"encoding/binary"
 	"encoding/hex"
 	"errors"
 	"fmt"
@@ -10,10 +9,8 @@ import (
 	"satosensible/lib/utils"
 	"satosensible/logger"
 	"satosensible/model"
-	"strconv"
 
 	redis "github.com/go-redis/redis/v8"
-	scriptDecoder "github.com/sensible-contract/sensible-script-decoder"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
 )
@@ -206,40 +203,19 @@ func getUtxoFromRedis(utxoOutpoints []string) (txOutsRsp []*model.TxOutResp, err
 		} else if err != nil {
 			panic(err)
 		}
-		txout := &model.TxoData{}
-		txout.Unmarshal([]byte(res))
 
-		// 补充数据
-		txout.UTxid = []byte(outpoint[:32])                            // 32
-		txout.Vout = binary.LittleEndian.Uint32([]byte(outpoint[32:])) // 4
-		txout.ScriptType = scriptDecoder.GetLockingScriptType(txout.Script)
-
-		txo := scriptDecoder.ExtractPkScriptForTxo(txout.Script, txout.ScriptType)
-
-		txOutsRsp = append(txOutsRsp, &model.TxOutResp{
-			TxIdHex: blkparser.HashString(txout.UTxid),
-			Vout:    int(txout.Vout),
-			Address: utils.EncodeAddress(txo.AddressPkh, utils.PubKeyHashAddrID),
-			Satoshi: int(txout.Satoshi),
-
-			IsNFT:           (txo.CodeType == scriptDecoder.CodeType_NFT),
-			CodeType:        int(txo.CodeType),
-			TokenIndex:      strconv.FormatUint(txo.TokenIndex, 10),
-			MetaTxIdHex:     hex.EncodeToString(txo.MetaTxId),
-			MetaOutputIndex: int(txo.MetaOutputIndex),
-			TokenId:         hex.EncodeToString(txo.GenesisId),
-			TokenName:       txo.Name,
-			TokenSymbol:     txo.Symbol,
-			TokenAmount:     strconv.FormatUint(txo.Amount, 10),
-			TokenDecimal:    int(txo.Decimal),
-			CodeHashHex:     hex.EncodeToString(txo.CodeHash),
-			GenesisHex:      hex.EncodeToString(txo.GenesisId),
-			SensibleIdHex:   hex.EncodeToString(txo.SensibleId),
-			ScriptTypeHex:   hex.EncodeToString(txout.ScriptType),
-			// ScriptPkHex:   hex.EncodeToString(txout.Script),
-			Height: int(txout.BlockHeight),
-			Idx:    int(txout.TxIdx),
-		})
+		txout := model.NewTxoData([]byte(outpoint), []byte(res))
+		txOutDO := model.TxOutDO{
+			Height:     txout.BlockHeight,
+			Idx:        uint32(txout.TxIdx),
+			ScriptPk:   txout.Script,
+			Satoshi:    txout.Satoshi,
+			TxId:       txout.UTxid, // 32
+			Vout:       txout.Vout,  // 4
+			ScriptType: txout.ScriptType,
+		}
+		txOutRsp := getTxOutputRespFromDo(&txOutDO)
+		txOutsRsp = append(txOutsRsp, txOutRsp)
 	}
 
 	return txOutsRsp, nil
@@ -312,14 +288,8 @@ func getNonTokenUtxoFromRedis(utxoOutpoints []string) (txOutsRsp []*model.TxStan
 		} else if err != nil {
 			panic(err)
 		}
-		txout := &model.TxoData{}
-		txout.Unmarshal([]byte(res))
 
-		// 补充数据
-		txout.UTxid = []byte(outpoint[:32])                            // 32
-		txout.Vout = binary.LittleEndian.Uint32([]byte(outpoint[32:])) // 4
-		txout.ScriptType = scriptDecoder.GetLockingScriptType(txout.Script)
-
+		txout := model.NewTxoData([]byte(outpoint), []byte(res))
 		txOutsRsp = append(txOutsRsp, &model.TxStandardOutResp{
 			TxIdHex: blkparser.HashString(txout.UTxid),
 			Vout:    int(txout.Vout),

@@ -3,6 +3,8 @@ package model
 import (
 	"encoding/binary"
 	"encoding/json"
+
+	scriptDecoder "github.com/sensible-contract/sensible-script-decoder"
 )
 
 type TxRequest struct {
@@ -29,6 +31,7 @@ func (t *Response) MarshalJSON() ([]byte, error) {
 	return json.Marshal(*t)
 }
 
+////////////////
 type TxoData struct {
 	UTxid       []byte
 	Vout        uint32
@@ -51,6 +54,15 @@ func (d *TxoData) Unmarshal(buf []byte) {
 	d.TxIdx = binary.LittleEndian.Uint64(buf[4:12])     // 8
 	d.Satoshi = binary.LittleEndian.Uint64(buf[12:20])  // 8
 	d.Script = buf[20:]
-	// d.Script = make([]byte, len(buf)-20)
-	// copy(d.Script, buf[20:]) // n
+}
+
+func NewTxoData(outpoint, res []byte) (txout *TxoData) {
+	txout = &TxoData{}
+	txout.Unmarshal(res)
+
+	// 补充数据
+	txout.UTxid = outpoint[:32]                            // 32
+	txout.Vout = binary.LittleEndian.Uint32(outpoint[32:]) // 4
+	txout.ScriptType = scriptDecoder.GetLockingScriptType(txout.Script)
+	return
 }

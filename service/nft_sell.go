@@ -1,7 +1,6 @@
 package service
 
 import (
-	"encoding/binary"
 	"encoding/hex"
 	"errors"
 	"satosensible/lib/blkparser"
@@ -68,33 +67,28 @@ func getNFTSellUtxoFromRedis(utxoOutpoints []string) (nftSellsRsp []*model.NFTSe
 		} else if err != nil {
 			panic(err)
 		}
-		txout := &model.TxoData{}
-		txout.Unmarshal([]byte(res))
 
-		// 补充数据
-		txout.UTxid = []byte(outpoint[:32])                            // 32
-		txout.Vout = binary.LittleEndian.Uint32([]byte(outpoint[32:])) // 4
-		txout.ScriptType = scriptDecoder.GetLockingScriptType(txout.Script)
-
-		txo := scriptDecoder.ExtractPkScriptForTxo(txout.Script, txout.ScriptType)
-
-		nftSellsRsp = append(nftSellsRsp, &model.NFTSellResp{
+		txout := model.NewTxoData([]byte(outpoint), []byte(res))
+		nftSellRsp := &model.NFTSellResp{
 			TxIdHex: blkparser.HashString(txout.UTxid),
 			Vout:    int(txout.Vout),
-			Address: utils.EncodeAddress(txo.AddressPkh, utils.PubKeyHashAddrID),
 			Satoshi: int(txout.Satoshi),
+			Height:  int(txout.BlockHeight),
+			Idx:     int(txout.TxIdx),
+		}
+		txo := scriptDecoder.ExtractPkScriptForTxo(txout.Script, txout.ScriptType)
+		if txo.CodeType != scriptDecoder.CodeType_NONE && txo.CodeType != scriptDecoder.CodeType_SENSIBLE {
+			nftSellRsp.CodeHashHex = hex.EncodeToString(txo.CodeHash[:])
+			nftSellRsp.GenesisHex = hex.EncodeToString(txo.GenesisId[:txo.GenesisIdLen])
+		}
+		if txo.CodeType == scriptDecoder.CodeType_NFT_SELL {
+			nftSellRsp.Address = utils.EncodeAddress(txo.AddressPkh[:], utils.PubKeyHashAddrID)
+			nftSellRsp.TokenIndex = strconv.FormatUint(txo.NFTSell.TokenIndex, 10)
+			nftSellRsp.Price = int(txo.NFTSell.Price)
+		}
 
-			TokenIndex:      strconv.FormatUint(txo.TokenIndex, 10),
-			MetaTxIdHex:     hex.EncodeToString(txo.MetaTxId),
-			MetaOutputIndex: int(txo.MetaOutputIndex),
-			CodeHashHex:     hex.EncodeToString(txo.CodeHash),
-			GenesisHex:      hex.EncodeToString(txo.GenesisId),
-			SensibleIdHex:   hex.EncodeToString(txo.SensibleId),
-			Height:          int(txout.BlockHeight),
-			Idx:             int(txout.TxIdx),
-		})
+		nftSellsRsp = append(nftSellsRsp, nftSellRsp)
 	}
-
 	return nftSellsRsp, nil
 }
 
