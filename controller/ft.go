@@ -25,8 +25,8 @@ func ListAllFTCodeHash(ctx *gin.Context) {
 
 	result, err := service.GetTokenCodeHash(scriptDecoder.CodeType_FT)
 	if err != nil {
-		logger.Log.Info("get dummy failed", zap.Error(err))
-		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get dummy failed"})
+		logger.Log.Info("get ft codehash failed", zap.Error(err))
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get ft codehash failed"})
 		return
 	}
 
@@ -48,8 +48,8 @@ func ListAllFTInfo(ctx *gin.Context) {
 
 	result, err := service.GetFTInfo()
 	if err != nil {
-		logger.Log.Info("get dummy failed", zap.Error(err))
-		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get dummy failed"})
+		logger.Log.Info("get ft info failed", zap.Error(err))
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get ft info failed"})
 		return
 	}
 
@@ -81,8 +81,8 @@ func ListFTSummary(ctx *gin.Context) {
 
 	result, err := service.GetFTSummary(codeHashHex)
 	if err != nil {
-		logger.Log.Info("get dummy failed", zap.Error(err))
-		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get dummy failed"})
+		logger.Log.Info("get ft summary failed", zap.Error(err))
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get ft summary failed"})
 		return
 	}
 
@@ -148,8 +148,8 @@ func GetFTTransferVolumeInBlockRange(ctx *gin.Context) {
 
 	result, err := service.GetTokenVolumesInBlocksByHeightRange(blkStartHeight, blkEndHeight, codeHashHex, genesisIdHex, scriptDecoder.CodeType_FT, 0)
 	if err != nil {
-		logger.Log.Info("get dummy failed", zap.Error(err))
-		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get dummy failed"})
+		logger.Log.Info("get token volumes failed", zap.Error(err))
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get token volumes failed"})
 		return
 	}
 
@@ -208,8 +208,8 @@ func ListFTOwners(ctx *gin.Context) {
 
 	result, err := service.GetTokenOwnersByCodeHashGenesis(cursor, size, codeHash, genesisId)
 	if err != nil {
-		logger.Log.Info("get dummy failed", zap.Error(err))
-		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get dummy failed"})
+		logger.Log.Info("get token owner failed", zap.Error(err))
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get token owner failed"})
 		return
 	}
 
@@ -258,8 +258,8 @@ func ListAllFTBalanceByOwner(ctx *gin.Context) {
 
 	result, err := service.GetAllTokenBalanceByAddress(cursor, size, addressPkh)
 	if err != nil {
-		logger.Log.Info("get dummy failed", zap.Error(err))
-		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get dummy failed"})
+		logger.Log.Info("get token balance failed", zap.Error(err))
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get token balance failed"})
 		return
 	}
 
@@ -310,8 +310,8 @@ func GetFTBalanceByOwner(ctx *gin.Context) {
 
 	result, err := service.GetTokenBalanceByCodeHashGenesisAddress(codeHash, genesisId, addressPkh)
 	if err != nil {
-		logger.Log.Info("get dummy failed", zap.Error(err))
-		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get dummy failed"})
+		logger.Log.Info("get ft balance failed", zap.Error(err))
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get ft balance failed"})
 		return
 	}
 

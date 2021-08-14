@@ -21,8 +21,8 @@ func ListAllTokenInfo(ctx *gin.Context) {
 
 	result, err := service.GetTokenInfo()
 	if err != nil {
-		logger.Log.Info("get dummy failed", zap.Error(err))
-		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get dummy failed"})
+		logger.Log.Info("get token info failed", zap.Error(err))
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get token info failed"})
 		return
 	}
 

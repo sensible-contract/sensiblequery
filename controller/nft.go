@@ -25,8 +25,8 @@ func ListAllNFTCodeHash(ctx *gin.Context) {
 
 	result, err := service.GetTokenCodeHash(scriptDecoder.CodeType_NFT)
 	if err != nil {
-		logger.Log.Info("get dummy failed", zap.Error(err))
-		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get dummy failed"})
+		logger.Log.Info("get nft failed", zap.Error(err))
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get nft failed"})
 		return
 	}
 
@@ -48,8 +48,8 @@ func ListAllNFTInfo(ctx *gin.Context) {
 
 	result, err := service.GetNFTInfo()
 	if err != nil {
-		logger.Log.Info("get dummy failed", zap.Error(err))
-		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get dummy failed"})
+		logger.Log.Info("get nft info failed", zap.Error(err))
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get nft info failed"})
 		return
 	}
 
@@ -81,8 +81,8 @@ func ListNFTSummary(ctx *gin.Context) {
 
 	result, err := service.GetNFTSummary(codeHashHex)
 	if err != nil {
-		logger.Log.Info("get dummy failed", zap.Error(err))
-		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get dummy failed"})
+		logger.Log.Info("get nft summary failed", zap.Error(err))
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get nft summary failed"})
 		return
 	}
 
