@@ -1,4 +1,4 @@
-module satosensible
+module sensiblequery
 
 go 1.15
 

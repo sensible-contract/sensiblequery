@@ -5,8 +5,8 @@ import (
 	"encoding/hex"
 	"fmt"
 	"net/http"
-	"satosensible/logger"
-	"satosensible/model"
+	"sensiblequery/logger"
+	"sensiblequery/model"
 
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"

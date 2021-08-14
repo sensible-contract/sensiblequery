@@ -4,9 +4,9 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"satosensible/dao/clickhouse"
-	"satosensible/logger"
-	"satosensible/model"
+	"sensiblequery/dao/clickhouse"
+	"sensiblequery/logger"
+	"sensiblequery/model"
 
 	"go.uber.org/zap"
 )

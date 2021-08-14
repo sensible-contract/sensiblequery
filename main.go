@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"satosensible/controller"
-	_ "satosensible/docs"
-	"satosensible/logger"
+	"sensiblequery/controller"
+	_ "sensiblequery/docs"
+	"sensiblequery/logger"
 	"syscall"
 	"time"
 
@@ -38,8 +38,8 @@ func KeepJsonContentType() gin.HandlerFunc {
 // @version 1.0
 // @description Sensible 区块浏览器
 
-// @contact.name satosensible
-// @contact.url https://github.com/sensing-contract/satosensible
+// @contact.name sensiblequery
+// @contact.url https://github.com/sensing-contract/sensiblequery
 // @contact.email jiedohh@gmail.com
 
 // @license.name MIT License

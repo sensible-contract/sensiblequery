@@ -5,9 +5,9 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
-	"satosensible/dao/clickhouse"
-	"satosensible/logger"
-	"satosensible/model"
+	"sensiblequery/dao/clickhouse"
+	"sensiblequery/logger"
+	"sensiblequery/model"
 	"strconv"
 
 	"github.com/go-redis/redis/v8"

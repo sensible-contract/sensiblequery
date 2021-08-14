@@ -2,9 +2,9 @@ package controller
 
 import (
 	"net/http"
-	"satosensible/logger"
-	"satosensible/model"
-	"satosensible/service"
+	"sensiblequery/logger"
+	"sensiblequery/model"
+	"sensiblequery/service"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"

@@ -2,9 +2,9 @@ package service
 
 import (
 	"encoding/hex"
-	"satosensible/lib/utils"
-	"satosensible/logger"
-	"satosensible/model"
+	"sensiblequery/lib/utils"
+	"sensiblequery/logger"
+	"sensiblequery/model"
 	"strconv"
 
 	"github.com/go-redis/redis/v8"

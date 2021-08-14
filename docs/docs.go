@@ -19,8 +19,8 @@ var doc = `{
         "description": "{{.Description}}",
         "title": "{{.Title}}",
         "contact": {
-            "name": "satosensible",
-            "url": "https://github.com/sensing-contract/satosensible",
+            "name": "sensiblequery",
+            "url": "https://github.com/sensing-contract/sensiblequery",
             "email": "jiedohh@gmail.com"
         },
         "license": {

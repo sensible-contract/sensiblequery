@@ -1,9 +1,9 @@
 version: '3'
 services:
 
-   satosensible:
+   sensiblequery:
      build: .
-     image: satosensible:universal-v1.8
+     image: sensiblequery:universal-v1.8
      volumes:
        - ./conf:/data/conf:ro
      ports:
@@ -12,7 +12,7 @@ services:
      environment:
        LISTEN: 0.0.0.0:8000
      labels:
-       - "name=satosensible"
+       - "name=sensiblequery"
      logging:
        driver: "json-file"
        options:

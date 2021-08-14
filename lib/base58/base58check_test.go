@@ -7,7 +7,7 @@ package base58_test
 import (
 	"testing"
 
-	"satosensible/lib/base58"
+	"sensiblequery/lib/base58"
 )
 
 var checkEncodingStringTests = []struct {

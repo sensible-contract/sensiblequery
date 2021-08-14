@@ -3,10 +3,10 @@ package controller
 import (
 	"encoding/hex"
 	"net/http"
-	"satosensible/lib/utils"
-	"satosensible/logger"
-	"satosensible/model"
-	"satosensible/service"
+	"sensiblequery/lib/utils"
+	"sensiblequery/logger"
+	"sensiblequery/model"
+	"sensiblequery/service"
 	"strconv"
 
 	"github.com/gin-gonic/gin"

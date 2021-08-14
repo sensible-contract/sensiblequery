@@ -8,7 +8,7 @@ import (
 	"bytes"
 	"testing"
 
-	"satosensible/lib/base58"
+	"sensiblequery/lib/base58"
 )
 
 func BenchmarkBase58Encode(b *testing.B) {

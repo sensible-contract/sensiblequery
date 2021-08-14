@@ -3,10 +3,10 @@ package service
 import (
 	"encoding/hex"
 	"errors"
-	"satosensible/lib/blkparser"
-	"satosensible/lib/utils"
-	"satosensible/logger"
-	"satosensible/model"
+	"sensiblequery/lib/blkparser"
+	"sensiblequery/lib/utils"
+	"sensiblequery/logger"
+	"sensiblequery/model"
 	"strconv"
 
 	redis "github.com/go-redis/redis/v8"

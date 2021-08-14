@@ -4,10 +4,10 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"satosensible/dao/clickhouse"
-	"satosensible/lib/blkparser"
-	"satosensible/logger"
-	"satosensible/model"
+	"sensiblequery/dao/clickhouse"
+	"sensiblequery/lib/blkparser"
+	"sensiblequery/logger"
+	"sensiblequery/model"
 
 	"go.uber.org/zap"
 )
