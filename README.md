@@ -70,12 +70,12 @@ sensiblequery服务可以随时重启，除了会中断用户访问，不会造�
 
 ## 部署资源需求
 
-| 部署                 | DISK   | MEM   |
-|----------------------|--------|-------|
-| sensiblequery        | 20 GB  | 4 GB  |
-| bsv-node + sensibled | 500 GB | 16 GB |
-| clickhouse           | 1.5 TB | 16 GB |
-| redis x 1            | 50GB   | 32GB  |
-| redis-cluster x 6    | 50GB   | 16GB  |
+| 部署                 | DISK(最低) | DISK(推荐) | MEM(最低) | MEM(推荐) |
+|----------------------|------------|------------|-----------|-----------|
+| sensiblequery        | 10 GB      | 20 GB      | 1 GB      | 4 GB      |
+| bsv-node + sensibled | 512 GB     | 1000 GB    | 8 GB      | 16 GB     |
+| clickhouse           | 512 GB     | 1000 GB    | 16 GB     | 32 GB     |
+| redis x 1            | 30GB       | 50GB       | 24GB      | 32GB      |
+| redis-cluster x 6    | 20GB       | 50GB       | 8GB       | 16GB      |
 
 其中sensiblequery用来对外提供API服务，可以部署多实例。sensibled是单实例运行。redis可以部署单节点或集群。
