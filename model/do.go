@@ -147,3 +147,17 @@ type TxOutStatusDO struct {
 	TxIdSpent   []byte `db:"txid_spent"`
 	HeightSpent uint32 `db:"height_spent"`
 }
+
+////////////////
+type ContractSwapDataDo struct {
+	Height          uint32 `db:"height"`    // 区块高度
+	CodeType        uint32 `db:"code_type"` // 合约类型 0: None, 1: FT, 2: UNIQUE, 3: NFT
+	Operation       uint32 `db:"operation"` // 0: sell, 1: buy, 2: add, 3: remove
+	InToken1Amount  uint64 `db:"in_value1"`
+	InToken2Amount  uint64 `db:"in_value2"`
+	InLpAmount      uint64 `db:"in_value3"`
+	OutToken1Amount uint64 `db:"out_value1"`
+	OutToken2Amount uint64 `db:"out_value2"`
+	OutLpAmount     uint64 `db:"out_value3"`
+	Idx             uint32 `db:"txidx"`
+}

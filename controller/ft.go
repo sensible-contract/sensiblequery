@@ -98,7 +98,7 @@ func ListFTSummary(ctx *gin.Context) {
 // @Tags token FT
 // @Produce  json
 // @Param start query int true "Start Block Height" default(0)
-// @Param end query int true "Start Block Height" default(3)
+// @Param end query int true "End Block Height" default(3)
 // @Param codehash path string true "Code Hash160" default(844c56bb99afc374967a27ce3b46244e2e1fba60)
 // @Param genesis path string true "Genesis ID" default(74967a27ce3b46244e2e1fba60844c56bb99afc3)
 // @Success 200 {object} model.Response{data=[]model.BlockTokenVolumeResp} "{"code": 0, "data": [{}], "msg": "ok"}"

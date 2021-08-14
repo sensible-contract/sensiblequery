@@ -154,3 +154,17 @@ type BalanceResp struct {
 	Satoshi        int    `json:"satoshi"`        // 余额satoshi
 	PendingSatoshi int    `json:"pendingSatoshi"` // 待确认余额satoshi
 }
+
+////////////////
+type ContractSwapDataResp struct {
+	Height          int `json:"height"`    // 区块高度
+	CodeType        int `json:"codeType"`  // 合约类型 0: None, 1: FT, 2: Unique, 3: NFT
+	Operation       int `json:"operation"` // 0: sell, 1: buy, 2: add, 3: remove
+	InToken1Amount  int `json:"inToken1Amount"`
+	InToken2Amount  int `json:"inToken2Amount"`
+	InLpAmount      int `json:"inTokenLpAmount"`
+	OutToken1Amount int `json:"outToken1Amount"`
+	OutToken2Amount int `json:"outToken2Amount"`
+	OutLpAmount     int `json:"outTokenLpAmount"`
+	Idx             int `json:"idx"`
+}

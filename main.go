@@ -100,6 +100,9 @@ func main() {
 
 	router.GET("/address/:address/balance", controller.GetBalanceByAddress)
 
+	router.GET("/contract/swap-data/:codehash/:genesis",
+		KeepJsonContentType(), cache.CachePageWithoutHeader(store, 10*time.Second, controller.GetContractSwapDataInBlockRange))
+
 	router.GET("/ft/codehash/all",
 		KeepJsonContentType(), cache.CachePageWithoutHeader(store, 10*time.Second, controller.ListAllFTCodeHash))
 	router.GET("/ft/codehash-info/:codehash",
