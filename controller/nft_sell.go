@@ -19,7 +19,7 @@ import (
 // @Produce  json
 // @Param cursor query int true "起始游标" default(0)
 // @Param size query int true "返回记录数量" default(10)
-// @Success 200 {object} model.Response{data=[]model.TxOutResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Success 200 {object} model.Response{data=[]model.NFTSellResp} "{"code": 0, "data": [{}], "msg": "ok"}"
 // @Router /nft/sell/utxo [get]
 func GetNFTSellUtxo(ctx *gin.Context) {
 	logger.Log.Info("GetNFTSellUtxo enter")
@@ -60,8 +60,8 @@ func GetNFTSellUtxo(ctx *gin.Context) {
 // @Param cursor query int true "起始游标" default(0)
 // @Param size query int true "返回记录数量" default(10)
 // @Param address path string true "Address" default(17SkEw2md5avVNyYgj6RiXuQKNwkXaxFyQ)
-// @Success 200 {object} model.Response{data=[]model.TxOutResp} "{"code": 0, "data": [{}], "msg": "ok"}"
-// @Router /nft/sell/utxo/{address} [get]
+// @Success 200 {object} model.Response{data=[]model.NFTSellResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Router /nft/sell/utxo-by-address/{address} [get]
 func GetNFTSellUtxoByAddress(ctx *gin.Context) {
 	logger.Log.Info("GetNFTSellUtxoByAddress enter")
 	// get cursor/size
@@ -112,7 +112,7 @@ func GetNFTSellUtxoByAddress(ctx *gin.Context) {
 // @Param size query int true "返回记录数量" default(10)
 // @Param codehash path string true "Code Hash160" default(844c56bb99afc374967a27ce3b46244e2e1fba60)
 // @Param genesis path string true "Genesis ID" default(74967a27ce3b46244e2e1fba60844c56bb99afc3)
-// @Success 200 {object} model.Response{data=[]model.TxOutResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Success 200 {object} model.Response{data=[]model.NFTSellResp} "{"code": 0, "data": [{}], "msg": "ok"}"
 // @Router /nft/sell/utxo/{codehash}/{genesis} [get]
 func GetNFTSellUtxoByGenesis(ctx *gin.Context) {
 	logger.Log.Info("GetNFTSellUtxoByGenesis enter")
@@ -172,8 +172,8 @@ func GetNFTSellUtxoByGenesis(ctx *gin.Context) {
 // @Param codehash path string true "Code Hash160" default(844c56bb99afc374967a27ce3b46244e2e1fba60)
 // @Param genesis path string true "Genesis ID" default(74967a27ce3b46244e2e1fba60844c56bb99afc3)
 // @Param token_index path int true "Token Index" default(3)
-// @Success 200 {object} model.Response{data=[]model.TxOutResp} "{"code": 0, "data": [{}], "msg": "ok"}"
-// @Router /nft/sell/utxo/{codehash}/{genesis}/{token_index} [get]
+// @Success 200 {object} model.Response{data=[]model.NFTSellResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Router /nft/sell/utxo-detail/{codehash}/{genesis}/{token_index} [get]
 func GetNFTSellUtxoDetail(ctx *gin.Context) {
 	logger.Log.Info("GetNFTSellUtxoDetail enter")
 

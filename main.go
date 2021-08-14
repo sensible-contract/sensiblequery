@@ -90,9 +90,9 @@ func main() {
 		KeepJsonContentType(), cache.CachePageWithoutHeader(store, 1*time.Second, controller.GetUtxoByAddress))
 
 	router.GET("/nft/sell/utxo", controller.GetNFTSellUtxo)
-	router.GET("/nft/sell/utxo/:address", controller.GetNFTSellUtxoByAddress)
+	router.GET("/nft/sell/utxo-by-address/:address", controller.GetNFTSellUtxoByAddress)
 	router.GET("/nft/sell/utxo/:codehash/:genesis", controller.GetNFTSellUtxoByGenesis)
-	router.GET("/nft/sell/utxo/:codehash/:genesis/:token_index", controller.GetNFTSellUtxoDetail)
+	router.GET("/nft/sell/utxo-detail/:codehash/:genesis/:token_index", controller.GetNFTSellUtxoDetail)
 
 	router.GET("/ft/utxo/:codehash/:genesis/:address", controller.GetFTUtxo)
 	router.GET("/nft/utxo/:codehash/:genesis/:address", controller.GetNFTUtxo)
