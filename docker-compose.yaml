@@ -3,7 +3,7 @@ services:
 
    sensiblequery:
      build: .
-     image: sensiblequery:universal-v1.8
+     image: sensiblequery:universal-v1.10
      volumes:
        - ./conf:/data/conf:ro
      ports:

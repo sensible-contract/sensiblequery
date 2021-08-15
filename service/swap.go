@@ -24,16 +24,19 @@ func contractSwapDataResultSRF(rows *sql.Rows) (interface{}, error) {
 	return &ret, nil
 }
 
-func GetContractSwapDataInBlocksByHeightRange(blkStartHeight, blkEndHeight int, codeHashHex, genesisHex string, codeType uint32) (blksRsp []*model.ContractSwapDataResp, err error) {
+func GetContractSwapDataInBlocksByHeightRange(size, blkStartHeight, blkEndHeight int, codeHashHex, genesisHex string, codeType uint32) (blksRsp []*model.ContractSwapDataResp, err error) {
+	if blkEndHeight == 0 {
+		blkEndHeight = 4294967296
+	}
 	psql := fmt.Sprintf(`
 SELECT %s FROM blktx_contract_height
 WHERE height >= %d AND height < %d AND
     code_type = %d AND
      codehash = unhex('%s') AND
       genesis = unhex('%s')
-ORDER BY height ASC
+ORDER BY height DESC, txidx DESC
 LIMIT %d`,
-		SQL_FIELEDS_SWAP_DATA, blkStartHeight, blkEndHeight, codeType, codeHashHex, genesisHex, blkEndHeight-blkStartHeight)
+		SQL_FIELEDS_SWAP_DATA, blkStartHeight, blkEndHeight, codeType, codeHashHex, genesisHex, size)
 
 	blksRet, err := clickhouse.ScanAll(psql, contractSwapDataResultSRF)
 	if err != nil {

@@ -18,7 +18,8 @@ import (
 // @Tags Unique
 // @Produce  json
 // @Param start query int true "Start Block Height" default(0)
-// @Param end query int true "End Block Height" default(3)
+// @Param end query int true "End Block Height, (0 to get mempool data)" default(0)
+// @Param size query int true "返回记录数量" default(16)
 // @Param codehash path string true "Code Hash160" default(844c56bb99afc374967a27ce3b46244e2e1fba60)
 // @Param genesis path string true "Genesis ID" default(74967a27ce3b46244e2e1fba60844c56bb99afc3)
 // @Success 200 {object} model.Response{data=[]model.ContractSwapDataResp} "{"code": 0, "data": [{}], "msg": "ok"}"
@@ -42,9 +43,17 @@ func GetContractSwapDataInBlockRange(ctx *gin.Context) {
 		return
 	}
 
-	if blkEndHeight <= blkStartHeight || (blkEndHeight-blkStartHeight > 1000) {
+	if blkEndHeight > 0 && (blkEndHeight <= blkStartHeight || (blkEndHeight-blkStartHeight > 1000)) {
 		logger.Log.Info("blk end height invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "blk end height invalid"})
+		return
+	}
+
+	sizeString := ctx.DefaultQuery("size", "16")
+	size, err := strconv.Atoi(sizeString)
+	if err != nil || size < 0 {
+		logger.Log.Info("size invalid", zap.Error(err))
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "size invalid"})
 		return
 	}
 
@@ -66,7 +75,7 @@ func GetContractSwapDataInBlockRange(ctx *gin.Context) {
 		return
 	}
 
-	result, err := service.GetContractSwapDataInBlocksByHeightRange(blkStartHeight, blkEndHeight, codeHashHex, genesisIdHex, scriptDecoder.CodeType_UNIQUE)
+	result, err := service.GetContractSwapDataInBlocksByHeightRange(size, blkStartHeight, blkEndHeight, codeHashHex, genesisIdHex, scriptDecoder.CodeType_UNIQUE)
 	if err != nil {
 		logger.Log.Info("get swap failed", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get swap failed"})

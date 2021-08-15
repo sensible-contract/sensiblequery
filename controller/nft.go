@@ -98,7 +98,7 @@ func ListNFTSummary(ctx *gin.Context) {
 // @Tags token NFT
 // @Produce  json
 // @Param start query int true "Start Block Height" default(0)
-// @Param end query int true "End Block Height" default(3)
+// @Param end query int true "End Block Height" default(0)
 // @Param codehash path string true "Code Hash160" default(844c56bb99afc374967a27ce3b46244e2e1fba60)
 // @Param genesis path string true "Genesis ID" default(74967a27ce3b46244e2e1fba60844c56bb99afc3)
 // @Param tokenid path int true "Token ID " default(3)

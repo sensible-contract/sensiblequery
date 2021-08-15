@@ -18,7 +18,7 @@ import (
 // @Tags Block
 // @Produce  json
 // @Param start query int true "Start Block Height" default(0)
-// @Param end query int true "End Block Height" default(3)
+// @Param end query int true "End Block Height" default(0)
 // @Success 200 {object} model.Response{data=[]model.BlockInfoResp} "{"code": 0, "data": [{}], "msg": "ok"}"
 // @Router /blocks [get]
 func GetBlocksByHeightRange(ctx *gin.Context) {
