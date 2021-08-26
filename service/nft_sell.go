@@ -87,6 +87,13 @@ func getNFTSellUtxoFromRedis(utxoOutpoints []string) (nftSellsRsp []*model.NFTSe
 			nftSellRsp.Price = int(txo.NFTSell.Price)
 		}
 
+		// 设置准备状态
+		contractHashAsAddressPkh := blkparser.GetHash160(txout.Script)
+		countRsp, err := GetNFTCountByCodeHashGenesisAddress(txo.CodeHash[:], txo.GenesisId[:txo.GenesisIdLen], contractHashAsAddressPkh)
+		if err == nil && countRsp.Count+countRsp.PendingCount > 0 {
+			nftSellRsp.IsReady = true
+		}
+
 		nftSellsRsp = append(nftSellsRsp, nftSellRsp)
 	}
 	return nftSellsRsp, nil
