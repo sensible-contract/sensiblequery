@@ -170,7 +170,7 @@ func GetNFTSellUtxoByGenesis(cursor, size int, codeHash, genesisId []byte) (nftS
 }
 
 //////////////// address utxo
-func GetNFTSellUtxoByTokenIndexMerge(codeHash, genesisId []byte, tokenIndex string) (nftSellsRsp *model.NFTSellResp, err error) {
+func GetNFTSellUtxoByTokenIndexMerge(codeHash, genesisId []byte, tokenIndex string) (nftSellsRsp []*model.NFTSellResp, err error) {
 	key := "mp:{suic" + string(genesisId) + string(codeHash) + "}"
 	resp, err := GetNFTSellUtxoByTokenIndex(key, tokenIndex)
 	if err == nil {
@@ -181,12 +181,12 @@ func GetNFTSellUtxoByTokenIndexMerge(codeHash, genesisId []byte, tokenIndex stri
 	return GetNFTSellUtxoByTokenIndex(key, tokenIndex)
 }
 
-func GetNFTSellUtxoByTokenIndex(key string, tokenIndex string) (nftSellsRsp *model.NFTSellResp, err error) {
+func GetNFTSellUtxoByTokenIndex(key string, tokenIndex string) (nftSellsRsp []*model.NFTSellResp, err error) {
 	op := &redis.ZRangeBy{
 		Min:    tokenIndex, // 最小分数
 		Max:    tokenIndex, // 最大分数
 		Offset: 0,          // 类似sql的limit, 表示开始偏移量
-		Count:  1,          // 一次返回多少数据
+		Count:  64,         // 最多兼容64条同样的index
 	}
 	utxoOutpoints, err := rdb.ZRangeByScore(ctx, key, op).Result()
 	if err != nil {
@@ -200,5 +200,5 @@ func GetNFTSellUtxoByTokenIndex(key string, tokenIndex string) (nftSellsRsp *mod
 	if len(result) == 0 {
 		return nil, errors.New("not exist")
 	}
-	return result[0], nil
+	return result, nil
 }

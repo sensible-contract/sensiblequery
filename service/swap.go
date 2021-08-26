@@ -2,7 +2,6 @@ package service
 
 import (
 	"database/sql"
-	"errors"
 	"fmt"
 	"sensiblequery/dao/clickhouse"
 	"sensiblequery/logger"
@@ -26,7 +25,7 @@ func contractSwapDataResultSRF(rows *sql.Rows) (interface{}, error) {
 
 func GetContractSwapDataInBlocksByHeightRange(size, blkStartHeight, blkEndHeight int, codeHashHex, genesisHex string, codeType uint32) (blksRsp []*model.ContractSwapDataResp, err error) {
 	if blkEndHeight == 0 {
-		blkEndHeight = 4294967296
+		blkEndHeight = 4294967295 + 1 // enable mempool
 	}
 	psql := fmt.Sprintf(`
 SELECT %s FROM blktx_contract_height
@@ -51,7 +50,8 @@ LIMIT %d`,
 		return nil, err
 	}
 	if blksRet == nil {
-		return nil, errors.New("not exist")
+		blksRsp = make([]*model.ContractSwapDataResp, 0)
+		return
 	}
 	blocks := blksRet.([]*model.ContractSwapDataDo)
 	for _, block := range blocks {
@@ -71,4 +71,83 @@ LIMIT %d`,
 	}
 	return
 
+}
+
+func contractSwapAggregateResultSRF(rows *sql.Rows) (interface{}, error) {
+	var ret model.ContractSwapAggregateDo
+	err := rows.Scan(&ret.Height, &ret.BlockTime, &ret.OpenPrice, &ret.ClosePrice, &ret.MinPrice, &ret.MaxPrice, &ret.Token1Volume, &ret.Token2Volume)
+	if err != nil {
+		return nil, err
+	}
+	return &ret, nil
+}
+
+func GetContractSwapAggregateInBlocksByHeightRange(interval, blkStartHeight, blkEndHeight int, codeHashHex, genesisHex string, codeType uint32) (blksRsp []*model.ContractSwapAggregateResp, err error) {
+	if blkEndHeight == 0 {
+		blkEndHeight = 4294967295 // disable mempool
+	}
+	if interval < 1 {
+		interval = 1
+	}
+	if interval > 10000 {
+		interval = 10000
+	}
+
+	psql := fmt.Sprintf(`
+SELECT height, blocktime, open_price, close_price, min_price, max_price, volume1, volume2 FROM (
+    SELECT ts * %d as height,
+           anyLast(price) as open_price,
+           any(price) as close_price,
+           min(price) as min_price,
+           max(price) as max_price,
+           sum(volume1) as volume1,
+           sum(volume2) as volume2
+    FROM (
+      SELECT intDiv(height, %d) as ts,
+             out_value1 / out_value2 as price,
+             abs(in_value1 - out_value1) as volume1,
+             abs(in_value2 - out_value2) as volume2
+      FROM blktx_contract_height
+      WHERE height >= %d AND height < %d
+        code_type = %d AND
+        operation < 2 AND
+         codehash = unhex('%s') AND
+          genesis = unhex('%s')
+      ORDER BY height DESC, txidx DESC
+    )
+    GROUP BY ts
+) AS swap
+LEFT JOIN (
+    SELECT height, blocktime FROM blk_height
+    WHERE height >= %d AND height < %d
+) AS block
+USING height
+ORDER BY height DESC
+`, interval, interval,
+		blkStartHeight, blkEndHeight, codeType, codeHashHex, genesisHex,
+		blkStartHeight, blkEndHeight)
+
+	blksRet, err := clickhouse.ScanAll(psql, contractSwapAggregateResultSRF)
+	if err != nil {
+		logger.Log.Info("query blk failed", zap.Error(err))
+		return nil, err
+	}
+	if blksRet == nil {
+		blksRsp = make([]*model.ContractSwapAggregateResp, 0)
+		return
+	}
+	blocks := blksRet.([]*model.ContractSwapAggregateDo)
+	for _, block := range blocks {
+		blksRsp = append(blksRsp, &model.ContractSwapAggregateResp{
+			Height:       int(block.Height),
+			BlockTime:    int(block.BlockTime),
+			OpenPrice:    block.OpenPrice,
+			ClosePrice:   block.ClosePrice,
+			MinPrice:     block.MinPrice,
+			MaxPrice:     block.MaxPrice,
+			Token1Volume: int(block.Token1Volume),
+			Token2Volume: int(block.Token2Volume),
+		})
+	}
+	return
 }

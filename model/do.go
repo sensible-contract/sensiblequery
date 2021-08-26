@@ -162,3 +162,15 @@ type ContractSwapDataDo struct {
 	OutLpAmount     uint64 `db:"out_value3"`
 	Idx             uint32 `db:"txidx"`
 }
+
+// height, blocktime, open_price, close_price, min_price, max_price, volume1, volume2
+type ContractSwapAggregateDo struct {
+	Height       uint32  `db:"height"` // 区块高度
+	BlockTime    uint32  `db:"blocktime"`
+	OpenPrice    float64 `db:"open_price"`
+	ClosePrice   float64 `db:"close_price"`
+	MinPrice     float64 `db:"min_price"`
+	MaxPrice     float64 `db:"max_price"`
+	Token1Volume uint64  `db:"volume1"`
+	Token2Volume uint64  `db:"volume2"`
+}

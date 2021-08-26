@@ -169,3 +169,14 @@ type ContractSwapDataResp struct {
 	OutLpAmount     int `json:"outTokenLpAmount"`
 	Idx             int `json:"idx"`
 }
+
+type ContractSwapAggregateResp struct {
+	Height       int     `json:"height"`       // 区块高度
+	BlockTime    int     `json:"timestamp"`    // 区块时间戳
+	OpenPrice    float64 `json:"openPrice"`    // 开盘价格
+	ClosePrice   float64 `json:"closePrice"`   // 收盘价格
+	MinPrice     float64 `json:"minPrice"`     // 最低价格
+	MaxPrice     float64 `json:"maxPrice"`     // 最高价格
+	Token1Volume int     `json:"token1Volume"` // token1交易量
+	Token2Volume int     `json:"token2Volume"` // token2交易量
+}
