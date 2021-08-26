@@ -104,7 +104,6 @@ func GetNFTSellUtxo(cursor, size int) (nftSellsRsp []*model.NFTSellResp, err err
 		return nil, err
 	}
 
-	//
 	utxoOutpoints, err := rdb.ZRevRange(ctx, finalKey, int64(cursor), int64(cursor+size-1)).Result()
 	if err == redis.Nil {
 		utxoOutpoints = nil
@@ -129,7 +128,6 @@ func GetNFTSellUtxoByAddress(cursor, size int, addressPkh []byte) (nftSellsRsp [
 		return nil, err
 	}
 
-	//
 	utxoOutpoints, err := rdb.ZRevRange(ctx, finalKey, int64(cursor), int64(cursor+size-1)).Result()
 	if err == redis.Nil {
 		utxoOutpoints = nil
@@ -154,7 +152,6 @@ func GetNFTSellUtxoByGenesis(cursor, size int, codeHash, genesisId []byte) (nftS
 		return nil, err
 	}
 
-	//
 	utxoOutpoints, err := rdb.ZRevRange(ctx, finalKey, int64(cursor), int64(cursor+size-1)).Result()
 	if err == redis.Nil {
 		utxoOutpoints = nil

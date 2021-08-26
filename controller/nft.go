@@ -93,6 +93,49 @@ func ListNFTSummary(ctx *gin.Context) {
 	})
 }
 
+// ListNFTInfoByGenesis
+// @Summary 查询使用某codehash+genesis的NFT Token简述
+// @Tags token NFT
+// @Produce  json
+// @Param codehash path string true "Code Hash160" default(844c56bb99afc374967a27ce3b46244e2e1fba60)
+// @Param genesis path string true "Genesis ID" default(74967a27ce3b46244e2e1fba60844c56bb99afc3)
+// @Success 200 {object} model.Response{data=[]model.NFTInfoResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Router /nft/genesis-info/{codehash}/{genesis} [get]
+func ListNFTInfoByGenesis(ctx *gin.Context) {
+	logger.Log.Info("ListNFTInfoByGenesis enter")
+
+	codeHashHex := ctx.Param("codehash")
+	// check
+	_, err := hex.DecodeString(codeHashHex)
+	if err != nil {
+		logger.Log.Info("codeHash invalid", zap.Error(err))
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "codeHash invalid"})
+		return
+	}
+
+	genesisIdHex := ctx.Param("genesis")
+	// check
+	_, err = hex.DecodeString(genesisIdHex)
+	if err != nil {
+		logger.Log.Info("genesisId invalid", zap.Error(err))
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "genesisId invalid"})
+		return
+	}
+
+	result, err := service.ListNFTInfoByGenesis(codeHashHex, genesisIdHex)
+	if err != nil {
+		logger.Log.Info("get nft summary failed", zap.Error(err))
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get nft summary failed"})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, model.Response{
+		Code: 0,
+		Msg:  "ok",
+		Data: result,
+	})
+}
+
 // GetNFTTransferTimesInBlockRange
 // @Summary 查询NFT Token在区块中的转移次数，以合约CodeHash+GenesisID，和tokenId来确认一种NFT。
 // @Tags token NFT
