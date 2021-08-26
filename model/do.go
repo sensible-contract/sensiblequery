@@ -150,7 +150,8 @@ type TxOutStatusDO struct {
 
 ////////////////
 type ContractSwapDataDo struct {
-	Height          uint32 `db:"height"`    // 区块高度
+	Height          uint32 `db:"height"` // 区块高度
+	BlockTime       uint32 `db:"blocktime"`
 	CodeType        uint32 `db:"code_type"` // 合约类型 0: None, 1: FT, 2: UNIQUE, 3: NFT
 	Operation       uint32 `db:"operation"` // 0: sell, 1: buy, 2: add, 3: remove
 	InToken1Amount  uint64 `db:"in_value1"`

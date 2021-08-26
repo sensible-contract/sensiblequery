@@ -12,12 +12,12 @@ import (
 )
 
 const (
-	SQL_FIELEDS_SWAP_DATA = "height, code_type, operation, in_value1, in_value2, in_value3, out_value1, out_value2, out_value3, txidx"
+	SQL_FIELEDS_SWAP_DATA = "height, blk.blocktime, code_type, operation, in_value1, in_value2, in_value3, out_value1, out_value2, out_value3, txidx"
 )
 
 func contractSwapDataResultSRF(rows *sql.Rows) (interface{}, error) {
 	var ret model.ContractSwapDataDo
-	err := rows.Scan(&ret.Height, &ret.CodeType, &ret.Operation, &ret.InToken1Amount, &ret.InToken2Amount, &ret.InLpAmount, &ret.OutToken1Amount, &ret.OutToken2Amount, &ret.OutLpAmount, &ret.Idx)
+	err := rows.Scan(&ret.Height, &ret.BlockTime, &ret.CodeType, &ret.Operation, &ret.InToken1Amount, &ret.InToken2Amount, &ret.InLpAmount, &ret.OutToken1Amount, &ret.OutToken2Amount, &ret.OutLpAmount, &ret.Idx)
 	if err != nil {
 		return nil, err
 	}
@@ -30,13 +30,20 @@ func GetContractSwapDataInBlocksByHeightRange(size, blkStartHeight, blkEndHeight
 	}
 	psql := fmt.Sprintf(`
 SELECT %s FROM blktx_contract_height
+LEFT JOIN (
+    SELECT height, blocktime FROM blk_height
+    WHERE height >= %d AND height < %d
+) AS blk
+USING height
 WHERE height >= %d AND height < %d AND
     code_type = %d AND
      codehash = unhex('%s') AND
       genesis = unhex('%s')
 ORDER BY height DESC, txidx DESC
 LIMIT %d`,
-		SQL_FIELEDS_SWAP_DATA, blkStartHeight, blkEndHeight, codeType, codeHashHex, genesisHex, size)
+		SQL_FIELEDS_SWAP_DATA,
+		blkStartHeight, blkEndHeight,
+		blkStartHeight, blkEndHeight, codeType, codeHashHex, genesisHex, size)
 
 	blksRet, err := clickhouse.ScanAll(psql, contractSwapDataResultSRF)
 	if err != nil {
@@ -50,6 +57,7 @@ LIMIT %d`,
 	for _, block := range blocks {
 		blksRsp = append(blksRsp, &model.ContractSwapDataResp{
 			Height:          int(block.Height),
+			BlockTime:       int(block.BlockTime),
 			CodeType:        int(block.CodeType),
 			Operation:       int(block.Operation),
 			InToken1Amount:  int(block.InToken1Amount),

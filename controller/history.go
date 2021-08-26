@@ -134,7 +134,7 @@ func GetFTHistoryByGenesis(ctx *gin.Context) {
 }
 
 // GetNFTHistoryByGenesis
-// @Summary 通过FT合约CodeHash+溯源genesis获取地址相关tx历史列表，返回详细输入/输出
+// @Summary 通过NFT合约CodeHash+溯源genesis获取地址相关tx历史列表，返回详细输入/输出
 // @Tags History, token NFT
 // @Produce  json
 // @Param cursor query int true "起始游标" default(0)

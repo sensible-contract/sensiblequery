@@ -2,7 +2,6 @@ package service
 
 import (
 	"database/sql"
-	"errors"
 	"fmt"
 	"sensiblequery/dao/clickhouse"
 	"sensiblequery/logger"
@@ -92,7 +91,9 @@ func GetHistoryBySql(psql string) (txOutHistoriesRsp []*model.TxOutHistoryResp, 
 		return nil, err
 	}
 	if txOutsRet == nil {
-		return nil, errors.New("not exist")
+		// not exist
+		txOutHistoriesRsp = make([]*model.TxOutHistoryResp, 0)
+		return
 	}
 	txOuts := txOutsRet.([]*model.TxOutHistoryDO)
 	for _, txout := range txOuts {
