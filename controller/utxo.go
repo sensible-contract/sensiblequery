@@ -104,7 +104,7 @@ func GetUtxoByAddress(ctx *gin.Context) {
 // @Param codehash path string true "Code Hash160" default(844c56bb99afc374967a27ce3b46244e2e1fba60)
 // @Param genesis path string true "Genesis ID" default(74967a27ce3b46244e2e1fba60844c56bb99afc3)
 // @Param token_index path int true "Token Index" default(3)
-// @Success 200 {object} model.Response{data=[]model.TxOutResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Success 200 {object} model.Response{data=model.TxOutResp} "{"code": 0, "data": {}, "msg": "ok"}"
 // @Router /nft/utxo-detail/{codehash}/{genesis}/{token_index} [get]
 func GetNFTUtxoDetailByTokenIndex(ctx *gin.Context) {
 	logger.Log.Info("GetNFTUtxoDetailByTokenIndex enter")
