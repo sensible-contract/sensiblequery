@@ -2,7 +2,6 @@ package service
 
 import (
 	"encoding/hex"
-	"errors"
 	"sensiblequery/lib/blkparser"
 	"sensiblequery/lib/utils"
 	"sensiblequery/logger"
@@ -170,18 +169,18 @@ func GetNFTSellUtxoByGenesis(cursor, size int, codeHash, genesisId []byte) (nftS
 }
 
 //////////////// address utxo
-func GetNFTSellUtxoByTokenIndexMerge(codeHash, genesisId []byte, tokenIndex string) (nftSellsRsp []*model.NFTSellResp, err error) {
+func GetNFTSellUtxoByTokenIndexMerge(codeHash, genesisId []byte, tokenIndex string, isReadyOnly bool) (nftSellsRsp []*model.NFTSellResp, err error) {
 	key := "mp:{suic" + string(genesisId) + string(codeHash) + "}"
-	resp, err := GetNFTSellUtxoByTokenIndex(key, tokenIndex)
+	resp, err := GetNFTSellUtxoByTokenIndex(key, tokenIndex, isReadyOnly)
 	if err == nil {
 		return resp, nil
 	}
 
 	key = "{suic" + string(genesisId) + string(codeHash) + "}"
-	return GetNFTSellUtxoByTokenIndex(key, tokenIndex)
+	return GetNFTSellUtxoByTokenIndex(key, tokenIndex, isReadyOnly)
 }
 
-func GetNFTSellUtxoByTokenIndex(key string, tokenIndex string) (nftSellsRsp []*model.NFTSellResp, err error) {
+func GetNFTSellUtxoByTokenIndex(key string, tokenIndex string, isReadyOnly bool) (nftSellsRsp []*model.NFTSellResp, err error) {
 	op := &redis.ZRangeBy{
 		Min:    tokenIndex, // 最小分数
 		Max:    tokenIndex, // 最大分数
@@ -197,8 +196,12 @@ func GetNFTSellUtxoByTokenIndex(key string, tokenIndex string) (nftSellsRsp []*m
 	if err != nil {
 		return nil, err
 	}
-	if len(result) == 0 {
-		return nil, errors.New("not exist")
+	nftSellsRsp = make([]*model.NFTSellResp, 0)
+	for _, data := range result {
+		if isReadyOnly && !data.IsReady {
+			continue
+		}
+		nftSellsRsp = append(nftSellsRsp, data)
 	}
-	return result, nil
+	return nftSellsRsp, nil
 }

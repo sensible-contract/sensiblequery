@@ -172,6 +172,7 @@ func GetNFTSellUtxoByGenesis(ctx *gin.Context) {
 // @Param codehash path string true "Code Hash160" default(844c56bb99afc374967a27ce3b46244e2e1fba60)
 // @Param genesis path string true "Genesis ID" default(74967a27ce3b46244e2e1fba60844c56bb99afc3)
 // @Param token_index path int true "Token Index" default(3)
+// @Param ready query boolean true "仅返回ready状态的记录" default(true)
 // @Success 200 {object} model.Response{data=[]model.NFTSellResp} "{"code": 0, "data": [{}], "msg": "ok"}"
 // @Router /nft/sell/utxo-detail/{codehash}/{genesis}/{token_index} [get]
 func GetNFTSellUtxoDetail(ctx *gin.Context) {
@@ -203,7 +204,8 @@ func GetNFTSellUtxoDetail(ctx *gin.Context) {
 		return
 	}
 
-	result, err := service.GetNFTSellUtxoByTokenIndexMerge(codeHash, genesisId, tokenIndexString)
+	isReadyOnly := (ctx.DefaultQuery("ready", "true") == "true")
+	result, err := service.GetNFTSellUtxoByTokenIndexMerge(codeHash, genesisId, tokenIndexString, isReadyOnly)
 	if err != nil {
 		logger.Log.Info("GetNFTSellUtxoByTokenIndexMerge", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get txo failed"})
