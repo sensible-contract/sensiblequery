@@ -108,7 +108,7 @@ SELECT height, blocktime, open_price, close_price, min_price, max_price, volume1
              abs(in_value1 - out_value1) as volume1,
              abs(in_value2 - out_value2) as volume2
       FROM blktx_contract_height
-      WHERE height >= %d AND height < %d
+      WHERE height >= %d AND height < %d AND
         code_type = %d AND
         operation < 2 AND
          codehash = unhex('%s') AND
