@@ -136,9 +136,11 @@ func main() {
 
 	router.GET("/address/:address/history",
 		KeepJsonContentType(), cache.CachePageWithoutHeader(store, 10*time.Second, controller.GetHistoryByAddress))
-	router.GET("/contract/history/:codehash/:genesis/:address", controller.GetHistoryByGenesis)
+	router.GET("/contract/history/:codehash/:genesis/:address",
+		KeepJsonContentType(), cache.CachePageWithoutHeader(store, 10*time.Second, controller.GetHistoryByGenesis))
 
-	router.GET("/token/info", controller.ListAllTokenInfo)
+	router.GET("/token/info",
+		KeepJsonContentType(), cache.CachePageWithoutHeader(store, 10*time.Second, controller.ListAllTokenInfo))
 
 	heightAPI := router.Group("/height/:height")
 	{
