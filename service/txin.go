@@ -95,10 +95,11 @@ func GetTxInputByTxIdAndIdx(txidHex string, index int) (txInRsp *model.TxInResp,
 SELECT %s FROM txin
 WHERE txid = unhex('%s') AND
        idx = %d AND
-height IN (
-    SELECT height FROM tx_height
-    WHERE txid = unhex('%s')
-)
+    (height = 4294967295 OR
+     height IN (
+        SELECT height FROM tx_height
+        WHERE txid = unhex('%s')
+    ))
 LIMIT 1`, SQL_FIELEDS_TXIN, txidHex, index, txidHex)
 
 	return GetTxInputBySql(psql)
@@ -134,11 +135,12 @@ func GetTxOutputSpentStatusByTxIdAndIdx(txidHex string, index int) (txInRsp *mod
 SELECT %s FROM txin_spent
 WHERE utxid = unhex('%s') AND
        vout = %d AND
-height IN (
-    SELECT height FROM txout_spent_height
-    WHERE utxid = unhex('%s') AND
-           vout = %d
-)
+    (height = 4294967295 OR
+     height IN (
+        SELECT height FROM txout_spent_height
+        WHERE utxid = unhex('%s') AND
+               vout = %d
+    ))
 LIMIT 1`, SQL_FIELEDS_TXIN_SPENT, txidHex, index, txidHex, index)
 
 	txInRet, err := clickhouse.ScanOne(psql, txInSpentResultSRF)

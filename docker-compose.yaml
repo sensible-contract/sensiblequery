@@ -3,11 +3,11 @@ services:
 
    sensiblequery:
      build: .
-     image: jiedo/sensiblequery:universal-v1.13
+     image: jiedo/sensiblequery:universal-v1.15
      volumes:
        - ./conf:/data/conf:ro
      ports:
-       - "5555:8000"
+       - "6666:8000"
      restart: always
      environment:
        LISTEN: 0.0.0.0:8000

@@ -126,10 +126,11 @@ func GetTxOutputByTxIdAndIdx(txidHex string, index int) (txOutRsp *model.TxOutRe
 SELECT %s FROM txout
 WHERE utxid = unhex('%s') AND
        vout = %d AND
-height IN (
-    SELECT height FROM tx_height
-    WHERE txid = unhex('%s')
-)
+       (height == 4294967295 OR
+        height IN (
+            SELECT height FROM tx_height
+            WHERE txid = unhex('%s')
+       ))
 LIMIT 1`, SQL_FIELEDS_TXOUT, txidHex, index, txidHex)
 	return GetTxOutputBySql(psql)
 }
