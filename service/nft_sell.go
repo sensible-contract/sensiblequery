@@ -170,17 +170,38 @@ func GetNFTSellUtxoByGenesis(cursor, size int, codeHash, genesisId []byte) (nftS
 
 //////////////// address utxo
 func GetNFTSellUtxoByTokenIndexMerge(codeHash, genesisId []byte, tokenIndex string, isReadyOnly bool) (nftSellsRsp []*model.NFTSellResp, err error) {
+	// fixme: 可能被恶意创建sell utxo
 	key := "mp:{suic" + string(genesisId) + string(codeHash) + "}"
-	resp, err := GetNFTSellUtxoByTokenIndex(key, tokenIndex, isReadyOnly)
-	if err == nil {
-		return resp, nil
+	respMp, err := GetNFTSellUtxoByTokenIndex(key, tokenIndex)
+	if err != nil {
+		return nil, err
 	}
 
 	key = "{suic" + string(genesisId) + string(codeHash) + "}"
-	return GetNFTSellUtxoByTokenIndex(key, tokenIndex, isReadyOnly)
+	resp, err := GetNFTSellUtxoByTokenIndex(key, tokenIndex)
+	if err != nil {
+		return nil, err
+	}
+
+	nftSellsRsp = make([]*model.NFTSellResp, 0)
+	for _, data := range respMp {
+		if isReadyOnly && !data.IsReady {
+			continue
+		}
+		nftSellsRsp = append(nftSellsRsp, data)
+	}
+
+	for _, data := range resp {
+		if isReadyOnly && !data.IsReady {
+			continue
+		}
+		nftSellsRsp = append(nftSellsRsp, data)
+	}
+
+	return
 }
 
-func GetNFTSellUtxoByTokenIndex(key string, tokenIndex string, isReadyOnly bool) (nftSellsRsp []*model.NFTSellResp, err error) {
+func GetNFTSellUtxoByTokenIndex(key string, tokenIndex string) (nftSellsRsp []*model.NFTSellResp, err error) {
 	op := &redis.ZRangeBy{
 		Min:    tokenIndex, // 最小分数
 		Max:    tokenIndex, // 最大分数
@@ -192,16 +213,9 @@ func GetNFTSellUtxoByTokenIndex(key string, tokenIndex string, isReadyOnly bool)
 		logger.Log.Info("GetUtxoByTokenIndex redis failed", zap.Error(err))
 		return
 	}
-	result, err := getNFTSellUtxoFromRedis(utxoOutpoints)
+	nftSellsRsp, err = getNFTSellUtxoFromRedis(utxoOutpoints)
 	if err != nil {
 		return nil, err
-	}
-	nftSellsRsp = make([]*model.NFTSellResp, 0)
-	for _, data := range result {
-		if isReadyOnly && !data.IsReady {
-			continue
-		}
-		nftSellsRsp = append(nftSellsRsp, data)
 	}
 	return nftSellsRsp, nil
 }
