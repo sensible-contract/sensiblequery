@@ -95,7 +95,44 @@ func getNFTSellUtxoFromRedis(utxoOutpoints []string) (nftSellsRsp []*model.NFTSe
 
 		nftSellsRsp = append(nftSellsRsp, nftSellRsp)
 	}
+
+	getNFTMetaInfoForSell(nftSellsRsp)
+
 	return nftSellsRsp, nil
+}
+
+func getNFTMetaInfoForSell(nftSellsRsp []*model.NFTSellResp) {
+	pipe := rdb.Pipeline()
+	nftinfoCmds := make([]*redis.StringStringMapCmd, 0)
+	for _, nft := range nftSellsRsp {
+		// nftinfo of each token
+		key, _ := hex.DecodeString(nft.CodeHashHex + nft.GenesisHex)
+		nftinfoCmds = append(nftinfoCmds, pipe.HGetAll(ctx, "ni"+string(key)))
+	}
+	_, err := pipe.Exec(ctx)
+	if err != nil && err != redis.Nil {
+		panic(err)
+	}
+	for idx, nft := range nftSellsRsp {
+		nftinfo, err := nftinfoCmds[idx].Result()
+		if err == redis.Nil {
+			nftinfo = map[string]string{
+				"metatxid":   "",
+				"metavout":   "0",
+				"supply":     "0",
+				"sensibleid": "",
+			}
+			continue
+		} else if err != nil {
+			logger.Log.Info("getNFTDecimal redis failed", zap.Error(err))
+		}
+		supply, _ := strconv.Atoi(nftinfo["supply"])
+		metavout, _ := strconv.Atoi(nftinfo["metavout"])
+		nft.Supply = supply
+		nft.MetaTxIdHex = hex.EncodeToString([]byte(nftinfo["metatxid"]))
+		nft.MetaOutputIndex = metavout
+		nft.SensibleIdHex = hex.EncodeToString([]byte(nftinfo["sensibleid"]))
+	}
 }
 
 ////////////////

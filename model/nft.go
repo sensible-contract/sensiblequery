@@ -56,6 +56,7 @@ type NFTSellResp struct {
 	TokenIndex      string `json:"tokenIndex"`      // 当前售卖NFT的tokenIndex
 	MetaTxIdHex     string `json:"metaTxId"`        // 当前售卖NFT的metaTxId
 	MetaOutputIndex int    `json:"metaOutputIndex"` // 当前售卖NFT的metaOutputIndex
+	Supply          int    `json:"supply"`          // 当前售卖NFT最大发行量
 	Price           int    `json:"price"`           // 当前售卖NFT的出售价格(satoshi)
 	IsReady         bool   `json:"isReady"`         // 当前售卖NFT是否已准备好(转出到售卖合约)
 }
