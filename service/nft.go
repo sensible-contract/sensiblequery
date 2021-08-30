@@ -58,7 +58,7 @@ func getNFTMetaInfo(nftsRsp []*model.NFTInfoResp) {
 	}
 }
 
-func ListNFTInfoByGenesis(codeHashHex, genesisHex string) (nftsRsp []*model.NFTInfoResp, err error) {
+func ListNFTInfoByGenesis(codeHashHex, genesisHex string) (nftRsp *model.NFTInfoResp, err error) {
 	psql := fmt.Sprintf(`
 SELECT codehash, genesis, count(1), sum(in_times), sum(out_times), sum(in_satoshi), sum(out_satoshi) FROM (
      SELECT codehash, genesis, nft_idx,
@@ -71,12 +71,15 @@ GROUP BY codehash, genesis
 ORDER BY count(1) DESC
 `, codeHashHex, genesisHex)
 
-	nftsRsp, err = GetNFTInfoBySQL(psql)
+	nftsRsp, err := GetNFTInfoBySQL(psql)
 	if err != nil {
 		return
 	}
-	getNFTMetaInfo(nftsRsp)
-	return
+	if len(nftsRsp) > 0 {
+		getNFTMetaInfo(nftsRsp)
+		return nftsRsp[0], nil
+	}
+	return nil, errors.New("not exist")
 }
 
 func GetNFTSummary(codeHashHex string) (nftsRsp []*model.NFTInfoResp, err error) {
