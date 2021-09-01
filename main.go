@@ -24,7 +24,7 @@ import (
 var (
 	// 0.0.0.0:8000
 	listen_address = os.Getenv("LISTEN")
-	is_testnet     = os.Getenv("TESTNET")
+	basePath       = os.Getenv("BASE_PATH")
 )
 
 func KeepJsonContentType() gin.HandlerFunc {
@@ -51,10 +51,7 @@ func main() {
 	router.Use(gzip.Gzip(gzip.DefaultCompression, gzip.WithDecompressFn(gzip.DefaultDecompressHandle)))
 
 	// go get -u github.com/swaggo/swag/cmd/swag@v1.6.7
-	url := ginSwagger.URL("/swagger/doc.json")
-	if is_testnet != "" {
-		url = ginSwagger.URL("/test/swagger/doc.json")
-	}
+	url := ginSwagger.URL(basePath + "/swagger/doc.json")
 
 	store := persistence.NewInMemoryStore(time.Second)
 

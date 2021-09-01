@@ -3,7 +3,7 @@ services:
 
    sensiblequery:
      build: .
-     image: jiedo/sensiblequery:universal-v1.17
+     image: jiedo/sensiblequery:universal-v1.18
      volumes:
        - ./conf:/data/conf:ro
      ports:
@@ -11,6 +11,7 @@ services:
      restart: always
      environment:
        LISTEN: 0.0.0.0:8000
+       BASE_PATH: ""
      labels:
        - "name=sensiblequery"
      logging:

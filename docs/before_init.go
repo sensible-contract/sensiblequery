@@ -5,10 +5,8 @@ package docs
 
 import "os"
 
-var is_testnet = os.Getenv("TESTNET")
+var basePath = os.Getenv("BASE_PATH")
 
 func init() {
-	if is_testnet != "" {
-		SwaggerInfo.BasePath = "/test"
-	}
+	SwaggerInfo.BasePath = basePath
 }
