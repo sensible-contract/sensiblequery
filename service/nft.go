@@ -39,21 +39,12 @@ func getNFTMetaInfo(nftsRsp []*model.NFTInfoResp) {
 	for idx, nft := range nftsRsp {
 		nftinfo, err := nftinfoCmds[idx].Result()
 		if err == redis.Nil {
-			nftinfo = map[string]string{
-				"metatxid":   "",
-				"metavout":   "0",
-				"supply":     "0",
-				"sensibleid": "",
-			}
 			continue
 		} else if err != nil {
 			logger.Log.Info("getNFTDecimal redis failed", zap.Error(err))
 		}
 		supply, _ := strconv.Atoi(nftinfo["supply"])
-		metavout, _ := strconv.Atoi(nftinfo["metavout"])
 		nft.Supply = supply
-		nft.MetaTxIdHex = hex.EncodeToString([]byte(nftinfo["metatxid"]))
-		nft.MetaOutputIndex = metavout
 		nft.SensibleIdHex = hex.EncodeToString([]byte(nftinfo["sensibleid"]))
 	}
 }

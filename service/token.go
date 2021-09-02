@@ -324,25 +324,16 @@ func GetAllNFTBalanceByAddress(cursor, size int, addressPkh []byte) (nftOwnersRs
 		}
 		nftOwnersRsp = append(nftOwnersRsp, countRsp)
 
-		// decimal
-		nftinfo, err := nftInfoCmds[idx].Result()
-		if err == redis.Nil {
+		// sensible/supply
+		if nftinfo, err := nftInfoCmds[idx].Result(); err == nil {
+			supply, _ := strconv.Atoi(nftinfo["supply"])
+			countRsp.Supply = supply
+			countRsp.SensibleIdHex = hex.EncodeToString([]byte(nftinfo["sensibleid"]))
+		} else if err == redis.Nil {
 			logger.Log.Info("GetAllTokenBalanceByAddress ftinfo not found")
-			nftinfo = map[string]string{
-				"metatxid":   "",
-				"metavout":   "0",
-				"supply":     "0",
-				"sensibleid": "",
-			}
 		} else if err != nil {
 			panic(err)
 		}
-		supply, _ := strconv.Atoi(nftinfo["supply"])
-		metavout, _ := strconv.Atoi(nftinfo["metavout"])
-		countRsp.Supply = supply
-		countRsp.MetaTxIdHex = hex.EncodeToString([]byte(nftinfo["metatxid"]))
-		countRsp.MetaOutputIndex = metavout
-		countRsp.SensibleIdHex = hex.EncodeToString([]byte(nftinfo["sensibleid"]))
 
 		// count
 		pendingCount, err := data.Result()

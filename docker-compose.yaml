@@ -3,7 +3,7 @@ services:
 
    sensiblequery:
      build: .
-     image: jiedo/sensiblequery:universal-v1.18
+     image: jiedo/sensiblequery:v2.0
      volumes:
        - ./conf:/data/conf:ro
      ports:
