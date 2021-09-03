@@ -209,3 +209,23 @@ func GetMempoolTxCount() (count int, err error) {
 
 	return mempoolTxCount, nil
 }
+
+func GetBlockMedianTimePast(height int) (mtp int, err error) {
+	psql := fmt.Sprintf(`
+SELECT toUInt32(quantileExact(blocktime)) FROM (
+    SELECT blocktime FROM blk_height WHERE height > %d AND height <= %d
+)
+`, height-11, height)
+
+	blkRet, err := clickhouse.ScanOne(psql, mempoolResultSRF)
+	if err != nil {
+		logger.Log.Info("query mtp failed", zap.Error(err))
+		return 0, err
+	}
+	if blkRet == nil {
+		return 0, errors.New("not exist")
+	}
+	mtp = blkRet.(int)
+
+	return mtp, nil
+}

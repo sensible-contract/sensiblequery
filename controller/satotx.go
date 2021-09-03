@@ -44,6 +44,13 @@ func GetBlockchainInfo(ctx *gin.Context) {
 		return
 	}
 
+	mtp, err := service.GetBlockMedianTimePast(blk.Height)
+	if err != nil {
+		logger.Log.Info("block mtp failed", zap.Error(err))
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get block mtp failed"})
+		return
+	}
+
 	ctx.JSON(http.StatusOK, model.Response{
 		Code: 0,
 		Msg:  "ok",
@@ -53,7 +60,7 @@ func GetBlockchainInfo(ctx *gin.Context) {
 			Headers:       blk.Height + 1,
 			BestBlockHash: blk.BlockIdHex,
 			Difficulty:    "",
-			MedianTime:    blk.BlockTime,
+			MedianTime:    mtp,
 			Chainwork:     "",
 		},
 	})
