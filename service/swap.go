@@ -183,7 +183,7 @@ SELECT height, blocktime, open_amount, close_amount, min_amount, max_amount FROM
            max(amount) as max_amount
     FROM (
       SELECT intDiv(height, %d) as ts,
-             out_value1 as amount,
+             out_value1 as amount
       FROM blktx_contract_height
       WHERE height >= %d AND height < %d AND
         code_type = %d AND
