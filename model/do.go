@@ -161,6 +161,7 @@ type ContractSwapDataDo struct {
 	OutToken2Amount uint64 `db:"out_value2"`
 	OutLpAmount     uint64 `db:"out_value3"`
 	Idx             uint32 `db:"txidx"`
+	TxId            []byte `db:"txid"`
 }
 
 // height, blocktime, open_price, close_price, min_price, max_price, volume1, volume2
