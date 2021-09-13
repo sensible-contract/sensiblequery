@@ -180,3 +180,12 @@ type ContractSwapAggregateResp struct {
 	Token1Volume int     `json:"token1Volume"` // token1交易量
 	Token2Volume int     `json:"token2Volume"` // token2交易量
 }
+
+type ContractSwapAggregateAmountResp struct {
+	Height      int `json:"height"`      // 区块高度
+	BlockTime   int `json:"timestamp"`   // 区块时间戳
+	OpenAmount  int `json:"openAmount"`  // 开盘Token1存量
+	CloseAmount int `json:"closeAmount"` // 收盘Token1存量
+	MinAmount   int `json:"minAmount"`   // 最低Token1存量
+	MaxAmount   int `json:"maxAmount"`   // 最高Token1存量
+}

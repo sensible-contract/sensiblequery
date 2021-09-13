@@ -101,6 +101,8 @@ func main() {
 		KeepJsonContentType(), cache.CachePageWithoutHeader(store, 10*time.Second, controller.GetContractSwapDataInBlockRange))
 	router.GET("/contract/swap-aggregate/:codehash/:genesis",
 		KeepJsonContentType(), cache.CachePageWithoutHeader(store, 60*time.Second, controller.GetContractSwapAggregateInBlockRange))
+	router.GET("/contract/swap-aggregate-amount/:codehash/:genesis",
+		KeepJsonContentType(), cache.CachePageWithoutHeader(store, 60*time.Second, controller.GetContractSwapAggregateAmountInBlockRange))
 
 	router.GET("/ft/codehash/all",
 		KeepJsonContentType(), cache.CachePageWithoutHeader(store, 10*time.Second, controller.ListAllFTCodeHash))

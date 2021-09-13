@@ -47,7 +47,6 @@ GROUP BY codehash, genesis
 		blksRsp = append(blksRsp, &model.TokenInfoResp{})
 	}
 	return
-
 }
 
 func tokenCodeHashResultSRF(rows *sql.Rows) (interface{}, error) {

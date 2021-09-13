@@ -174,3 +174,12 @@ type ContractSwapAggregateDo struct {
 	Token1Volume uint64  `db:"volume1"`
 	Token2Volume uint64  `db:"volume2"`
 }
+
+type ContractSwapAggregateAmountDo struct {
+	Height      uint32 `db:"height"` // 区块高度
+	BlockTime   uint32 `db:"blocktime"`
+	OpenAmount  uint64 `db:"open_amount"`
+	CloseAmount uint64 `db:"close_amount"`
+	MinAmount   uint64 `db:"min_amount"`
+	MaxAmount   uint64 `db:"max_amount"`
+}
