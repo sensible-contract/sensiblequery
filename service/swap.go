@@ -25,7 +25,7 @@ func GetContractSwapDataInBlocksByHeightRange(cursor, size, blkStartHeight, blkE
 		blkEndHeight = 4294967295 + 1 // enable mempool
 	}
 	psql := fmt.Sprintf(`
-SELECT height, blk.blocktime, code_type, operation, in_value1, in_value2, in_value3, out_value1, out_value2, out_value3, txidx FROM blktx_contract_height
+SELECT height, blk.blocktime, code_type, operation, in_value1, in_value2, in_value3, out_value1, out_value2, out_value3, txidx, txid FROM blktx_contract_height
 LEFT JOIN (
     SELECT height, blocktime FROM blk_height
     WHERE height >= %d AND height < %d
