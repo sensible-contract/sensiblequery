@@ -11,8 +11,9 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/gin-contrib/cache"
-	"github.com/gin-contrib/cache/persistence"
+	cache "github.com/chenyahui/gin-cache"
+	"github.com/chenyahui/gin-cache/persist"
+
 	"github.com/gin-contrib/gzip"
 	ginzap "github.com/gin-contrib/zap"
 	"github.com/gin-gonic/gin"
@@ -53,7 +54,7 @@ func main() {
 	// go get -u github.com/swaggo/swag/cmd/swag@v1.6.7
 	url := ginSwagger.URL(basePath + "/swagger/doc.json")
 
-	store := persistence.NewInMemoryStore(time.Second)
+	store := persist.NewMemoryStore(time.Second)
 
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
 
@@ -84,7 +85,7 @@ func main() {
 	router.GET("/tx/:txid/out/:index/spent", controller.GetTxOutputSpentStatusByTxIdAndIdx)
 
 	router.GET("/address/:address/utxo",
-		KeepJsonContentType(), cache.CachePageWithoutHeader(store, 1*time.Second, controller.GetUtxoByAddress))
+		cache.CacheByRequestURI(store, 1*time.Second), controller.GetUtxoByAddress)
 
 	router.GET("/nft/sell/utxo", controller.GetNFTSellUtxo)
 	router.GET("/nft/sell/utxo-by-address/:address", controller.GetNFTSellUtxoByAddress)
@@ -98,58 +99,58 @@ func main() {
 	router.GET("/address/:address/balance", controller.GetBalanceByAddress)
 
 	router.GET("/contract/swap-data/:codehash/:genesis",
-		KeepJsonContentType(), cache.CachePageWithoutHeader(store, 10*time.Second, controller.GetContractSwapDataInBlockRange))
+		cache.CacheByRequestURI(store, 10*time.Second), controller.GetContractSwapDataInBlockRange)
 	router.GET("/contract/swap-aggregate/:codehash/:genesis",
-		KeepJsonContentType(), cache.CachePageWithoutHeader(store, 60*time.Second, controller.GetContractSwapAggregateInBlockRange))
+		cache.CacheByRequestURI(store, 60*time.Second), controller.GetContractSwapAggregateInBlockRange)
 	router.GET("/contract/swap-aggregate-amount/:codehash/:genesis",
-		KeepJsonContentType(), cache.CachePageWithoutHeader(store, 60*time.Second, controller.GetContractSwapAggregateAmountInBlockRange))
+		cache.CacheByRequestURI(store, 60*time.Second), controller.GetContractSwapAggregateAmountInBlockRange)
 
 	router.GET("/ft/codehash/all",
-		KeepJsonContentType(), cache.CachePageWithoutHeader(store, 10*time.Second, controller.ListAllFTCodeHash))
+		cache.CacheByRequestURI(store, 10*time.Second), controller.ListAllFTCodeHash)
 	router.GET("/ft/codehash-info/:codehash",
-		KeepJsonContentType(), cache.CachePageWithoutHeader(store, 10*time.Second, controller.ListFTSummary))
+		cache.CacheByRequestURI(store, 10*time.Second), controller.ListFTSummary)
 	router.GET("/ft/info/all",
-		KeepJsonContentType(), cache.CachePageWithoutHeader(store, 10*time.Second, controller.ListAllFTInfo))
+		cache.CacheByRequestURI(store, 10*time.Second), controller.ListAllFTInfo)
 	router.GET("/ft/transfer-times/:codehash/:genesis",
-		KeepJsonContentType(), cache.CachePageWithoutHeader(store, 10*time.Second, controller.GetFTTransferVolumeInBlockRange))
+		cache.CacheByRequestURI(store, 10*time.Second), controller.GetFTTransferVolumeInBlockRange)
 	router.GET("/ft/owners/:codehash/:genesis",
-		KeepJsonContentType(), cache.CachePageWithoutHeader(store, 1*time.Second, controller.ListFTOwners))
+		cache.CacheByRequestURI(store, 1*time.Second), controller.ListFTOwners)
 	router.GET("/ft/summary/:address",
-		KeepJsonContentType(), cache.CachePageWithoutHeader(store, 2*time.Second, controller.ListAllFTBalanceByOwner))
+		cache.CacheByRequestURI(store, 2*time.Second), controller.ListAllFTBalanceByOwner)
 
 	// without cache
 	router.GET("/ft/balance/:codehash/:genesis/:address", controller.GetFTBalanceByOwner)
 
 	router.GET("/ft/history/:codehash/:genesis/:address",
-		KeepJsonContentType(), cache.CachePageWithoutHeader(store, 10*time.Second, controller.GetFTHistoryByGenesis))
+		cache.CacheByRequestURI(store, 10*time.Second), controller.GetFTHistoryByGenesis)
 
 	router.GET("/nft/info/all",
-		KeepJsonContentType(), cache.CachePageWithoutHeader(store, 10*time.Second, controller.ListAllNFTInfo))
+		cache.CacheByRequestURI(store, 10*time.Second), controller.ListAllNFTInfo)
 	router.GET("/nft/codehash/all",
-		KeepJsonContentType(), cache.CachePageWithoutHeader(store, 10*time.Second, controller.ListAllNFTCodeHash))
+		cache.CacheByRequestURI(store, 10*time.Second), controller.ListAllNFTCodeHash)
 	router.GET("/nft/codehash-info/:codehash",
-		KeepJsonContentType(), cache.CachePageWithoutHeader(store, 10*time.Second, controller.ListNFTSummary))
+		cache.CacheByRequestURI(store, 10*time.Second), controller.ListNFTSummary)
 	router.GET("/nft/genesis-info/:codehash/:genesis",
-		KeepJsonContentType(), cache.CachePageWithoutHeader(store, 10*time.Second, controller.ListNFTInfoByGenesis))
+		cache.CacheByRequestURI(store, 10*time.Second), controller.ListNFTInfoByGenesis)
 
 	router.GET("/nft/transfer-times/:codehash/:genesis/:tokenid",
-		KeepJsonContentType(), cache.CachePageWithoutHeader(store, 10*time.Second, controller.GetNFTTransferTimesInBlockRange))
+		cache.CacheByRequestURI(store, 10*time.Second), controller.GetNFTTransferTimesInBlockRange)
 	router.GET("/nft/owners/:codehash/:genesis",
-		KeepJsonContentType(), cache.CachePageWithoutHeader(store, 2*time.Second, controller.ListNFTOwners))
+		cache.CacheByRequestURI(store, 2*time.Second), controller.ListNFTOwners)
 	router.GET("/nft/summary/:address",
-		KeepJsonContentType(), cache.CachePageWithoutHeader(store, 2*time.Second, controller.ListAllNFTByOwner))
+		cache.CacheByRequestURI(store, 2*time.Second), controller.ListAllNFTByOwner)
 
 	// without cache
 	router.GET("/nft/detail/:codehash/:genesis/:address", controller.ListNFTCountByOwner)
 
 	router.GET("/nft/history/:codehash/:genesis/:address",
-		KeepJsonContentType(), cache.CachePageWithoutHeader(store, 10*time.Second, controller.GetNFTHistoryByGenesis))
+		cache.CacheByRequestURI(store, 10*time.Second), controller.GetNFTHistoryByGenesis)
 	router.GET("/address/:address/history",
-		KeepJsonContentType(), cache.CachePageWithoutHeader(store, 10*time.Second, controller.GetHistoryByAddress))
+		cache.CacheByRequestURI(store, 10*time.Second), controller.GetHistoryByAddress)
 	router.GET("/contract/history/:codehash/:genesis/:address",
-		KeepJsonContentType(), cache.CachePageWithoutHeader(store, 10*time.Second, controller.GetHistoryByGenesis))
+		cache.CacheByRequestURI(store, 10*time.Second), controller.GetHistoryByGenesis)
 	router.GET("/token/info",
-		KeepJsonContentType(), cache.CachePageWithoutHeader(store, 10*time.Second, controller.ListAllTokenInfo))
+		cache.CacheByRequestURI(store, 10*time.Second), controller.ListAllTokenInfo)
 
 	heightAPI := router.Group("/height/:height")
 	{
