@@ -13,6 +13,8 @@ import (
 	"go.uber.org/zap"
 )
 
+const MAX_HISTORY_LIMIT = 1024000
+
 // GetHistoryByAddress
 // @Summary 通过地址address获取相关tx历史列表，返回详细输入/输出
 // @Tags History
@@ -41,7 +43,7 @@ func GetHistoryByAddress(ctx *gin.Context) {
 		return
 	}
 
-	if cursor+size > 1024 {
+	if cursor+size > MAX_HISTORY_LIMIT {
 		logger.Log.Info("size invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "size invalid"})
 		return
@@ -100,7 +102,7 @@ func GetHistoryByGenesis(ctx *gin.Context) {
 		return
 	}
 
-	if cursor+size > 1024 {
+	if cursor+size > MAX_HISTORY_LIMIT {
 		logger.Log.Info("size invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "size invalid"})
 		return
