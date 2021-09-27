@@ -189,4 +189,5 @@ type ContractSwapAggregateAmountResp struct {
 	CloseAmount int `json:"closeAmount"` // 收盘Token1存量
 	MinAmount   int `json:"minAmount"`   // 最低Token1存量
 	MaxAmount   int `json:"maxAmount"`   // 最高Token1存量
+	Count       int `json:"txCount"`     // 交易次数
 }

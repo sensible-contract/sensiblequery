@@ -153,7 +153,7 @@ ORDER BY height DESC
 
 func contractSwapAggregateAmountResultSRF(rows *sql.Rows) (interface{}, error) {
 	var ret model.ContractSwapAggregateAmountDo
-	err := rows.Scan(&ret.Height, &ret.BlockTime, &ret.OpenAmount, &ret.CloseAmount, &ret.MinAmount, &ret.MaxAmount)
+	err := rows.Scan(&ret.Height, &ret.BlockTime, &ret.OpenAmount, &ret.CloseAmount, &ret.MinAmount, &ret.MaxAmount, &ret.Count)
 	if err != nil {
 		return nil, err
 	}
@@ -172,12 +172,13 @@ func GetContractSwapAggregateAmountInBlocksByHeightRange(interval, blkStartHeigh
 	}
 
 	psql := fmt.Sprintf(`
-SELECT height, blocktime, open_amount, close_amount, min_amount, max_amount FROM (
+SELECT height, blocktime, open_amount, close_amount, min_amount, max_amount, tx_count FROM (
     SELECT ts * %d as height,
            anyLast(amount) as open_amount,
            any(amount) as close_amount,
            min(amount) as min_amount,
-           max(amount) as max_amount
+           max(amount) as max_amount,
+           count(1) as tx_count
     FROM (
       SELECT intDiv(height, %d) as ts,
              out_value1 as amount
@@ -202,7 +203,7 @@ ORDER BY height DESC
 
 	blksRet, err := clickhouse.ScanAll(psql, contractSwapAggregateAmountResultSRF)
 	if err != nil {
-		logger.Log.Info("query blk failed", zap.Error(err))
+		logger.Log.Info("query swap aggregate amount failed", zap.Error(err))
 		return nil, err
 	}
 	if blksRet == nil {
@@ -218,6 +219,7 @@ ORDER BY height DESC
 			CloseAmount: int(block.CloseAmount),
 			MinAmount:   int(block.MinAmount),
 			MaxAmount:   int(block.MaxAmount),
+			Count:       int(block.Count),
 		})
 	}
 	return

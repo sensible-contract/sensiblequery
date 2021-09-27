@@ -183,4 +183,5 @@ type ContractSwapAggregateAmountDo struct {
 	CloseAmount uint64 `db:"close_amount"`
 	MinAmount   uint64 `db:"min_amount"`
 	MaxAmount   uint64 `db:"max_amount"`
+	Count       uint64 `db:"tx_count"`
 }
