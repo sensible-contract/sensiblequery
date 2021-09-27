@@ -308,7 +308,7 @@ func GetAllNFTBalanceByAddress(cursor, size int, addressPkh []byte) (nftOwnersRs
 	for _, val := range vals {
 		pendingCountCmds = append(pendingCountCmds, pipe.ZScore(ctx, newKey, val.Member.(string)))
 		// metatx of each token
-		nftInfoCmds = append(nftInfoCmds, pipe.HGetAll(ctx, "nI"+val.Member.(string)+"0"))
+		nftInfoCmds = append(nftInfoCmds, pipe.HGetAll(ctx, "nI"+val.Member.(string)+"1"))
 	}
 	_, err = pipe.Exec(ctx)
 	if err != nil && err != redis.Nil {

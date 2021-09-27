@@ -30,7 +30,7 @@ func getNFTMetaInfo(nftsRsp []*model.NFTInfoResp) {
 	for _, nft := range nftsRsp {
 		// nftinfo of each token
 		key, _ := hex.DecodeString(nft.CodeHashHex + nft.GenesisHex)
-		nftinfoCmds = append(nftinfoCmds, pipe.HGetAll(ctx, "nI"+string(key)+"0"))
+		nftinfoCmds = append(nftinfoCmds, pipe.HGetAll(ctx, "nI"+string(key)+"1"))
 	}
 	_, err := pipe.Exec(ctx)
 	if err != nil && err != redis.Nil {
