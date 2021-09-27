@@ -90,6 +90,7 @@ WHERE (height = 4294967295 OR
     SELECT height FROM tx_height
     WHERE txid = unhex('%s')
 )) AND txid = unhex('%s')
+ORDER BY height
 LIMIT 1`, SQL_FIELEDS_TX_TIMESTAMP, txidHex, txidHex, txidHex)
 	return GetTxBySql(psql)
 }
