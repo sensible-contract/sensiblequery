@@ -117,10 +117,10 @@ func getNFTMetaInfoForSell(nftSellsRsp []*model.NFTSellResp) {
 		// sensible/supply
 		if nftinfo, err := nftInfoCmds[idx].Result(); err == nil {
 			supply, _ := strconv.Atoi(nftinfo["supply"])
-			metavout, _ := strconv.Atoi(nftinfo["metavout"])
 			nft.Supply = supply
-			nft.MetaTxIdHex = hex.EncodeToString([]byte(nftinfo["metatxid"]))
+			metavout, _ := strconv.Atoi(nftinfo["metavout"])
 			nft.MetaOutputIndex = metavout
+			nft.MetaTxIdHex = hex.EncodeToString([]byte(nftinfo["metatxid"]))
 			nft.SensibleIdHex = hex.EncodeToString([]byte(nftinfo["sensibleid"]))
 		} else if err == redis.Nil {
 			logger.Log.Info("getNFTMetaInfoForSell nftinfo not found")

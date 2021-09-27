@@ -30,7 +30,7 @@ func getNFTMetaInfo(nftsRsp []*model.NFTInfoResp) {
 	for _, nft := range nftsRsp {
 		// nftinfo of each token
 		key, _ := hex.DecodeString(nft.CodeHashHex + nft.GenesisHex)
-		nftinfoCmds = append(nftinfoCmds, pipe.HGetAll(ctx, "ni"+string(key)))
+		nftinfoCmds = append(nftinfoCmds, pipe.HGetAll(ctx, "nI"+string(key)+"0"))
 	}
 	_, err := pipe.Exec(ctx)
 	if err != nil && err != redis.Nil {
@@ -45,6 +45,9 @@ func getNFTMetaInfo(nftsRsp []*model.NFTInfoResp) {
 		}
 		supply, _ := strconv.Atoi(nftinfo["supply"])
 		nft.Supply = supply
+		metavout, _ := strconv.Atoi(nftinfo["metavout"])
+		nft.MetaOutputIndex = metavout
+		nft.MetaTxIdHex = hex.EncodeToString([]byte(nftinfo["metatxid"]))
 		nft.SensibleIdHex = hex.EncodeToString([]byte(nftinfo["sensibleid"]))
 	}
 }
