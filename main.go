@@ -105,12 +105,15 @@ func main() {
 	router.GET("/contract/swap-aggregate-amount/:codehash/:genesis",
 		cache.CacheByRequestURI(store, 60*time.Second), controller.GetContractSwapAggregateAmountInBlockRange)
 
+	router.GET("/ft/info/all",
+		cache.CacheByRequestURI(store, 10*time.Second), controller.ListAllFTInfo)
 	router.GET("/ft/codehash/all",
 		cache.CacheByRequestURI(store, 10*time.Second), controller.ListAllFTCodeHash)
 	router.GET("/ft/codehash-info/:codehash",
 		cache.CacheByRequestURI(store, 10*time.Second), controller.ListFTSummary)
-	router.GET("/ft/info/all",
-		cache.CacheByRequestURI(store, 10*time.Second), controller.ListAllFTInfo)
+	router.GET("/ft/genesis-info/:codehash/:genesis",
+		cache.CacheByRequestURI(store, 10*time.Second), controller.ListFTInfoByGenesis)
+
 	router.GET("/ft/transfer-times/:codehash/:genesis",
 		cache.CacheByRequestURI(store, 10*time.Second), controller.GetFTTransferVolumeInBlockRange)
 	router.GET("/ft/owners/:codehash/:genesis",

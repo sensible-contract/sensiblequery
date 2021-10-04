@@ -60,6 +60,26 @@ func getFTDecimal(ftsRsp []*model.FTInfoResp) {
 	}
 }
 
+func ListFTInfoByGenesis(codeHashHex, genesisHex string) (ftRsp *model.FTInfoResp, err error) {
+	psql := fmt.Sprintf(`
+SELECT codehash, genesis, count(1),
+       sum(in_data_value) AS in_volume , sum(out_data_value) AS out_volume,
+       sum(invalue) AS in_satoshi , sum(outvalue) AS out_satoshi FROM blk_codehash_height
+WHERE code_type = 1 AND codehash = unhex('%s') AND genesis = unhex('%s')
+GROUP BY codehash, genesis
+ORDER BY count(1) DESC
+`, codeHashHex, genesisHex)
+	ftsRsp, err := GetFTInfoBySQL(psql)
+	if err != nil {
+		return
+	}
+	if len(ftsRsp) > 0 {
+		getFTDecimal(ftsRsp)
+		return ftsRsp[0], nil
+	}
+	return nil, errors.New("not exist")
+}
+
 func GetFTSummary(codeHashHex string) (ftsRsp []*model.FTInfoResp, err error) {
 	psql := fmt.Sprintf(`
 SELECT codehash, genesis, count(1),
