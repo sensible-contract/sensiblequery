@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/signal"
 	"sensiblequery/controller"
+	"sensiblequery/dao/rdb"
 	_ "sensiblequery/docs"
 	"sensiblequery/logger"
 	"syscall"
@@ -54,7 +55,8 @@ func main() {
 	// go get -u github.com/swaggo/swag/cmd/swag@v1.6.7
 	url := ginSwagger.URL(basePath + "/swagger/doc.json")
 
-	store := persist.NewMemoryStore(time.Second)
+	// store := persist.NewMemoryStore(time.Second)
+	store := persist.NewRedisStore(rdb.CacheClient)
 
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
 
