@@ -53,43 +53,47 @@ LIMIT %d, %d`,
 }
 
 //////////////// genesis
-func GetHistoryByGenesis(cursor, size int, codeHashHex, genesisHex, addressHex string) (txOutsRsp []*model.TxOutHistoryResp, err error) {
+func GetHistoryByGenesis(cursor, size int, codehashHex, genesisHex, addressHex string) (txOutsRsp []*model.TxOutHistoryResp, err error) {
 	logger.Log.Info("query tx history by codehash/genesis for", zap.String("address", addressHex))
 	addressMatch := ""
 	if addressHex == "0000000000000000000000000000000000000000" {
 		addressMatch = "OR address = ''"
 	}
 
+	codehashMatch := ""
+	genesisMatch := ""
+	if codehashHex != "0000000000000000000000000000000000000000" {
+		codehashMatch = fmt.Sprintf("codehash = unhex('%s') AND", codehashHex)
+		genesisMatch = fmt.Sprintf("genesis = unhex('%s') AND", genesisHex)
+	}
+
 	maxOffset := cursor + size
+	// script_pk -> ''
 	psql := fmt.Sprintf(`
-SELECT txid, idx, address, codehash, genesis, satoshi, script_type, script_pk, height, txidx, io_type FROM
+SELECT txid, idx, address, codehash, genesis, satoshi, script_type, '', height, txidx, io_type FROM
 (
-SELECT utxid AS txid, vout AS idx, address, codehash, genesis, satoshi, script_type, script_pk, height, utxidx AS txidx, 1 AS io_type FROM txout
+SELECT utxid AS txid, vout AS idx, address, codehash, genesis, satoshi, script_type, '', height, utxidx AS txidx, 1 AS io_type FROM txout
 WHERE (utxid, vout, height) in (
     SELECT utxid, vout, height FROM txout_genesis_height
-    WHERE codehash = unhex('%s') AND
-          genesis = unhex('%s') AND
-          (address = unhex('%s') %s)
+    WHERE %s %s (address = unhex('%s') %s)
     ORDER BY height DESC
     LIMIT %d
 )
 
 UNION ALL
 
-SELECT txid, idx, address, codehash, genesis, satoshi, script_type, script_pk, height, txidx, 0 AS io_type FROM txin
+SELECT txid, idx, address, codehash, genesis, satoshi, script_type, '', height, txidx, 0 AS io_type FROM txin
 WHERE (txid, idx, height) in (
     SELECT txid, idx, height FROM txin_genesis_height
-    WHERE codehash = unhex('%s') AND
-          genesis = unhex('%s') AND
-          (address = unhex('%s') %s)
+    WHERE %s %s (address = unhex('%s') %s)
     ORDER BY height DESC
     LIMIT %d
 )
 )
 ORDER BY height DESC, txidx DESC
 LIMIT %d, %d`,
-		codeHashHex, genesisHex, addressHex, addressMatch, maxOffset,
-		codeHashHex, genesisHex, addressHex, addressMatch, maxOffset,
+		codehashMatch, genesisMatch, addressHex, addressMatch, maxOffset,
+		codehashMatch, genesisMatch, addressHex, addressMatch, maxOffset,
 		cursor, size)
 	return GetHistoryBySql(psql)
 }
