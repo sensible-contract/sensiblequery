@@ -112,6 +112,7 @@ func GetHistoryBySql(psql string) (txOutHistoriesRsp []*model.TxOutHistoryResp, 
 	txOuts := txOutsRet.([]*model.TxOutHistoryDO)
 	for _, txout := range txOuts {
 		txOutRsp := getTxOutputRespFromDo(&txout.TxOutDO)
+		txOutRsp.ScriptPkHex = ""
 		txOutHistoryRsp := &model.TxOutHistoryResp{
 			TxOutResp: *txOutRsp,
 		}
