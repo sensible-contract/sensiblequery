@@ -138,8 +138,8 @@ type TxStandardOutResp struct {
 
 type TxOutHistoryResp struct {
 	TxOutResp
-
-	IOType int `json:"ioType"` // 1为输出包含(即收入)，0为输入包含(即花费)
+	BlockTime int `json:"timestamp"` // 区块时间戳
+	IOType    int `json:"ioType"`    // 1为输出包含(即收入)，0为输入包含(即花费)
 }
 
 type TxOutStatusResp struct {

@@ -13,7 +13,7 @@ import (
 //////////////// history
 func txOutHistoryResultSRF(rows *sql.Rows) (interface{}, error) {
 	var ret model.TxOutHistoryDO
-	err := rows.Scan(&ret.TxId, &ret.Vout, &ret.Address, &ret.CodeHash, &ret.Genesis, &ret.Satoshi, &ret.ScriptType, &ret.ScriptPk, &ret.Height, &ret.Idx, &ret.IOType)
+	err := rows.Scan(&ret.TxId, &ret.Vout, &ret.Address, &ret.CodeHash, &ret.Genesis, &ret.Satoshi, &ret.ScriptType, &ret.ScriptPk, &ret.Height, &ret.Idx, &ret.IOType, &ret.BlockTime)
 	if err != nil {
 		return nil, err
 	}
@@ -24,26 +24,30 @@ func txOutHistoryResultSRF(rows *sql.Rows) (interface{}, error) {
 func GetHistoryByAddress(cursor, size int, addressHex string) (txOutsRsp []*model.TxOutHistoryResp, err error) {
 	maxOffset := cursor + size
 	psql := fmt.Sprintf(`
-SELECT txid, idx, address, codehash, genesis, satoshi, script_type, script_pk, height, txidx, io_type FROM
+SELECT txid, idx, address, codehash, genesis, satoshi, script_type, script_pk, height, txidx, io_type, blk.blocktime FROM
 (
-SELECT utxid AS txid, vout AS idx, address, codehash, genesis, satoshi, script_type, script_pk, height, utxidx AS txidx, 1 AS io_type FROM txout
-WHERE (utxid, vout, height) in (
-    SELECT utxid, vout, height FROM txout_address_height
-    WHERE address = unhex('%s')
-    ORDER BY height DESC
-    LIMIT %d
-)
+    SELECT utxid AS txid, vout AS idx, address, codehash, genesis, satoshi, script_type, script_pk, height, utxidx AS txidx, 1 AS io_type FROM txout
+    WHERE (utxid, vout, height) in (
+        SELECT utxid, vout, height FROM txout_address_height
+        WHERE address = unhex('%s')
+        ORDER BY height DESC
+        LIMIT %d
+    )
 
-UNION ALL
+    UNION ALL
 
-SELECT txid, idx, address, codehash, genesis, satoshi, script_type, script_pk, height, txidx, 0 AS io_type FROM txin
-WHERE (txid, idx, height) in (
-    SELECT txid, idx, height FROM txin_address_height
-    WHERE address = unhex('%s')
-    ORDER BY height DESC
-    LIMIT %d
+    SELECT txid, idx, address, codehash, genesis, satoshi, script_type, script_pk, height, txidx, 0 AS io_type FROM txin
+    WHERE (txid, idx, height) in (
+        SELECT txid, idx, height FROM txin_address_height
+        WHERE address = unhex('%s')
+        ORDER BY height DESC
+        LIMIT %d
+    )
 )
-)
+LEFT JOIN (
+    SELECT height, blocktime FROM blk_height
+) AS blk
+USING height
 ORDER BY height DESC, txidx DESC
 LIMIT %d, %d`,
 		addressHex, maxOffset,
@@ -70,26 +74,31 @@ func GetHistoryByGenesis(cursor, size int, codehashHex, genesisHex, addressHex s
 	maxOffset := cursor + size
 	// script_pk -> ''
 	psql := fmt.Sprintf(`
-SELECT txid, idx, address, codehash, genesis, satoshi, script_type, script_pk, height, txidx, io_type FROM
+SELECT txid, idx, address, codehash, genesis, satoshi, script_type, script_pk, height, txidx, io_type, blk.blocktime FROM
 (
-SELECT utxid AS txid, vout AS idx, address, codehash, genesis, satoshi, script_type, script_pk, height, utxidx AS txidx, 1 AS io_type FROM txout
-WHERE (utxid, vout, height) in (
-    SELECT utxid, vout, height FROM txout_genesis_height
-    WHERE %s %s (address = unhex('%s') %s)
-    ORDER BY height DESC
-    LIMIT %d
-)
+    SELECT utxid AS txid, vout AS idx, address, codehash, genesis, satoshi, script_type, script_pk, height, utxidx AS txidx, 1 AS io_type FROM txout
+    WHERE (utxid, vout, height) in (
+        SELECT utxid, vout, height FROM txout_genesis_height
+        WHERE %s %s (address = unhex('%s') %s)
+        ORDER BY height DESC
+        LIMIT %d
+    )
 
-UNION ALL
+    UNION ALL
 
-SELECT txid, idx, address, codehash, genesis, satoshi, script_type, script_pk, height, txidx, 0 AS io_type FROM txin
-WHERE (txid, idx, height) in (
-    SELECT txid, idx, height FROM txin_genesis_height
-    WHERE %s %s (address = unhex('%s') %s)
-    ORDER BY height DESC
-    LIMIT %d
+    SELECT txid, idx, address, codehash, genesis, satoshi, script_type, script_pk, height, txidx, 0 AS io_type FROM txin
+    WHERE (txid, idx, height) in (
+        SELECT txid, idx, height FROM txin_genesis_height
+        WHERE %s %s (address = unhex('%s') %s)
+        ORDER BY height DESC
+        LIMIT %d
+    )
 )
-)
+LEFT JOIN (
+    SELECT height, blocktime FROM blk_height
+    WHERE height >= 660000
+) AS blk
+USING height
 ORDER BY height DESC, txidx DESC
 LIMIT %d, %d`,
 		codehashMatch, genesisMatch, addressHex, addressMatch, maxOffset,
@@ -117,6 +126,7 @@ func GetHistoryBySql(psql string) (txOutHistoriesRsp []*model.TxOutHistoryResp, 
 			TxOutResp: *txOutRsp,
 		}
 		txOutHistoryRsp.IOType = int(txout.IOType)
+		txOutHistoryRsp.BlockTime = int(txout.BlockTime)
 		txOutHistoriesRsp = append(txOutHistoriesRsp, txOutHistoryRsp)
 	}
 	return

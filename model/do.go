@@ -137,8 +137,8 @@ type TxOutDO struct {
 
 type TxOutHistoryDO struct {
 	TxOutDO
-
-	IOType uint8 `db:"io_type"` // 0: input; 1: output
+	BlockTime uint32 `db:"blocktime"`
+	IOType    uint8  `db:"io_type"` // 0: input; 1: output
 }
 
 type TxOutStatusDO struct {
