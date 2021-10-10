@@ -153,7 +153,7 @@ func mergeUtxoByCodeHashGenesisAddress(codeHash, genesisId, addressPkh []byte, i
 	}
 	nUnion, err := rdb.ZUnionStore(ctx, finalKey, finalZs).Result()
 	if err != nil {
-		logger.Log.Info("ZDiffStore redis failed", zap.Error(err))
+		logger.Log.Info("ZUnionStore redis failed", zap.Error(err))
 		return
 	}
 	logger.Log.Info("ZUnionStore", zap.Int64("n", nUnion))
