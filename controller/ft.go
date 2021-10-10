@@ -215,6 +215,7 @@ func GetFTTransferVolumeInBlockRange(ctx *gin.Context) {
 // @Router /ft/owners/{codehash}/{genesis} [get]
 func ListFTOwners(ctx *gin.Context) {
 	logger.Log.Info("ListFTOwners enter")
+
 	// get cursor/size
 	cursorString := ctx.DefaultQuery("cursor", "0")
 	cursor, err := strconv.Atoi(cursorString)
@@ -274,6 +275,7 @@ func ListFTOwners(ctx *gin.Context) {
 // @Router /ft/summary/{address} [get]
 func ListAllFTBalanceByOwner(ctx *gin.Context) {
 	logger.Log.Info("ListAllFTOwners enter")
+
 	// get cursor/size
 	cursorString := ctx.DefaultQuery("cursor", "0")
 	cursor, err := strconv.Atoi(cursorString)

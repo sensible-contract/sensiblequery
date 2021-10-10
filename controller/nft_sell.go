@@ -23,6 +23,7 @@ import (
 // @Router /nft/sell/utxo [get]
 func GetNFTSellUtxo(ctx *gin.Context) {
 	logger.Log.Info("GetNFTSellUtxo enter")
+
 	// get cursor/size
 	cursorString := ctx.DefaultQuery("cursor", "0")
 	cursor, err := strconv.Atoi(cursorString)
@@ -64,6 +65,7 @@ func GetNFTSellUtxo(ctx *gin.Context) {
 // @Router /nft/sell/utxo-by-address/{address} [get]
 func GetNFTSellUtxoByAddress(ctx *gin.Context) {
 	logger.Log.Info("GetNFTSellUtxoByAddress enter")
+
 	// get cursor/size
 	cursorString := ctx.DefaultQuery("cursor", "0")
 	cursor, err := strconv.Atoi(cursorString)
@@ -116,6 +118,7 @@ func GetNFTSellUtxoByAddress(ctx *gin.Context) {
 // @Router /nft/sell/utxo/{codehash}/{genesis} [get]
 func GetNFTSellUtxoByGenesis(ctx *gin.Context) {
 	logger.Log.Info("GetNFTSellUtxoByGenesis enter")
+
 	// get cursor/size
 	cursorString := ctx.DefaultQuery("cursor", "0")
 	cursor, err := strconv.Atoi(cursorString)

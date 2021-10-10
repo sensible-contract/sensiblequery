@@ -37,13 +37,7 @@ func GetHistoryByAddress(ctx *gin.Context) {
 	}
 	sizeString := ctx.DefaultQuery("size", "16")
 	size, err := strconv.Atoi(sizeString)
-	if err != nil || size <= 0 {
-		logger.Log.Info("size invalid", zap.Error(err))
-		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "size invalid"})
-		return
-	}
-
-	if cursor+size > MAX_HISTORY_LIMIT {
+	if err != nil || size <= 0 || cursor+size > MAX_HISTORY_LIMIT {
 		logger.Log.Info("size invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "size invalid"})
 		return
@@ -96,13 +90,7 @@ func GetHistoryByGenesis(ctx *gin.Context) {
 	}
 	sizeString := ctx.DefaultQuery("size", "16")
 	size, err := strconv.Atoi(sizeString)
-	if err != nil || size <= 0 {
-		logger.Log.Info("size invalid", zap.Error(err))
-		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "size invalid"})
-		return
-	}
-
-	if cursor+size > MAX_HISTORY_LIMIT {
+	if err != nil || size <= 0 || cursor+size > MAX_HISTORY_LIMIT {
 		logger.Log.Info("size invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "size invalid"})
 		return

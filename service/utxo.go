@@ -114,27 +114,27 @@ func GetNFTUtxoByTokenIndex(key string, tokenIndex string) (txOutsRsp *model.TxO
 //////////////// merge ft utxo
 func mergeUtxoByCodeHashGenesisAddress(codeHash, genesisId, addressPkh []byte, isNFT bool) (finalKey string, err error) {
 	// 注意这里查询需要原子化，可使用pipeline
+	newUtxoKey := ""
 	addressKey := string(addressPkh) + "}" + string(codeHash) + string(genesisId)
 	addressUtxoConfirmed := ""
 	addressUtxoSpentUnconfirmed := ""
-	oldUtxoKey := ""
-	newUtxoKey := ""
+	tmpUtxoKey := ""
 
 	if isNFT {
 		addressUtxoConfirmed = "{nu" + addressKey
 		addressUtxoSpentUnconfirmed = "mp:s:{nu" + addressKey
-		oldUtxoKey = "mp:t:{nu" + addressKey
+		tmpUtxoKey = "mp:t:{nu" + addressKey
 		newUtxoKey = "mp:{nu" + addressKey
 		finalKey = "mp:z:{nu" + addressKey
 	} else {
 		addressUtxoConfirmed = "{fu" + addressKey
 		addressUtxoSpentUnconfirmed = "mp:s:{fu" + addressKey
-		oldUtxoKey = "mp:t:{fu" + addressKey
+		tmpUtxoKey = "mp:t:{fu" + addressKey
 		newUtxoKey = "mp:{fu" + addressKey
 		finalKey = "mp:z:{fu" + addressKey
 	}
 
-	nDiff, err := rdb.ZDiffStore(ctx, oldUtxoKey, addressUtxoConfirmed, addressUtxoSpentUnconfirmed).Result()
+	nDiff, err := rdb.ZDiffStore(ctx, tmpUtxoKey, addressUtxoConfirmed, addressUtxoSpentUnconfirmed).Result()
 	if err != nil {
 		logger.Log.Info("ZDiffStore redis failed", zap.Error(err))
 		return
@@ -143,7 +143,7 @@ func mergeUtxoByCodeHashGenesisAddress(codeHash, genesisId, addressPkh []byte, i
 
 	finalZs := &redis.ZStore{
 		Keys: []string{
-			oldUtxoKey, newUtxoKey,
+			tmpUtxoKey, newUtxoKey,
 		},
 	}
 	nUnion, err := rdb.ZUnionStore(ctx, finalKey, finalZs).Result()
@@ -217,7 +217,7 @@ func getUtxoFromRedis(utxoOutpoints []string) (txOutsRsp []*model.TxOutResp, err
 }
 
 //////////////// address utxo
-func GetUtxoByAddress(size int, addressPkh []byte) (txOutsRsp []*model.TxStandardOutResp, err error) {
+func GetUtxoByAddress(cursor, size int, addressPkh []byte) (txOutsRsp []*model.TxStandardOutResp, err error) {
 	logger.Log.Info("GetUtxoByAddress", zap.String("addressHex", hex.EncodeToString(addressPkh)))
 
 	newUtxoKey := "mp:{au" + string(addressPkh) + "}"
@@ -232,20 +232,23 @@ func GetUtxoByAddress(size int, addressPkh []byte) (txOutsRsp []*model.TxStandar
 		logger.Log.Info("get newUtxoNum from redis failed", zap.Error(err))
 		return
 	}
+	logger.Log.Info("newUtxoNum", zap.Int64("n", newUtxoNum))
 	// confirmed count
 	addressUtxoConfirmedNum, err := rdb.ZCard(ctx, addressUtxoConfirmed).Result()
 	if err != nil {
 		logger.Log.Info("get addressUtxoConfirmedNum from redis failed", zap.Error(err))
 		return
 	}
+	logger.Log.Info("addressUtxoConfirmedNum", zap.Int64("n", addressUtxoConfirmedNum))
 	// confirmed spending count(spend still unconfirmed)
 	addressUtxoSpentUnconfirmedNum, err := rdb.ZCard(ctx, addressUtxoSpentUnconfirmed).Result()
 	if err != nil {
 		logger.Log.Info("get addressUtxoSpentUnconfirmedNum from redis failed", zap.Error(err))
 		return
 	}
+	logger.Log.Info("addressUtxoSpentUnconfirmedNum", zap.Int64("n", addressUtxoSpentUnconfirmedNum))
 
-	newUtxoOutpoints, err := rdb.ZRevRange(ctx, newUtxoKey, 0, int64(size)-1).Result()
+	newUtxoOutpoints, err := rdb.ZRevRange(ctx, newUtxoKey, int64(cursor), int64(cursor+size)-1).Result()
 	if err == redis.Nil {
 		newUtxoOutpoints = nil
 	} else if err != nil {
@@ -253,7 +256,7 @@ func GetUtxoByAddress(size int, addressPkh []byte) (txOutsRsp []*model.TxStandar
 		return
 	}
 	// 未超过未确认的utxo数量，或者已确认数量减去已花费数量为0，则直接返回
-	if int64(size) <= newUtxoNum || addressUtxoConfirmedNum == addressUtxoSpentUnconfirmedNum {
+	if int64(cursor+size) <= newUtxoNum || addressUtxoConfirmedNum == addressUtxoSpentUnconfirmedNum {
 		return getNonTokenUtxoFromRedis(newUtxoOutpoints)
 	}
 
@@ -261,7 +264,8 @@ func GetUtxoByAddress(size int, addressPkh []byte) (txOutsRsp []*model.TxStandar
 	zargs := redis.ZRangeArgs{
 		Key:   addressUtxoConfirmed,
 		Start: 0,
-		Stop:  int64(size) - newUtxoNum + addressUtxoSpentUnconfirmedNum,
+		Stop:  int64(cursor+size) - newUtxoNum + addressUtxoSpentUnconfirmedNum,
+		Rev:   true,
 	}
 	nRange, err := rdb.ZRangeStore(ctx, addressUtxoConfirmedRange, zargs).Result()
 	if err != nil {
@@ -279,7 +283,7 @@ func GetUtxoByAddress(size int, addressPkh []byte) (txOutsRsp []*model.TxStandar
 	logger.Log.Info("ZDiffStore", zap.Int64("n", nDiff))
 
 	// 再提取结果
-	utxoOutpoints, err := rdb.ZRevRange(ctx, tmpUtxoKey, 0, int64(size)-1-newUtxoNum).Result()
+	utxoOutpoints, err := rdb.ZRevRange(ctx, tmpUtxoKey, int64(cursor)-newUtxoNum, int64(cursor+size)-1-newUtxoNum).Result()
 	if err == redis.Nil {
 		utxoOutpoints = nil
 	} else if err != nil {

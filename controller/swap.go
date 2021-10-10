@@ -58,7 +58,6 @@ func GetContractSwapDataInBlockRange(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "cursor invalid"})
 		return
 	}
-
 	sizeString := ctx.DefaultQuery("size", "16")
 	size, err := strconv.Atoi(sizeString)
 	if err != nil || size <= 0 {

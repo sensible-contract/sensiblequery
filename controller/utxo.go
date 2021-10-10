@@ -13,6 +13,8 @@ import (
 	"go.uber.org/zap"
 )
 
+const MAX_UTXO_LIMIT = 1024
+
 // GetBalanceByAddress
 // @Summary 通过地址address获取balance
 // @Tags UTXO
@@ -57,10 +59,19 @@ func GetBalanceByAddress(ctx *gin.Context) {
 func GetUtxoByAddress(ctx *gin.Context) {
 	logger.Log.Info("GetUtxoByAddress enter")
 
+	// get cursor
+	cursorString := ctx.DefaultQuery("cursor", "0")
+	cursor, err := strconv.Atoi(cursorString)
+	if err != nil || cursor < 0 {
+		logger.Log.Info("cursor invalid", zap.Error(err))
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "cursor invalid"})
+		return
+	}
+
 	// get size
 	sizeString := ctx.DefaultQuery("size", "16")
 	size, err := strconv.Atoi(sizeString)
-	if err != nil || size <= 0 {
+	if err != nil || size <= 0 || cursor+size > MAX_UTXO_LIMIT {
 		logger.Log.Info("size invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "size invalid"})
 		return
@@ -75,7 +86,7 @@ func GetUtxoByAddress(ctx *gin.Context) {
 		return
 	}
 
-	result, err := service.GetUtxoByAddress(size, addressPkh)
+	result, err := service.GetUtxoByAddress(cursor, size, addressPkh)
 	if err != nil {
 		logger.Log.Info("get block failed", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get txo failed"})
@@ -174,6 +185,8 @@ func GetNFTUtxo(ctx *gin.Context) {
 }
 
 func GetUtxoByCodeHashGenesisAddress(ctx *gin.Context, isNFT bool) {
+	logger.Log.Info("GetUtxoByCodeHashGenesisAddress enter")
+
 	// get cursor/size
 	cursorString := ctx.DefaultQuery("cursor", "0")
 	cursor, err := strconv.Atoi(cursorString)
