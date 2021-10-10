@@ -15,12 +15,7 @@ import (
 
 func mergeUtxoByKeys(addressUtxoConfirmed, addressUtxoSpentUnconfirmed, oldUtxoKey, newUtxoKey, finalKey string) (err error) {
 	// 注意这里查询需要原子化，可使用pipeline
-	tmpZs := &redis.ZStore{
-		Keys: []string{
-			addressUtxoConfirmed, addressUtxoSpentUnconfirmed,
-		},
-	}
-	nDiff, err := rdb.ZDiffStore(ctx, oldUtxoKey, tmpZs).Result()
+	nDiff, err := rdb.ZDiffStore(ctx, oldUtxoKey, addressUtxoConfirmed, addressUtxoSpentUnconfirmed).Result()
 	if err != nil {
 		logger.Log.Info("ZDiffStore redis failed", zap.Error(err))
 		return
@@ -34,7 +29,7 @@ func mergeUtxoByKeys(addressUtxoConfirmed, addressUtxoSpentUnconfirmed, oldUtxoK
 	}
 	nUnion, err := rdb.ZUnionStore(ctx, finalKey, finalZs).Result()
 	if err != nil {
-		logger.Log.Info("ZDiffStore redis failed", zap.Error(err))
+		logger.Log.Info("ZUnionStore redis failed", zap.Error(err))
 		return
 	}
 	logger.Log.Info("ZUnionStore", zap.Int64("n", nUnion))

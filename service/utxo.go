@@ -134,12 +134,7 @@ func mergeUtxoByCodeHashGenesisAddress(codeHash, genesisId, addressPkh []byte, i
 		finalKey = "mp:z:{fu" + addressKey
 	}
 
-	tmpZs := &redis.ZStore{
-		Keys: []string{
-			addressUtxoConfirmed, addressUtxoSpentUnconfirmed,
-		},
-	}
-	nDiff, err := rdb.ZDiffStore(ctx, oldUtxoKey, tmpZs).Result()
+	nDiff, err := rdb.ZDiffStore(ctx, oldUtxoKey, addressUtxoConfirmed, addressUtxoSpentUnconfirmed).Result()
 	if err != nil {
 		logger.Log.Info("ZDiffStore redis failed", zap.Error(err))
 		return
@@ -222,46 +217,80 @@ func getUtxoFromRedis(utxoOutpoints []string) (txOutsRsp []*model.TxOutResp, err
 }
 
 //////////////// address utxo
-func GetUtxoByAddress(cursor, size int, addressPkh []byte) (txOutsRsp []*model.TxStandardOutResp, err error) {
+func GetUtxoByAddress(size int, addressPkh []byte) (txOutsRsp []*model.TxStandardOutResp, err error) {
 	logger.Log.Info("GetUtxoByAddress", zap.String("addressHex", hex.EncodeToString(addressPkh)))
 
+	newUtxoKey := "mp:{au" + string(addressPkh) + "}"
 	addressUtxoConfirmed := "{au" + string(addressPkh) + "}"
 	addressUtxoSpentUnconfirmed := "mp:s:{au" + string(addressPkh) + "}"
-	oldUtxoKey := "mp:t:{au" + string(addressPkh) + "}"
-	newUtxoKey := "mp:{au" + string(addressPkh) + "}"
-	finalKey := "mp:z:{au" + string(addressPkh) + "}"
+	addressUtxoConfirmedRange := "mp:r:{au" + string(addressPkh) + "}"
+	tmpUtxoKey := "mp:t:{au" + string(addressPkh) + "}"
 
-	tmpZs := &redis.ZStore{
-		Keys: []string{
-			addressUtxoConfirmed, addressUtxoSpentUnconfirmed,
-		},
+	// unconfirmed count
+	newUtxoNum, err := rdb.ZCard(ctx, newUtxoKey).Result()
+	if err != nil {
+		logger.Log.Info("get newUtxoNum from redis failed", zap.Error(err))
+		return
 	}
-	nDiff, err := rdb.ZDiffStore(ctx, oldUtxoKey, tmpZs).Result()
+	// confirmed count
+	addressUtxoConfirmedNum, err := rdb.ZCard(ctx, addressUtxoConfirmed).Result()
+	if err != nil {
+		logger.Log.Info("get addressUtxoConfirmedNum from redis failed", zap.Error(err))
+		return
+	}
+	// confirmed spending count(spend still unconfirmed)
+	addressUtxoSpentUnconfirmedNum, err := rdb.ZCard(ctx, addressUtxoSpentUnconfirmed).Result()
+	if err != nil {
+		logger.Log.Info("get addressUtxoSpentUnconfirmedNum from redis failed", zap.Error(err))
+		return
+	}
+
+	newUtxoOutpoints, err := rdb.ZRevRange(ctx, newUtxoKey, 0, int64(size)-1).Result()
+	if err == redis.Nil {
+		newUtxoOutpoints = nil
+	} else if err != nil {
+		logger.Log.Info("GetUtxoByAddress redis failed", zap.Error(err))
+		return
+	}
+	// 未超过未确认的utxo数量，或者已确认数量减去已花费数量为0，则直接返回
+	if int64(size) <= newUtxoNum || addressUtxoConfirmedNum == addressUtxoSpentUnconfirmedNum {
+		return getNonTokenUtxoFromRedis(newUtxoOutpoints)
+	}
+
+	// 否则需要先提取
+	zargs := redis.ZRangeArgs{
+		Key:   addressUtxoConfirmed,
+		Start: 0,
+		Stop:  int64(size) - newUtxoNum + addressUtxoSpentUnconfirmedNum,
+	}
+	nRange, err := rdb.ZRangeStore(ctx, addressUtxoConfirmedRange, zargs).Result()
+	if err != nil {
+		logger.Log.Info("ZRangeStore redis failed", zap.Error(err))
+		return
+	}
+	logger.Log.Info("ZRangeStore", zap.Int64("n", nRange))
+
+	// 再去掉已花费的utxo
+	nDiff, err := rdb.ZDiffStore(ctx, tmpUtxoKey, addressUtxoConfirmedRange, addressUtxoSpentUnconfirmed).Result()
 	if err != nil {
 		logger.Log.Info("ZDiffStore redis failed", zap.Error(err))
 		return
 	}
 	logger.Log.Info("ZDiffStore", zap.Int64("n", nDiff))
 
-	finalZs := &redis.ZStore{
-		Keys: []string{
-			oldUtxoKey, newUtxoKey,
-		},
-	}
-	nUnion, err := rdb.ZUnionStore(ctx, finalKey, finalZs).Result()
-	if err != nil {
-		logger.Log.Info("ZUnionStore redis failed", zap.Error(err))
-		return
-	}
-	logger.Log.Info("ZUnionStore", zap.Int64("n", nUnion))
-	utxoOutpoints, err := rdb.ZRevRange(ctx, finalKey, int64(cursor), int64(cursor+size-1)).Result()
+	// 再提取结果
+	utxoOutpoints, err := rdb.ZRevRange(ctx, tmpUtxoKey, 0, int64(size)-1-newUtxoNum).Result()
 	if err == redis.Nil {
 		utxoOutpoints = nil
 	} else if err != nil {
 		logger.Log.Info("GetUtxoByAddress redis failed", zap.Error(err))
 		return
 	}
-	return getNonTokenUtxoFromRedis(utxoOutpoints)
+
+	for _, utxo := range utxoOutpoints {
+		newUtxoOutpoints = append(newUtxoOutpoints, utxo)
+	}
+	return getNonTokenUtxoFromRedis(newUtxoOutpoints)
 }
 
 ////////////////

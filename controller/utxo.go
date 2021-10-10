@@ -50,7 +50,6 @@ func GetBalanceByAddress(ctx *gin.Context) {
 // @Summary 通过地址address获取相关常规utxo列表
 // @Tags UTXO
 // @Produce  json
-// @Param cursor query int true "起始游标" default(0)
 // @Param size query int true "返回记录数量" default(16)
 // @Param address path string true "Address" default(17SkEw2md5avVNyYgj6RiXuQKNwkXaxFyQ)
 // @Success 200 {object} model.Response{data=[]model.TxStandardOutResp} "{"code": 0, "data": [{}], "msg": "ok"}"
@@ -58,14 +57,6 @@ func GetBalanceByAddress(ctx *gin.Context) {
 func GetUtxoByAddress(ctx *gin.Context) {
 	logger.Log.Info("GetUtxoByAddress enter")
 
-	// get cursor/size
-	cursorString := ctx.DefaultQuery("cursor", "0")
-	cursor, err := strconv.Atoi(cursorString)
-	if err != nil || cursor < 0 {
-		logger.Log.Info("cursor invalid", zap.Error(err))
-		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "cursor invalid"})
-		return
-	}
 	// get size
 	sizeString := ctx.DefaultQuery("size", "16")
 	size, err := strconv.Atoi(sizeString)
@@ -84,7 +75,7 @@ func GetUtxoByAddress(ctx *gin.Context) {
 		return
 	}
 
-	result, err := service.GetUtxoByAddress(cursor, size, addressPkh)
+	result, err := service.GetUtxoByAddress(size, addressPkh)
 	if err != nil {
 		logger.Log.Info("get block failed", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get txo failed"})
