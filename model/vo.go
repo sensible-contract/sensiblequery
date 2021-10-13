@@ -145,6 +145,15 @@ type AddressUTXOResp struct {
 	UTXO                  []*TxStandardOutResp `json:"utxo"`                  // utxo结果
 }
 
+type AddressTokenUTXOResp struct {
+	Cursor                int          `json:"cursor"`                // utxo结果偏移
+	Total                 int          `json:"total"`                 // utxo总量 total = confirmed + unconfirmed - unconfirmedSpend
+	TotalConfirmed        int          `json:"totalConfirmed"`        // 已确认utxo总量
+	TotalUnconfirmedNew   int          `json:"totalUnconfirmed"`      // 未确认新utxo总量
+	TotalUnconfirmedSpend int          `json:"totalUnconfirmedSpend"` // 未确认已花费utxo总量
+	UTXO                  []*TxOutResp `json:"utxo"`                  // utxo结果
+}
+
 type TxOutHistoryResp struct {
 	TxOutResp
 	BlockTime int `json:"timestamp"` // 区块时间戳
@@ -162,6 +171,7 @@ type BalanceResp struct {
 	Address        string `json:"address"`        // address
 	Satoshi        int    `json:"satoshi"`        // 余额satoshi
 	PendingSatoshi int    `json:"pendingSatoshi"` // 待确认余额satoshi
+	UtxoCount      int    `json:"utxoCount"`      // UTXO 数量
 }
 
 ////////////////

@@ -191,17 +191,12 @@ func GetTokenBalanceByCodeHashGenesisAddress(codeHash, genesisId, addressPkh []b
 		logger.Log.Info("GetTokenBalanceByCodeHashGenesisAddress mp:fb, but redis mp failed", zap.Error(err))
 		return
 	}
-
-	// 计算utxo count，有点费
 	logger.Log.Info("GetTokenBalanceByCodeHashGenesisAddress fb", zap.Float64("pendingBalance", mpBalance))
-	finalUtxoKey, err := mergeUtxoByCodeHashGenesisAddress(codeHash, genesisId, addressPkh, false)
-	if err != nil {
-		return
-	}
 
-	utxoCount, err := rdb.ZCard(ctx, finalUtxoKey).Result()
+	// 计算utxo count
+	utxoCount, _, _, _, err := GetUtxoCountByAddress(codeHash, genesisId, addressPkh, "fu")
 	if err != nil {
-		logger.Log.Info("GetTokenBalanceByCodeHashGenesisAddress merge, but redis failed", zap.Error(err))
+		logger.Log.Info("GetTokenBalanceByCodeHashGenesisAddress utxo count, but redis failed", zap.Error(err))
 		return
 	}
 
@@ -209,7 +204,7 @@ func GetTokenBalanceByCodeHashGenesisAddress(codeHash, genesisId, addressPkh []b
 		Address:        utils.EncodeAddress(addressPkh, utils.PubKeyHashAddrID),
 		Balance:        int(balance),
 		PendingBalance: int(mpBalance),
-		UtxoCount:      int(utxoCount),
+		UtxoCount:      utxoCount,
 		Decimal:        decimal,
 	}
 	return balanceRsp, nil

@@ -49,7 +49,7 @@ func GetBalanceByAddress(ctx *gin.Context) {
 }
 
 // GetUtxoDataByAddress
-// @Summary 通过地址address获取相关常规utxo列表
+// @Summary 通过地址address获取相关常规utxo列表，和数量信息
 // @Tags UTXO
 // @Produce  json
 // @Param cursor query int true "起始游标" default(0)
@@ -59,7 +59,25 @@ func GetBalanceByAddress(ctx *gin.Context) {
 // @Router /address/{address}/utxo-data [get]
 func GetUtxoDataByAddress(ctx *gin.Context) {
 	logger.Log.Info("GetUtxoDataByAddress enter")
+	GetUtxoDataByAddressCommon(ctx, true)
+}
 
+// GetUtxoByAddress
+// @Summary 通过地址address获取相关常规utxo列表
+// @Tags UTXO
+// @Produce  json
+// @Param cursor query int true "起始游标" default(0)
+// @Param size query int true "返回记录数量" default(16)
+// @Param address path string true "Address" default(17SkEw2md5avVNyYgj6RiXuQKNwkXaxFyQ)
+// @Success 200 {object} model.Response{data=[]model.TxStandardOutResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Router /address/{address}/utxo [get]
+func GetUtxoByAddress(ctx *gin.Context) {
+	logger.Log.Info("GetUtxoByAddress enter")
+	GetUtxoDataByAddressCommon(ctx, false)
+}
+
+func GetUtxoDataByAddressCommon(ctx *gin.Context, detail bool) {
+	logger.Log.Info("GetUtxoDataByAddressCommon enter")
 	// get cursor
 	cursorString := ctx.DefaultQuery("cursor", "0")
 	cursor, err := strconv.Atoi(cursorString)
@@ -94,71 +112,26 @@ func GetUtxoDataByAddress(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, model.Response{
-		Code: 0,
-		Msg:  "ok",
-		Data: &model.AddressUTXOResp{
-			Cursor:                cursor,
-			Total:                 total,
-			TotalConfirmed:        totalConf,
-			TotalUnconfirmedNew:   totalUnconf,
-			TotalUnconfirmedSpend: totalUnconfSpend,
-			UTXO:                  result,
-		},
-	})
-}
-
-// GetUtxoByAddress
-// @Summary 通过地址address获取相关常规utxo列表
-// @Tags UTXO
-// @Produce  json
-// @Param cursor query int true "起始游标" default(0)
-// @Param size query int true "返回记录数量" default(16)
-// @Param address path string true "Address" default(17SkEw2md5avVNyYgj6RiXuQKNwkXaxFyQ)
-// @Success 200 {object} model.Response{data=[]model.TxStandardOutResp} "{"code": 0, "data": [{}], "msg": "ok"}"
-// @Router /address/{address}/utxo [get]
-func GetUtxoByAddress(ctx *gin.Context) {
-	logger.Log.Info("GetUtxoByAddress enter")
-
-	// get cursor
-	cursorString := ctx.DefaultQuery("cursor", "0")
-	cursor, err := strconv.Atoi(cursorString)
-	if err != nil || cursor < 0 {
-		logger.Log.Info("cursor invalid", zap.Error(err))
-		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "cursor invalid"})
-		return
+	if detail {
+		ctx.JSON(http.StatusOK, model.Response{
+			Code: 0,
+			Msg:  "ok",
+			Data: &model.AddressUTXOResp{
+				Cursor:                cursor,
+				Total:                 total,
+				TotalConfirmed:        totalConf,
+				TotalUnconfirmedNew:   totalUnconf,
+				TotalUnconfirmedSpend: totalUnconfSpend,
+				UTXO:                  result,
+			},
+		})
+	} else {
+		ctx.JSON(http.StatusOK, model.Response{
+			Code: 0,
+			Msg:  "ok",
+			Data: result,
+		})
 	}
-
-	// get size
-	sizeString := ctx.DefaultQuery("size", "16")
-	size, err := strconv.Atoi(sizeString)
-	if err != nil || size <= 0 || cursor+size > MAX_UTXO_LIMIT {
-		logger.Log.Info("size invalid", zap.Error(err))
-		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "size invalid"})
-		return
-	}
-
-	address := ctx.Param("address")
-	// check
-	addressPkh, err := utils.DecodeAddress(address)
-	if err != nil {
-		logger.Log.Info("address invalid", zap.Error(err))
-		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "address invalid"})
-		return
-	}
-
-	result, _, _, _, _, err := service.GetUtxoByAddress(cursor, size, addressPkh)
-	if err != nil {
-		logger.Log.Info("get utxo failed", zap.Error(err))
-		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get txo failed"})
-		return
-	}
-
-	ctx.JSON(http.StatusOK, model.Response{
-		Code: 0,
-		Msg:  "ok",
-		Data: result,
-	})
 }
 
 // GetNFTUtxoDetailByTokenIndex
@@ -213,6 +186,38 @@ func GetNFTUtxoDetailByTokenIndex(ctx *gin.Context) {
 	})
 }
 
+// GetFTUtxoData
+// @Summary 通过FT合约CodeHash+溯源genesis获取某地址的utxo列表，和数量信息
+// @Tags UTXO, token FT
+// @Produce  json
+// @Param cursor query int true "起始游标" default(0)
+// @Param size query int true "返回记录数量" default(10)
+// @Param codehash path string true "Code Hash160" default(844c56bb99afc374967a27ce3b46244e2e1fba60)
+// @Param genesis path string true "Genesis ID" default(74967a27ce3b46244e2e1fba60844c56bb99afc3)
+// @Param address path string true "Address" default(17SkEw2md5avVNyYgj6RiXuQKNwkXaxFyQ)
+// @Success 200 {object} model.Response{data=model.AddressTokenUTXOResp} "{"code": 0, "data": {}, "msg": "ok"}"
+// @Router /ft/utxo-data/{codehash}/{genesis}/{address} [get]
+func GetFTUtxoData(ctx *gin.Context) {
+	logger.Log.Info("GetFTUtxoData enter")
+	GetUtxoByCodeHashGenesisAddress(ctx, "fu", true)
+}
+
+// GetNFTUtxoData
+// @Summary 通过NFT合约CodeHash+溯源genesis获取某地址的utxo列表，和数量信息
+// @Tags UTXO, token NFT
+// @Produce  json
+// @Param cursor query int true "起始游标" default(0)
+// @Param size query int true "返回记录数量" default(10)
+// @Param codehash path string true "Code Hash160" default(844c56bb99afc374967a27ce3b46244e2e1fba60)
+// @Param genesis path string true "Genesis ID" default(74967a27ce3b46244e2e1fba60844c56bb99afc3)
+// @Param address path string true "Address" default(17SkEw2md5avVNyYgj6RiXuQKNwkXaxFyQ)
+// @Success 200 {object} model.Response{data=model.AddressTokenUTXOResp} "{"code": 0, "data": {}, "msg": "ok"}"
+// @Router /nft/utxo-data/{codehash}/{genesis}/{address} [get]
+func GetNFTUtxoData(ctx *gin.Context) {
+	logger.Log.Info("GetNFTUtxoData enter")
+	GetUtxoByCodeHashGenesisAddress(ctx, "nu", true)
+}
+
 // GetFTUtxo
 // @Summary 通过FT合约CodeHash+溯源genesis获取某地址的utxo列表
 // @Tags UTXO, token FT
@@ -226,7 +231,7 @@ func GetNFTUtxoDetailByTokenIndex(ctx *gin.Context) {
 // @Router /ft/utxo/{codehash}/{genesis}/{address} [get]
 func GetFTUtxo(ctx *gin.Context) {
 	logger.Log.Info("GetFTUtxo enter")
-	GetUtxoByCodeHashGenesisAddress(ctx, false)
+	GetUtxoByCodeHashGenesisAddress(ctx, "fu", false)
 }
 
 // GetNFTUtxo
@@ -242,10 +247,10 @@ func GetFTUtxo(ctx *gin.Context) {
 // @Router /nft/utxo/{codehash}/{genesis}/{address} [get]
 func GetNFTUtxo(ctx *gin.Context) {
 	logger.Log.Info("GetNFTUtxo enter")
-	GetUtxoByCodeHashGenesisAddress(ctx, true)
+	GetUtxoByCodeHashGenesisAddress(ctx, "nu", false)
 }
 
-func GetUtxoByCodeHashGenesisAddress(ctx *gin.Context, isNFT bool) {
+func GetUtxoByCodeHashGenesisAddress(ctx *gin.Context, key string, detail bool) {
 	logger.Log.Info("GetUtxoByCodeHashGenesisAddress enter")
 
 	// get cursor/size
@@ -291,16 +296,32 @@ func GetUtxoByCodeHashGenesisAddress(ctx *gin.Context, isNFT bool) {
 		return
 	}
 
-	result, err := service.GetUtxoByCodeHashGenesisAddress(cursor, size, codeHash, genesisId, addressPkh, isNFT)
+	result, total, totalConf, totalUnconf, totalUnconfSpend, err := service.GetUtxoByCodeHashGenesisAddress(cursor, size, codeHash, genesisId, addressPkh, key)
 	if err != nil {
 		logger.Log.Info("get block failed", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get txo failed"})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, model.Response{
-		Code: 0,
-		Msg:  "ok",
-		Data: result,
-	})
+	if detail {
+		ctx.JSON(http.StatusOK, model.Response{
+			Code: 0,
+			Msg:  "ok",
+			Data: &model.AddressTokenUTXOResp{
+				Cursor:                cursor,
+				Total:                 total,
+				TotalConfirmed:        totalConf,
+				TotalUnconfirmedNew:   totalUnconf,
+				TotalUnconfirmedSpend: totalUnconfSpend,
+				UTXO:                  result,
+			},
+		})
+
+	} else {
+		ctx.JSON(http.StatusOK, model.Response{
+			Code: 0,
+			Msg:  "ok",
+			Data: result,
+		})
+	}
 }
