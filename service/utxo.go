@@ -56,7 +56,7 @@ func GetUtxoCountByAddress(codeHash, genesisId, addressPkh []byte, key string) (
 	if len(codeHash) == 0 {
 		addressKey = string(addressPkh) + "}"
 	} else {
-		addressKey = addressKey + string(codeHash) + string(genesisId)
+		addressKey = string(addressPkh) + "}" + string(codeHash) + string(genesisId)
 	}
 
 	// key: nu, fu, au
@@ -103,7 +103,7 @@ func GetUtxoOutpointsByAddress(cursor, size int, codeHash, genesisId, addressPkh
 	if len(codeHash) == 0 {
 		addressKey = string(addressPkh) + "}"
 	} else {
-		addressKey = addressKey + string(codeHash) + string(genesisId)
+		addressKey = string(addressPkh) + "}" + string(codeHash) + string(genesisId)
 	}
 
 	// 注意这里查询需要原子化，可使用pipeline
@@ -139,12 +139,13 @@ func GetUtxoOutpointsByAddress(cursor, size int, codeHash, genesisId, addressPkh
 		Stop:  cursor + size - totalUnconf + totalUnconfSpend,
 		Rev:   true,
 	}
+	logger.Log.Info("ZRangeStore", zap.Any("zargs", zargs))
 	nRange, err := rdb.ZRangeStore(ctx, addressUtxoConfirmedRange, zargs).Result()
 	if err != nil {
 		logger.Log.Info("ZRangeStore redis failed", zap.Error(err))
 		return
 	}
-	logger.Log.Info("ZRangeStore", zap.Int64("result", nRange), zap.Any("zargs", zargs))
+	logger.Log.Info("ZRangeStore", zap.Int64("result", nRange))
 
 	// 再去掉已花费的utxo
 	nDiff, err := rdb.ZDiffStore(ctx, tmpUtxoKey, addressUtxoConfirmedRange, addressUtxoSpentUnconfirmed).Result()

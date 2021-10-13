@@ -298,7 +298,7 @@ func GetUtxoByCodeHashGenesisAddress(ctx *gin.Context, key string, detail bool) 
 
 	result, total, totalConf, totalUnconf, totalUnconfSpend, err := service.GetUtxoByCodeHashGenesisAddress(cursor, size, codeHash, genesisId, addressPkh, key)
 	if err != nil {
-		logger.Log.Info("get block failed", zap.Error(err))
+		logger.Log.Info("get token utxo failed", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get txo failed"})
 		return
 	}

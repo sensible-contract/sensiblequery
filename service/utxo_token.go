@@ -80,6 +80,7 @@ func getUtxoFromRedis(utxoOutpoints []string) (txOutsRsp []*model.TxOutResp, err
 			ScriptType: txout.ScriptType,
 		}
 		txOutRsp := getTxOutputRespFromDo(&txOutDO)
+		txOutRsp.ScriptPkHex = ""
 		txOutsRsp = append(txOutsRsp, txOutRsp)
 	}
 
