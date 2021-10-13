@@ -88,6 +88,8 @@ func main() {
 
 	router.GET("/address/:address/utxo",
 		cache.CacheByRequestURI(store, 1*time.Second), controller.GetUtxoByAddress)
+	router.GET("/address/:address/utxo-data",
+		cache.CacheByRequestURI(store, 1*time.Second), controller.GetUtxoDataByAddress)
 
 	router.GET("/nft/sell/utxo", controller.GetNFTSellUtxo)
 	router.GET("/nft/sell/utxo-by-address/:address", controller.GetNFTSellUtxoByAddress)

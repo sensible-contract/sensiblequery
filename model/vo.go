@@ -136,6 +136,15 @@ type TxStandardOutResp struct {
 	Idx           int    `json:"idx"`        // 输出被花费的txid所在区块内序号
 }
 
+type AddressUTXOResp struct {
+	Cursor                int                  `json:"cursor"`                // utxo结果偏移
+	Total                 int                  `json:"total"`                 // utxo总量 total = confirmed + unconfirmed - unconfirmedSpend
+	TotalConfirmed        int                  `json:"totalConfirmed"`        // 已确认utxo总量
+	TotalUnconfirmedNew   int                  `json:"totalUnconfirmed"`      // 未确认新utxo总量
+	TotalUnconfirmedSpend int                  `json:"totalUnconfirmedSpend"` // 未确认已花费utxo总量
+	UTXO                  []*TxStandardOutResp `json:"utxo"`                  // utxo结果
+}
+
 type TxOutHistoryResp struct {
 	TxOutResp
 	BlockTime int `json:"timestamp"` // 区块时间戳

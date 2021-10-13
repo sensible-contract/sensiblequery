@@ -36,7 +36,7 @@ func GetBalanceByAddress(ctx *gin.Context) {
 	logger.Log.Info("GetBalance", zap.String("address", hex.EncodeToString(addressPkh)))
 	result, err := service.GetBalanceByAddress(addressPkh)
 	if err != nil {
-		logger.Log.Info("get block failed", zap.Error(err))
+		logger.Log.Info("get balance failed", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get txo failed"})
 		return
 	}
@@ -48,10 +48,71 @@ func GetBalanceByAddress(ctx *gin.Context) {
 	})
 }
 
+// GetUtxoDataByAddress
+// @Summary 通过地址address获取相关常规utxo列表
+// @Tags UTXO
+// @Produce  json
+// @Param cursor query int true "起始游标" default(0)
+// @Param size query int true "返回记录数量" default(16)
+// @Param address path string true "Address" default(17SkEw2md5avVNyYgj6RiXuQKNwkXaxFyQ)
+// @Success 200 {object} model.Response{data=model.AddressUTXOResp} "{"code": 0, "data": {}, "msg": "ok"}"
+// @Router /address/{address}/utxo-data [get]
+func GetUtxoDataByAddress(ctx *gin.Context) {
+	logger.Log.Info("GetUtxoDataByAddress enter")
+
+	// get cursor
+	cursorString := ctx.DefaultQuery("cursor", "0")
+	cursor, err := strconv.Atoi(cursorString)
+	if err != nil || cursor < 0 {
+		logger.Log.Info("cursor invalid", zap.Error(err))
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "cursor invalid"})
+		return
+	}
+
+	// get size
+	sizeString := ctx.DefaultQuery("size", "16")
+	size, err := strconv.Atoi(sizeString)
+	if err != nil || size <= 0 || cursor+size > MAX_UTXO_LIMIT {
+		logger.Log.Info("size invalid", zap.Error(err))
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "size invalid"})
+		return
+	}
+
+	address := ctx.Param("address")
+	// check
+	addressPkh, err := utils.DecodeAddress(address)
+	if err != nil {
+		logger.Log.Info("address invalid", zap.Error(err))
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "address invalid"})
+		return
+	}
+
+	result, total, totalConf, totalUnconf, totalUnconfSpend, err := service.GetUtxoByAddress(cursor, size, addressPkh)
+	if err != nil {
+		logger.Log.Info("get utxo failed", zap.Error(err))
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get txo failed"})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, model.Response{
+		Code: 0,
+		Msg:  "ok",
+		Data: &model.AddressUTXOResp{
+			Cursor:                cursor,
+			Total:                 total,
+			TotalConfirmed:        totalConf,
+			TotalUnconfirmedNew:   totalUnconf,
+			TotalUnconfirmedSpend: totalUnconfSpend,
+			UTXO:                  result,
+		},
+	})
+}
+
 // GetUtxoByAddress
 // @Summary 通过地址address获取相关常规utxo列表
 // @Tags UTXO
 // @Produce  json
+// @Param cursor query int true "起始游标" default(0)
 // @Param size query int true "返回记录数量" default(16)
 // @Param address path string true "Address" default(17SkEw2md5avVNyYgj6RiXuQKNwkXaxFyQ)
 // @Success 200 {object} model.Response{data=[]model.TxStandardOutResp} "{"code": 0, "data": [{}], "msg": "ok"}"
@@ -86,9 +147,9 @@ func GetUtxoByAddress(ctx *gin.Context) {
 		return
 	}
 
-	result, err := service.GetUtxoByAddress(cursor, size, addressPkh)
+	result, _, _, _, _, err := service.GetUtxoByAddress(cursor, size, addressPkh)
 	if err != nil {
-		logger.Log.Info("get block failed", zap.Error(err))
+		logger.Log.Info("get utxo failed", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get txo failed"})
 		return
 	}

@@ -217,7 +217,8 @@ func getUtxoFromRedis(utxoOutpoints []string) (txOutsRsp []*model.TxOutResp, err
 }
 
 //////////////// address utxo
-func GetUtxoByAddress(cursor, size int, addressPkh []byte) (txOutsRsp []*model.TxStandardOutResp, err error) {
+func GetUtxoByAddress(cursor, size int, addressPkh []byte) (txOutsRsp []*model.TxStandardOutResp,
+	total, totalConf, totalUnconf, totalUnconfSpend int, err error) {
 	logger.Log.Info("GetUtxoByAddress", zap.String("addressHex", hex.EncodeToString(addressPkh)))
 
 	newUtxoKey := "mp:{au" + string(addressPkh) + "}"
@@ -248,6 +249,11 @@ func GetUtxoByAddress(cursor, size int, addressPkh []byte) (txOutsRsp []*model.T
 	}
 	logger.Log.Info("addressUtxoSpentUnconfirmedNum", zap.Int64("n", addressUtxoSpentUnconfirmedNum))
 
+	totalConf = int(addressUtxoConfirmedNum)
+	totalUnconf = int(newUtxoNum)
+	totalUnconfSpend = int(addressUtxoSpentUnconfirmedNum)
+	total = totalConf + totalUnconf - totalUnconfSpend
+
 	newUtxoOutpoints, err := rdb.ZRevRange(ctx, newUtxoKey, int64(cursor), int64(cursor+size)-1).Result()
 	if err == redis.Nil {
 		newUtxoOutpoints = nil
@@ -257,7 +263,8 @@ func GetUtxoByAddress(cursor, size int, addressPkh []byte) (txOutsRsp []*model.T
 	}
 	// 未超过未确认的utxo数量，或者已确认数量减去已花费数量为0，则直接返回
 	if int64(cursor+size) <= newUtxoNum || addressUtxoConfirmedNum == addressUtxoSpentUnconfirmedNum {
-		return getNonTokenUtxoFromRedis(newUtxoOutpoints)
+		txOutsRsp, err = getNonTokenUtxoFromRedis(newUtxoOutpoints)
+		return txOutsRsp, total, totalConf, totalUnconf, totalUnconfSpend, err
 	}
 
 	// 否则需要先提取
@@ -272,7 +279,7 @@ func GetUtxoByAddress(cursor, size int, addressPkh []byte) (txOutsRsp []*model.T
 		logger.Log.Info("ZRangeStore redis failed", zap.Error(err))
 		return
 	}
-	logger.Log.Info("ZRangeStore", zap.Int64("n", nRange))
+	logger.Log.Info("ZRangeStore", zap.Int64("result", nRange), zap.Any("zargs", zargs))
 
 	// 再去掉已花费的utxo
 	nDiff, err := rdb.ZDiffStore(ctx, tmpUtxoKey, addressUtxoConfirmedRange, addressUtxoSpentUnconfirmed).Result()
@@ -283,7 +290,7 @@ func GetUtxoByAddress(cursor, size int, addressPkh []byte) (txOutsRsp []*model.T
 	logger.Log.Info("ZDiffStore", zap.Int64("n", nDiff))
 
 	// 再提取结果
-	utxoOutpoints, err := rdb.ZRevRange(ctx, tmpUtxoKey, int64(cursor)-newUtxoNum, int64(cursor+size)-1-newUtxoNum).Result()
+	utxoOutpoints, err := rdb.ZRevRange(ctx, tmpUtxoKey, int64(cursor), int64(cursor+size)-1-newUtxoNum).Result()
 	if err == redis.Nil {
 		utxoOutpoints = nil
 	} else if err != nil {
@@ -294,7 +301,9 @@ func GetUtxoByAddress(cursor, size int, addressPkh []byte) (txOutsRsp []*model.T
 	for _, utxo := range utxoOutpoints {
 		newUtxoOutpoints = append(newUtxoOutpoints, utxo)
 	}
-	return getNonTokenUtxoFromRedis(newUtxoOutpoints)
+
+	txOutsRsp, err = getNonTokenUtxoFromRedis(newUtxoOutpoints)
+	return txOutsRsp, total, totalConf, totalUnconf, totalUnconfSpend, err
 }
 
 ////////////////
