@@ -30,7 +30,7 @@ SELECT txid, idx, address, codehash, genesis, satoshi, script_type, script_pk, h
     WHERE (utxid, vout, height) in (
         SELECT utxid, vout, height FROM txout_address_height
         WHERE address = unhex('%s')
-        ORDER BY height DESC
+        ORDER BY address DESC, codehash DESC, genesis DESC, height DESC
         LIMIT %d
     )
 
@@ -40,7 +40,7 @@ SELECT txid, idx, address, codehash, genesis, satoshi, script_type, script_pk, h
     WHERE (txid, idx, height) in (
         SELECT txid, idx, height FROM txin_address_height
         WHERE address = unhex('%s')
-        ORDER BY height DESC
+        ORDER BY address DESC, codehash DESC, genesis DESC, height DESC
         LIMIT %d
     )
 ) AS history
@@ -80,7 +80,7 @@ SELECT txid, idx, address, codehash, genesis, satoshi, script_type, script_pk, h
     WHERE (utxid, vout, height) in (
         SELECT utxid, vout, height FROM txout_genesis_height
         WHERE %s %s (address = unhex('%s') %s)
-        ORDER BY height DESC
+        ORDER BY codehash DESC, genesis DESC, address DESC, height DESC
         LIMIT %d
     )
 
@@ -90,7 +90,7 @@ SELECT txid, idx, address, codehash, genesis, satoshi, script_type, script_pk, h
     WHERE (txid, idx, height) in (
         SELECT txid, idx, height FROM txin_genesis_height
         WHERE %s %s (address = unhex('%s') %s)
-        ORDER BY height DESC
+        ORDER BY codehash DESC, genesis DESC, address DESC, height DESC
         LIMIT %d
     )
 ) AS history
