@@ -60,8 +60,7 @@ func GetTokenOwnersByCodeHashGenesis(cursor, size int, codeHash, genesisId []byt
 		panic(err)
 	}
 
-	for idx, data := range pendingBalanceCmds {
-		val := vals[idx]
+	for idx, val := range vals {
 		balanceRsp := &model.FTOwnerBalanceResp{
 			Address: utils.EncodeAddress([]byte(val.Member.(string)), utils.PubKeyHashAddrID),
 			Balance: int(val.Score),
@@ -69,7 +68,7 @@ func GetTokenOwnersByCodeHashGenesis(cursor, size int, codeHash, genesisId []byt
 		}
 		ftOwnersRsp = append(ftOwnersRsp, balanceRsp)
 
-		pendingBalance, err := data.Result()
+		pendingBalance, err := pendingBalanceCmds[idx].Result()
 		if err == redis.Nil {
 			continue
 		} else if err != nil {
@@ -121,13 +120,23 @@ func GetAllTokenBalanceByAddress(cursor, size int, addressPkh []byte) (ftOwnersR
 		panic(err)
 	}
 
-	for idx, data := range pendingBalanceCmds {
-		val := vals[idx]
+	for idx, val := range vals {
+		codeHash := []byte(val.Member.(string))[:20]
+		genesisId := []byte(val.Member.(string))[20:]
 		balanceRsp := &model.FTSummaryByAddressResp{
-			CodeHashHex: hex.EncodeToString([]byte(val.Member.(string))[:20]),
-			GenesisHex:  hex.EncodeToString([]byte(val.Member.(string))[20:]),
+			CodeHashHex: hex.EncodeToString(codeHash),
+			GenesisHex:  hex.EncodeToString(genesisId),
 			Balance:     int(val.Score),
 		}
+
+		// 计算utxo count
+		utxoCount, _, _, _, err := GetUtxoCountByAddress(codeHash, genesisId, addressPkh, "fu")
+		if err != nil {
+			logger.Log.Info("GetAllTokenBalanceByAddress utxo count, but redis failed", zap.Error(err))
+		} else {
+			balanceRsp.UtxoCount = utxoCount
+		}
+
 		ftOwnersRsp = append(ftOwnersRsp, balanceRsp)
 
 		// decimal
@@ -151,7 +160,7 @@ func GetAllTokenBalanceByAddress(cursor, size int, addressPkh []byte) (ftOwnersR
 		balanceRsp.SensibleIdHex = hex.EncodeToString([]byte(ftinfo["sensibleid"]))
 
 		// balance
-		pendingBalance, err := data.Result()
+		pendingBalance, err := pendingBalanceCmds[idx].Result()
 		if err == redis.Nil {
 			continue
 		} else if err != nil {
@@ -248,16 +257,14 @@ func GetNFTOwnersByCodeHashGenesis(cursor, size int, codeHash, genesisId []byte)
 		panic(err)
 	}
 
-	for idx, data := range pendingCountCmds {
-		val := vals[idx]
-
+	for idx, val := range vals {
 		countRsp := &model.NFTOwnerResp{
 			Address: utils.EncodeAddress([]byte(val.Member.(string)), utils.PubKeyHashAddrID),
 			Count:   int(val.Score),
 		}
 		ownersRsp = append(ownersRsp, countRsp)
 
-		pendingCount, err := data.Result()
+		pendingCount, err := pendingCountCmds[idx].Result()
 		if err == redis.Nil {
 			continue
 		} else if err != nil {
@@ -310,11 +317,12 @@ func GetAllNFTBalanceByAddress(cursor, size int, addressPkh []byte) (nftOwnersRs
 		panic(err)
 	}
 
-	for idx, data := range pendingCountCmds {
-		val := vals[idx]
+	for idx, val := range vals {
+		codeHash := []byte(val.Member.(string))[:20]
+		genesisId := []byte(val.Member.(string))[20:]
 		countRsp := &model.NFTSummaryByAddressResp{
-			CodeHashHex: hex.EncodeToString([]byte(val.Member.(string))[:20]),
-			GenesisHex:  hex.EncodeToString([]byte(val.Member.(string))[20:]),
+			CodeHashHex: hex.EncodeToString(codeHash),
+			GenesisHex:  hex.EncodeToString(genesisId),
 			Count:       int(val.Score),
 		}
 		nftOwnersRsp = append(nftOwnersRsp, countRsp)
@@ -334,7 +342,7 @@ func GetAllNFTBalanceByAddress(cursor, size int, addressPkh []byte) (nftOwnersRs
 		}
 
 		// count
-		pendingCount, err := data.Result()
+		pendingCount, err := pendingCountCmds[idx].Result()
 		if err == redis.Nil {
 			continue
 		} else if err != nil {
