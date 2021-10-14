@@ -264,7 +264,22 @@ func ListFTOwners(ctx *gin.Context) {
 	})
 }
 
-// ListAllFTBalanceByOwner
+// ListAllFTSummaryDataByOwner
+// @Summary 查询某人持有的FT Token列表。获得每个token的余额。并返回token总量
+// @Tags token FT
+// @Produce  json
+// @Param cursor query int true "起始游标" default(0)
+// @Param size query int true "返回记录数量" default(10)
+// @Param address path string true "Address" default(17SkEw2md5avVNyYgj6RiXuQKNwkXaxFyQ)
+// @Success 200 {object} model.Response{data=model.FTSummaryDataByAddressResp} "{"code": 0, "data": {}, "msg": "ok"}"
+// @Router /ft/summary-data/{address} [get]
+func ListAllFTSummaryDataByOwner(ctx *gin.Context) {
+	logger.Log.Info("ListAllFTOwners enter")
+
+	ListAllFTSummaryByOwnerCommon(ctx, true)
+}
+
+// ListAllFTSummaryByOwner
 // @Summary 查询某人持有的FT Token列表。获得每个token的余额
 // @Tags token FT
 // @Produce  json
@@ -273,9 +288,14 @@ func ListFTOwners(ctx *gin.Context) {
 // @Param address path string true "Address" default(17SkEw2md5avVNyYgj6RiXuQKNwkXaxFyQ)
 // @Success 200 {object} model.Response{data=[]model.FTSummaryByAddressResp} "{"code": 0, "data": [{}], "msg": "ok"}"
 // @Router /ft/summary/{address} [get]
-func ListAllFTBalanceByOwner(ctx *gin.Context) {
+func ListAllFTSummaryByOwner(ctx *gin.Context) {
 	logger.Log.Info("ListAllFTOwners enter")
 
+	ListAllFTSummaryByOwnerCommon(ctx, false)
+}
+
+func ListAllFTSummaryByOwnerCommon(ctx *gin.Context, page bool) {
+	logger.Log.Info("ListAllFTOwners enter")
 	// get cursor/size
 	cursorString := ctx.DefaultQuery("cursor", "0")
 	cursor, err := strconv.Atoi(cursorString)
@@ -301,18 +321,31 @@ func ListAllFTBalanceByOwner(ctx *gin.Context) {
 		return
 	}
 
-	result, err := service.GetAllTokenBalanceByAddress(cursor, size, addressPkh)
+	result, total, err := service.GetAllTokenBalanceByAddress(cursor, size, addressPkh)
 	if err != nil {
 		logger.Log.Info("get token balance failed", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get token balance failed"})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, model.Response{
-		Code: 0,
-		Msg:  "ok",
-		Data: result,
-	})
+	if page {
+		ctx.JSON(http.StatusOK, model.Response{
+			Code: 0,
+			Msg:  "ok",
+			Data: &model.FTSummaryDataByAddressResp{
+				Cursor: cursor,
+				Total:  total,
+				Token:  result,
+			},
+		})
+
+	} else {
+		ctx.JSON(http.StatusOK, model.Response{
+			Code: 0,
+			Msg:  "ok",
+			Data: result,
+		})
+	}
 }
 
 // GetFTBalanceByOwner

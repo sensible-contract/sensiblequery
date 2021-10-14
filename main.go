@@ -126,7 +126,10 @@ func main() {
 	router.GET("/ft/owners/:codehash/:genesis",
 		cache.CacheByRequestURI(store, 1*time.Second), controller.ListFTOwners)
 	router.GET("/ft/summary/:address",
-		cache.CacheByRequestURI(store, 2*time.Second), controller.ListAllFTBalanceByOwner)
+		cache.CacheByRequestURI(store, 2*time.Second), controller.ListAllFTSummaryByOwner)
+
+	router.GET("/ft/summary-data/:address",
+		cache.CacheByRequestURI(store, 2*time.Second), controller.ListAllFTSummaryDataByOwner)
 
 	// without cache
 	router.GET("/ft/balance/:codehash/:genesis/:address", controller.GetFTBalanceByOwner)
@@ -157,6 +160,7 @@ func main() {
 		cache.CacheByRequestURI(store, 10*time.Second), controller.GetNFTHistoryByGenesis)
 	router.GET("/address/:address/history",
 		cache.CacheByRequestURI(store, 10*time.Second), controller.GetHistoryByAddress)
+
 	router.GET("/contract/history/:codehash/:genesis/:address",
 		cache.CacheByRequestURI(store, 10*time.Second), controller.GetHistoryByGenesis)
 	router.GET("/token/info",

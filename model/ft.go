@@ -45,7 +45,13 @@ type FTSummaryByAddressResp struct {
 	Name           string `json:"name"`           // FT name
 	Symbol         string `json:"symbol"`         // FT symbol
 	Balance        int    `json:"balance"`        // 余额
-	UtxoCount      int    `json:"utxoCount"`      // UTXO 数量
 	PendingBalance int    `json:"pendingBalance"` // 待确认余额
 	Decimal        int    `json:"decimal"`        // decimal
+	// UtxoCount      int    `json:"utxoCount"`      // UTXO 数量
+}
+
+type FTSummaryDataByAddressResp struct {
+	Cursor int                       `json:"cursor"` // token结果偏移
+	Total  int                       `json:"total"`  // token总量
+	Token  []*FTSummaryByAddressResp `json:"token"`  // token结果
 }

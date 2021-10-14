@@ -81,7 +81,7 @@ func GetTokenOwnersByCodeHashGenesis(cursor, size int, codeHash, genesisId []byt
 	return ftOwnersRsp, nil
 }
 
-func GetAllTokenBalanceByAddress(cursor, size int, addressPkh []byte) (ftOwnersRsp []*model.FTSummaryByAddressResp, err error) {
+func GetAllTokenBalanceByAddress(cursor, size int, addressPkh []byte) (ftOwnersRsp []*model.FTSummaryByAddressResp, total int, err error) {
 	finalKey := "mp:z:{fs" + string(addressPkh) + "}"
 
 	oldKey := "{fs" + string(addressPkh) + "}"
@@ -100,6 +100,12 @@ func GetAllTokenBalanceByAddress(cursor, size int, addressPkh []byte) (ftOwnersR
 		return
 	}
 	logger.Log.Info("ZUnionStore", zap.Int64("n", nUnion))
+
+	ftOwnersRsp = make([]*model.FTSummaryByAddressResp, 0)
+	total = int(nUnion)
+	if cursor >= total {
+		return
+	}
 
 	vals, err := rdb.ZRevRangeWithScores(ctx, finalKey, int64(cursor), int64(cursor+size-1)).Result()
 	if err != nil {
@@ -129,13 +135,13 @@ func GetAllTokenBalanceByAddress(cursor, size int, addressPkh []byte) (ftOwnersR
 			Balance:     int(val.Score),
 		}
 
-		// 计算utxo count
-		utxoCount, _, _, _, err := GetUtxoCountByAddress(codeHash, genesisId, addressPkh, "fu")
-		if err != nil {
-			logger.Log.Info("GetAllTokenBalanceByAddress utxo count, but redis failed", zap.Error(err))
-		} else {
-			balanceRsp.UtxoCount = utxoCount
-		}
+		// // 计算utxo count
+		// utxoCount, _, _, _, err := GetUtxoCountByAddress(codeHash, genesisId, addressPkh, "fu")
+		// if err != nil {
+		// 	logger.Log.Info("GetAllTokenBalanceByAddress utxo count, but redis failed", zap.Error(err))
+		// } else {
+		// 	balanceRsp.UtxoCount = utxoCount
+		// }
 
 		ftOwnersRsp = append(ftOwnersRsp, balanceRsp)
 
@@ -170,7 +176,7 @@ func GetAllTokenBalanceByAddress(cursor, size int, addressPkh []byte) (ftOwnersR
 		balanceRsp.Balance -= int(pendingBalance)
 	}
 
-	return ftOwnersRsp, nil
+	return ftOwnersRsp, total, nil
 }
 
 func GetTokenBalanceByCodeHashGenesisAddress(codeHash, genesisId, addressPkh []byte) (balanceRsp *model.FTOwnerBalanceWithUtxoCountResp, err error) {
