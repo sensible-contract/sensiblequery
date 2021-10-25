@@ -32,7 +32,10 @@ SELECT txid, idx, address, codehash, genesis, satoshi, script_type, script_pk, h
         WHERE address = unhex('%s')
         ORDER BY height DESC, utxidx DESC
         LIMIT %d
-    )
+      ) OR ( height >= 4294967295 AND
+             address = unhex('%s'))
+    ORDER BY height DESC, utxidx DESC
+    LIMIT %d
 
     UNION ALL
 
@@ -42,7 +45,11 @@ SELECT txid, idx, address, codehash, genesis, satoshi, script_type, script_pk, h
         WHERE address = unhex('%s')
         ORDER BY height DESC, txidx DESC
         LIMIT %d
-    )
+      ) OR ( height >= 4294967295 AND
+             address = unhex('%s'))
+    ORDER BY height DESC, txidx DESC
+    LIMIT %d
+
 ) AS history
 LEFT JOIN (
     SELECT height, blocktime FROM blk_height
@@ -50,8 +57,8 @@ LEFT JOIN (
 USING height
 ORDER BY height DESC, txidx DESC
 LIMIT %d, %d`,
-		addressHex, maxOffset,
-		addressHex, maxOffset,
+		addressHex, maxOffset, addressHex, maxOffset,
+		addressHex, maxOffset, addressHex, maxOffset,
 		cursor, size)
 	return GetHistoryBySql(psql)
 }
@@ -82,7 +89,10 @@ SELECT txid, idx, address, codehash, genesis, satoshi, script_type, script_pk, h
         WHERE %s %s (address = unhex('%s') %s)
         ORDER BY height DESC, utxidx DESC, codehash DESC, genesis DESC
         LIMIT %d
-    )
+      ) OR ( height >= 4294967295 AND
+      %s %s (address = unhex('%s') %s))
+    ORDER BY height DESC, utxidx DESC
+    LIMIT %d
 
     UNION ALL
 
@@ -92,7 +102,11 @@ SELECT txid, idx, address, codehash, genesis, satoshi, script_type, script_pk, h
         WHERE %s %s (address = unhex('%s') %s)
         ORDER BY height DESC, txidx DESC, codehash DESC, genesis DESC
         LIMIT %d
-    )
+      ) OR ( height >= 4294967295 AND
+      %s %s (address = unhex('%s') %s))
+    ORDER BY height DESC, txidx DESC
+    LIMIT %d
+
 ) AS history
 LEFT JOIN (
     SELECT height, blocktime FROM blk_height
@@ -101,6 +115,8 @@ LEFT JOIN (
 USING height
 ORDER BY height DESC, txidx DESC
 LIMIT %d, %d`,
+		codehashMatch, genesisMatch, addressHex, addressMatch, maxOffset,
+		codehashMatch, genesisMatch, addressHex, addressMatch, maxOffset,
 		codehashMatch, genesisMatch, addressHex, addressMatch, maxOffset,
 		codehashMatch, genesisMatch, addressHex, addressMatch, maxOffset,
 		cursor, size)
