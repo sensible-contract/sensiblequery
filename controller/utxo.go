@@ -134,6 +134,74 @@ func GetUtxoDataByAddressCommon(ctx *gin.Context, detail bool) {
 	}
 }
 
+// GetNFTUtxoList
+// @Summary 通过NFT合约CodeHash+溯源genesis按tokenIndex顺序获取所有的utxo列表，附带总量信息
+// @Tags UTXO, token NFT
+// @Produce  json
+// @Param cursor query int true "起始游标" default(0)
+// @Param size query int true "返回记录数量" default(10)
+// @Param codehash path string true "Code Hash160" default(844c56bb99afc374967a27ce3b46244e2e1fba60)
+// @Param genesis path string true "Genesis ID" default(74967a27ce3b46244e2e1fba60844c56bb99afc3)
+// @Success 200 {object} model.Response{data=model.AddressTokenUTXOResp} "{"code": 0, "data": {}, "msg": "ok"}"
+// @Router /nft/utxo-list/{codehash}/{genesis} [get]
+func GetNFTUtxoList(ctx *gin.Context) {
+	logger.Log.Info("GetNFTUtxoList enter")
+
+	// get cursor/size
+	cursorString := ctx.DefaultQuery("cursor", "0")
+	cursor, err := strconv.Atoi(cursorString)
+	if err != nil || cursor < 0 {
+		logger.Log.Info("cursor invalid", zap.Error(err))
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "cursor invalid"})
+		return
+	}
+	sizeString := ctx.DefaultQuery("size", "16")
+	size, err := strconv.Atoi(sizeString)
+	if err != nil || size <= 0 || size > MAX_UTXO_LIMIT {
+		logger.Log.Info("size invalid", zap.Error(err))
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "size invalid"})
+		return
+	}
+
+	codeHashHex := ctx.Param("codehash")
+	// check
+	codeHash, err := hex.DecodeString(codeHashHex)
+	if err != nil {
+		logger.Log.Info("codeHash invalid", zap.Error(err))
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "codeHash invalid"})
+		return
+	}
+
+	genesisIdHex := ctx.Param("genesis")
+	// check
+	genesisId, err := hex.DecodeString(genesisIdHex)
+	if err != nil {
+		logger.Log.Info("genesisId invalid", zap.Error(err))
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "genesisId invalid"})
+		return
+	}
+
+	result, total, totalConf, totalUnconf, err := service.GetNFTUtxoByTokenIndexRange(cursor, size, codeHash, genesisId)
+	if err != nil {
+		logger.Log.Info("get nft utxo failed", zap.Error(err))
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get nft utxo failed"})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, model.Response{
+		Code: 0,
+		Msg:  "ok",
+		Data: &model.AddressTokenUTXOResp{
+			Cursor:              cursor,
+			Total:               total,
+			TotalConfirmed:      totalConf,
+			TotalUnconfirmedNew: totalUnconf,
+			UTXO:                result,
+		},
+	})
+
+}
+
 // GetNFTUtxoDetailByTokenIndex
 // @Summary 通过NFT合约CodeHash+溯源genesis获取某tokenId的utxo
 // @Tags UTXO, token NFT
@@ -263,7 +331,7 @@ func GetUtxoByCodeHashGenesisAddress(ctx *gin.Context, key string, detail bool) 
 	}
 	sizeString := ctx.DefaultQuery("size", "16")
 	size, err := strconv.Atoi(sizeString)
-	if err != nil || size <= 0 {
+	if err != nil || size <= 0 || cursor+size > MAX_UTXO_LIMIT {
 		logger.Log.Info("size invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "size invalid"})
 		return

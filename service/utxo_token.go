@@ -5,6 +5,8 @@ import (
 	"errors"
 	"sensiblequery/logger"
 	"sensiblequery/model"
+	"sort"
+	"strconv"
 
 	redis "github.com/go-redis/redis/v8"
 	"go.uber.org/zap"
@@ -103,4 +105,80 @@ func GetUtxoByCodeHashGenesisAddress(cursor, size int, codeHash, genesisId, addr
 
 	txOutsRsp, err = getUtxoFromRedis(utxoOutpoints)
 	return txOutsRsp, total, totalConf, totalUnconf, totalUnconfSpend, err
+}
+
+//////////////// list NFT utxo
+func GetNFTUtxoByTokenIndexRange(cursor, size int, codeHash, genesisId []byte) (
+	txOutsRsp []*model.TxOutResp, total, totalConf, totalUnconf int, err error) {
+	newUtxoKey := "mp:nd" + string(codeHash) + string(genesisId)
+
+	// unconfirmed count
+	newUtxoNum, err := rdb.ZCard(ctx, newUtxoKey).Result()
+	if err != nil {
+		logger.Log.Info("get newUtxoNum from redis failed", zap.Error(err))
+		return
+	}
+	logger.Log.Info("newUtxoNum", zap.Int64("n", newUtxoNum))
+
+	utxoKeyConfirmed := "nd" + string(codeHash) + string(genesisId)
+	// confirmed count
+	utxoConfirmedNum, err := rdb.ZCard(ctx, utxoKeyConfirmed).Result()
+	if err != nil {
+		logger.Log.Info("get utxoConfirmedNum from redis failed", zap.Error(err))
+		return
+	}
+	logger.Log.Info("utxoConfirmedNum", zap.Int64("n", utxoConfirmedNum))
+
+	totalConf = int(utxoConfirmedNum)
+	totalUnconf = int(newUtxoNum)
+	total = totalConf + totalUnconf
+
+	// mempool
+	op := &redis.ZRangeBy{
+		Min: strconv.Itoa(cursor),            // 最小分数
+		Max: strconv.Itoa(cursor + size - 1), // 最大分数
+		// Offset: 0,                               // 类似sql的limit, 表示开始偏移量
+		// Count:  1,                               // 一次返回多少数据
+	}
+	utxoOutpointsUnconfirmed, err := rdb.ZRangeByScoreWithScores(ctx, newUtxoKey, op).Result()
+	if err != nil {
+		logger.Log.Info("GetNFTUtxoByTokenIndexRange redis failed", zap.Error(err))
+		return
+	}
+
+	utxoOutpointsWithScore, err := rdb.ZRangeByScoreWithScores(ctx, utxoKeyConfirmed, op).Result()
+	if err != nil {
+		logger.Log.Info("GetNFTUtxoByTokenIndexRange redis failed", zap.Error(err))
+		return
+	}
+
+	utxoOutpointsMap := make(map[int]string, size)
+	for _, out := range utxoOutpointsWithScore {
+		utxoOutpointsMap[int(out.Score)] = out.Member.(string)
+	}
+	for _, out := range utxoOutpointsUnconfirmed {
+		utxoOutpointsMap[int(out.Score)] = out.Member.(string)
+	}
+
+	var utxoOutpoints []string
+	// sort
+	var keys []int
+	for k := range utxoOutpointsMap {
+		keys = append(keys, k)
+	}
+	sort.Ints(keys)
+	for _, k := range keys {
+		utxoOutpoints = append(utxoOutpoints, utxoOutpointsMap[k])
+	}
+
+	// get utxo data
+	result, err := getUtxoFromRedis(utxoOutpoints)
+	if err != nil {
+		return
+	}
+	if len(result) == 0 {
+		err = errors.New("not exist")
+		return
+	}
+	return result, total, totalConf, totalUnconf, nil
 }
