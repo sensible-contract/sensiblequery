@@ -13,7 +13,7 @@ import (
 	"go.uber.org/zap"
 )
 
-const MAX_UTXO_LIMIT = 1024
+const MAX_UTXO_LIMIT = 5120
 
 // GetBalanceByAddress
 // @Summary 通过地址address获取balance
