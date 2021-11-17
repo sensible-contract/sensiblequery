@@ -13,7 +13,7 @@ require (
 	github.com/go-redis/redis/v8 v8.11.4 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
-	github.com/sensible-contract/sensible-script-decoder v1.12.1
+	github.com/sensible-contract/sensible-script-decoder v1.12.2
 	github.com/spf13/viper v1.7.1
 	github.com/swaggo/gin-swagger v1.3.0
 	github.com/swaggo/swag v1.6.7
