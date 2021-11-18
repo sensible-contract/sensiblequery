@@ -26,7 +26,7 @@ func GetHistoryByAddressAndType(cursor, size int, addressHex string, historyType
 
 	codehashMatch := ""
 	if historyType == model.HISTORY_CONTRACT_ONLY {
-		codehashMatch = "codehash != unhex('') AND"
+		codehashMatch = "AND codehash != unhex('')"
 	}
 
 	psql := fmt.Sprintf(`
@@ -35,11 +35,18 @@ SELECT txid, idx, address, codehash, genesis, satoshi, script_type, script_pk, h
     SELECT utxid AS txid, vout AS idx, address, codehash, genesis, satoshi, script_type, script_pk, height, utxidx AS txidx, 1 AS io_type FROM txout
     WHERE (utxid, vout, height) in (
         SELECT utxid, vout, height FROM txout_address_height
-        WHERE %s address = unhex('%s')
+        WHERE address = unhex('%s') %s
         ORDER BY height DESC, utxidx DESC
         LIMIT %d
-      ) OR ( height >= 4294967295 AND
-             %s address = unhex('%s'))
+      )
+    ORDER BY height DESC, utxidx DESC
+    LIMIT %d
+
+    UNION ALL
+
+    SELECT utxid AS txid, vout AS idx, address, codehash, genesis, satoshi, script_type, script_pk, height, utxidx AS txidx, 1 AS io_type FROM txout
+    WHERE height >= 4294967295 AND
+          address = unhex('%s') %s
     ORDER BY height DESC, utxidx DESC
     LIMIT %d
 
@@ -48,11 +55,18 @@ SELECT txid, idx, address, codehash, genesis, satoshi, script_type, script_pk, h
     SELECT txid, idx, address, codehash, genesis, satoshi, script_type, script_pk, height, txidx, 0 AS io_type FROM txin
     WHERE (txid, idx, height) in (
         SELECT txid, idx, height FROM txin_address_height
-        WHERE %s address = unhex('%s')
+        WHERE address = unhex('%s') %s
         ORDER BY height DESC, txidx DESC
         LIMIT %d
-      ) OR ( height >= 4294967295 AND
-             %s address = unhex('%s'))
+      )
+    ORDER BY height DESC, txidx DESC
+    LIMIT %d
+
+    UNION ALL
+
+    SELECT txid, idx, address, codehash, genesis, satoshi, script_type, script_pk, height, txidx, 0 AS io_type FROM txin
+    WHERE height >= 4294967295 AND
+          address = unhex('%s') %s
     ORDER BY height DESC, txidx DESC
     LIMIT %d
 
@@ -63,10 +77,10 @@ LEFT JOIN (
 USING height
 ORDER BY height DESC, txidx DESC
 LIMIT %d, %d`,
-		codehashMatch, addressHex, maxOffset,
-		codehashMatch, addressHex, maxOffset,
-		codehashMatch, addressHex, maxOffset,
-		codehashMatch, addressHex, maxOffset,
+		addressHex, codehashMatch, maxOffset, maxOffset,
+		addressHex, codehashMatch, maxOffset,
+		addressHex, codehashMatch, maxOffset, maxOffset,
+		addressHex, codehashMatch, maxOffset,
 		cursor, size)
 	return GetHistoryBySql(psql)
 }
@@ -79,8 +93,12 @@ func GetHistoryByGenesis(cursor, size int, codehashHex, genesisHex, addressHex s
 		addressMatch = "OR address = ''"
 	}
 
-	codehashMatch := fmt.Sprintf("codehash = unhex('%s') AND", codehashHex)
-	genesisMatch := fmt.Sprintf("genesis = unhex('%s') AND", genesisHex)
+	codehashMatch := ""
+	genesisMatch := ""
+	if codehashHex != "0000000000000000000000000000000000000000" {
+		codehashMatch = fmt.Sprintf("codehash = unhex('%s') AND", codehashHex)
+		genesisMatch = fmt.Sprintf("genesis = unhex('%s') AND", genesisHex)
+	}
 	maxOffset := cursor + size
 	// script_pk -> ''
 	psql := fmt.Sprintf(`
@@ -92,8 +110,15 @@ SELECT txid, idx, address, codehash, genesis, satoshi, script_type, script_pk, h
         WHERE %s %s (address = unhex('%s') %s)
         ORDER BY height DESC, utxidx DESC, codehash DESC, genesis DESC
         LIMIT %d
-      ) OR ( height >= 4294967295 AND
-      %s %s (address = unhex('%s') %s))
+      )
+    ORDER BY height DESC, utxidx DESC
+    LIMIT %d
+
+    UNION ALL
+
+    SELECT utxid AS txid, vout AS idx, address, codehash, genesis, satoshi, script_type, script_pk, height, utxidx AS txidx, 1 AS io_type FROM txout
+    WHERE height >= 4294967295 AND
+      %s %s (address = unhex('%s') %s)
     ORDER BY height DESC, utxidx DESC
     LIMIT %d
 
@@ -105,8 +130,15 @@ SELECT txid, idx, address, codehash, genesis, satoshi, script_type, script_pk, h
         WHERE %s %s (address = unhex('%s') %s)
         ORDER BY height DESC, txidx DESC, codehash DESC, genesis DESC
         LIMIT %d
-      ) OR ( height >= 4294967295 AND
-      %s %s (address = unhex('%s') %s))
+      )
+    ORDER BY height DESC, txidx DESC
+    LIMIT %d
+
+    UNION ALL
+
+    SELECT txid, idx, address, codehash, genesis, satoshi, script_type, script_pk, height, txidx, 0 AS io_type FROM txin
+    WHERE height >= 4294967295 AND
+      %s %s (address = unhex('%s') %s)
     ORDER BY height DESC, txidx DESC
     LIMIT %d
 
@@ -118,9 +150,9 @@ LEFT JOIN (
 USING height
 ORDER BY height DESC, txidx DESC
 LIMIT %d, %d`,
+		codehashMatch, genesisMatch, addressHex, addressMatch, maxOffset, maxOffset,
 		codehashMatch, genesisMatch, addressHex, addressMatch, maxOffset,
-		codehashMatch, genesisMatch, addressHex, addressMatch, maxOffset,
-		codehashMatch, genesisMatch, addressHex, addressMatch, maxOffset,
+		codehashMatch, genesisMatch, addressHex, addressMatch, maxOffset, maxOffset,
 		codehashMatch, genesisMatch, addressHex, addressMatch, maxOffset,
 		cursor, size)
 	return GetHistoryBySql(psql)

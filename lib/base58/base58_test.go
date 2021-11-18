@@ -62,6 +62,18 @@ var hexTests = []struct {
 	{"00000000000000000000", "1111111111"},
 }
 
+func TestAddress(t *testing.T) {
+	addr := "1F4Ga3Nbjehizh5ZMfKtZ6bP3WQuVRP7Xf"
+	decoded, _, err := base58.CheckDecode(addr)
+	if err != nil {
+		t.Error(err)
+
+	} else {
+		t.Logf("Address %s: %s", addr, hex.EncodeToString(decoded))
+
+	}
+}
+
 func TestBase58(t *testing.T) {
 	// Encode tests
 	for x, test := range stringTests {

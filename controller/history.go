@@ -140,12 +140,7 @@ func GetHistoryByGenesis(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "address invalid"})
 		return
 	}
-	var result []*model.TxOutHistoryResp
-	if codehashHex == "0000000000000000000000000000000000000000" {
-		result, err = service.GetHistoryByAddressAndType(cursor, size, hex.EncodeToString(addressPkh), model.HISTORY_CONTRACT_ONLY)
-	} else {
-		result, err = service.GetHistoryByGenesis(cursor, size, codehashHex, genesisIdHex, hex.EncodeToString(addressPkh))
-	}
+	result, err := service.GetHistoryByGenesis(cursor, size, codehashHex, genesisIdHex, hex.EncodeToString(addressPkh))
 	if err != nil {
 		logger.Log.Info("get history failed", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get histroy failed"})
