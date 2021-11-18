@@ -21,19 +21,25 @@ func txOutHistoryResultSRF(rows *sql.Rows) (interface{}, error) {
 }
 
 //////////////// address
-func GetHistoryByAddress(cursor, size int, addressHex string) (txOutsRsp []*model.TxOutHistoryResp, err error) {
+func GetHistoryByAddressAndType(cursor, size int, addressHex string, historyType model.HistoryType) (txOutsRsp []*model.TxOutHistoryResp, err error) {
 	maxOffset := cursor + size
+
+	codehashMatch := ""
+	if historyType == model.HISTORY_CONTRACT_ONLY {
+		codehashMatch = "codehash != unhex('') AND"
+	}
+
 	psql := fmt.Sprintf(`
 SELECT txid, idx, address, codehash, genesis, satoshi, script_type, script_pk, height, txidx, io_type, blk.blocktime FROM
 (
     SELECT utxid AS txid, vout AS idx, address, codehash, genesis, satoshi, script_type, script_pk, height, utxidx AS txidx, 1 AS io_type FROM txout
     WHERE (utxid, vout, height) in (
         SELECT utxid, vout, height FROM txout_address_height
-        WHERE address = unhex('%s')
+        WHERE %s address = unhex('%s')
         ORDER BY height DESC, utxidx DESC
         LIMIT %d
       ) OR ( height >= 4294967295 AND
-             address = unhex('%s'))
+             %s address = unhex('%s'))
     ORDER BY height DESC, utxidx DESC
     LIMIT %d
 
@@ -42,11 +48,11 @@ SELECT txid, idx, address, codehash, genesis, satoshi, script_type, script_pk, h
     SELECT txid, idx, address, codehash, genesis, satoshi, script_type, script_pk, height, txidx, 0 AS io_type FROM txin
     WHERE (txid, idx, height) in (
         SELECT txid, idx, height FROM txin_address_height
-        WHERE address = unhex('%s')
+        WHERE %s address = unhex('%s')
         ORDER BY height DESC, txidx DESC
         LIMIT %d
       ) OR ( height >= 4294967295 AND
-             address = unhex('%s'))
+             %s address = unhex('%s'))
     ORDER BY height DESC, txidx DESC
     LIMIT %d
 
@@ -57,8 +63,10 @@ LEFT JOIN (
 USING height
 ORDER BY height DESC, txidx DESC
 LIMIT %d, %d`,
-		addressHex, maxOffset, addressHex, maxOffset,
-		addressHex, maxOffset, addressHex, maxOffset,
+		codehashMatch, addressHex, maxOffset,
+		codehashMatch, addressHex, maxOffset,
+		codehashMatch, addressHex, maxOffset,
+		codehashMatch, addressHex, maxOffset,
 		cursor, size)
 	return GetHistoryBySql(psql)
 }
@@ -71,13 +79,8 @@ func GetHistoryByGenesis(cursor, size int, codehashHex, genesisHex, addressHex s
 		addressMatch = "OR address = ''"
 	}
 
-	codehashMatch := ""
-	genesisMatch := ""
-	if codehashHex != "0000000000000000000000000000000000000000" {
-		codehashMatch = fmt.Sprintf("codehash = unhex('%s') AND", codehashHex)
-		genesisMatch = fmt.Sprintf("genesis = unhex('%s') AND", genesisHex)
-	}
-
+	codehashMatch := fmt.Sprintf("codehash = unhex('%s') AND", codehashHex)
+	genesisMatch := fmt.Sprintf("genesis = unhex('%s') AND", genesisHex)
 	maxOffset := cursor + size
 	// script_pk -> ''
 	psql := fmt.Sprintf(`

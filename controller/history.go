@@ -26,7 +26,25 @@ const MAX_HISTORY_LIMIT = 1024000
 // @Router /address/{address}/history [get]
 func GetHistoryByAddress(ctx *gin.Context) {
 	logger.Log.Info("GetHistoryByAddress enter")
+	GetHistoryByAddressAndType(ctx, model.HISTORY_CONTRACT_P2PKH_BOTH)
+}
 
+// GetContractHistoryByAddress
+// @Summary 通过地址address获取合约相关tx历史列表，返回详细输入/输出
+// @Tags History
+// @Produce  json
+// @Param cursor query int true "起始游标" default(0)
+// @Param size query int true "返回记录数量" default(16)
+// @Param address path string true "Address" default(17SkEw2md5avVNyYgj6RiXuQKNwkXaxFyQ)
+// @Success 200 {object} model.Response{data=[]model.TxOutHistoryResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Router /address/{address}/contract-history [get]
+func GetContractHistoryByAddress(ctx *gin.Context) {
+	logger.Log.Info("GetContractHistoryByAddress enter")
+	GetHistoryByAddressAndType(ctx, model.HISTORY_CONTRACT_ONLY)
+}
+
+func GetHistoryByAddressAndType(ctx *gin.Context, historyType model.HistoryType) {
+	logger.Log.Info("GetHistoryByAddressAndType enter")
 	// get cursor/size
 	cursorString := ctx.DefaultQuery("cursor", "0")
 	cursor, err := strconv.Atoi(cursorString)
@@ -52,10 +70,10 @@ func GetHistoryByAddress(ctx *gin.Context) {
 		return
 	}
 
-	result, err := service.GetHistoryByAddress(cursor, size, hex.EncodeToString(addressPkh))
+	result, err := service.GetHistoryByAddressAndType(cursor, size, hex.EncodeToString(addressPkh), historyType)
 	if err != nil {
-		logger.Log.Info("get block failed", zap.Error(err))
-		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get txo failed"})
+		logger.Log.Info("get history failed", zap.Error(err))
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get history failed"})
 		return
 	}
 
@@ -96,9 +114,9 @@ func GetHistoryByGenesis(ctx *gin.Context) {
 		return
 	}
 
-	codeHashHex := ctx.Param("codehash")
+	codehashHex := ctx.Param("codehash")
 	// check
-	_, err = hex.DecodeString(codeHashHex)
+	_, err = hex.DecodeString(codehashHex)
 	if err != nil {
 		logger.Log.Info("codeHash invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "codeHash invalid"})
@@ -122,8 +140,12 @@ func GetHistoryByGenesis(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "address invalid"})
 		return
 	}
-
-	result, err := service.GetHistoryByGenesis(cursor, size, codeHashHex, genesisIdHex, hex.EncodeToString(addressPkh))
+	var result []*model.TxOutHistoryResp
+	if codehashHex == "0000000000000000000000000000000000000000" {
+		result, err = service.GetHistoryByAddressAndType(cursor, size, hex.EncodeToString(addressPkh), model.HISTORY_CONTRACT_ONLY)
+	} else {
+		result, err = service.GetHistoryByGenesis(cursor, size, codehashHex, genesisIdHex, hex.EncodeToString(addressPkh))
+	}
 	if err != nil {
 		logger.Log.Info("get history failed", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get histroy failed"})

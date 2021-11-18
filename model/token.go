@@ -1,5 +1,13 @@
 package model
 
+type HistoryType int
+
+const (
+	HISTORY_CONTRACT_P2PKH_BOTH HistoryType = 0
+	HISTORY_P2PKH_ONLY          HistoryType = 1
+	HISTORY_CONTRACT_ONLY       HistoryType = 2
+)
+
 type TokenInfoResp struct {
 	CodeCount int `json:"countCode"` // 当前合约代码种类数
 
