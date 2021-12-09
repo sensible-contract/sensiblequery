@@ -88,6 +88,8 @@ func GetHistoryByAddressAndType(ctx *gin.Context, historyType model.HistoryType)
 // @Summary 通过溯源genesis获取相关tx历史列表，返回详细输入/输出
 // @Tags History
 // @Produce  json
+// @Param start query int true "Start Block Height" default(0)
+// @Param end query int true "End Block Height, (0 to get mempool data)" default(0)
 // @Param cursor query int true "起始游标" default(0)
 // @Param size query int true "返回记录数量" default(16)
 // @Param codehash path string true "Code Hash160" default(844c56bb99afc374967a27ce3b46244e2e1fba60)
@@ -97,6 +99,28 @@ func GetHistoryByAddressAndType(ctx *gin.Context, historyType model.HistoryType)
 // @Router /contract/history/{codehash}/{genesis}/{address} [get]
 func GetHistoryByGenesis(ctx *gin.Context) {
 	logger.Log.Info("GetHistoryByGenesis enter")
+
+	// check height
+	blkStartHeightString := ctx.DefaultQuery("start", "0")
+	blkStartHeight, err := strconv.Atoi(blkStartHeightString)
+	if err != nil || blkStartHeight < 0 {
+		logger.Log.Info("blk start height invalid", zap.Error(err))
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "blk start height invalid"})
+		return
+	}
+	blkEndHeightString := ctx.DefaultQuery("end", "0")
+	blkEndHeight, err := strconv.Atoi(blkEndHeightString)
+	if err != nil || blkEndHeight < 0 {
+		logger.Log.Info("blk end height invalid", zap.Error(err))
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "blk end height invalid"})
+		return
+	}
+
+	if blkEndHeight > 0 && (blkEndHeight <= blkStartHeight || (blkEndHeight-blkStartHeight > 10000)) {
+		logger.Log.Info("blk end height invalid", zap.Error(err))
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "blk end height invalid"})
+		return
+	}
 
 	// get cursor/size
 	cursorString := ctx.DefaultQuery("cursor", "0")
@@ -140,7 +164,7 @@ func GetHistoryByGenesis(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "address invalid"})
 		return
 	}
-	result, err := service.GetHistoryByGenesis(cursor, size, codehashHex, genesisIdHex, hex.EncodeToString(addressPkh))
+	result, err := service.GetHistoryByGenesisByHeightRange(cursor, size, blkStartHeight, blkEndHeight, codehashHex, genesisIdHex, hex.EncodeToString(addressPkh))
 	if err != nil {
 		logger.Log.Info("get history failed", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get histroy failed"})
@@ -158,6 +182,8 @@ func GetHistoryByGenesis(ctx *gin.Context) {
 // @Summary 通过FT合约CodeHash+溯源genesis获取地址相关tx历史列表，返回详细输入/输出
 // @Tags History, token FT
 // @Produce  json
+// @Param start query int true "Start Block Height" default(0)
+// @Param end query int true "End Block Height, (0 to get mempool data)" default(0)
 // @Param cursor query int true "起始游标" default(0)
 // @Param size query int true "返回记录数量" default(10)
 // @Param codehash path string true "Code Hash160" default(844c56bb99afc374967a27ce3b46244e2e1fba60)
@@ -174,6 +200,8 @@ func GetFTHistoryByGenesis(ctx *gin.Context) {
 // @Summary 通过NFT合约CodeHash+溯源genesis获取地址相关tx历史列表，返回详细输入/输出
 // @Tags History, token NFT
 // @Produce  json
+// @Param start query int true "Start Block Height" default(0)
+// @Param end query int true "End Block Height, (0 to get mempool data)" default(0)
 // @Param cursor query int true "起始游标" default(0)
 // @Param size query int true "返回记录数量" default(10)
 // @Param codehash path string true "Code Hash160" default(844c56bb99afc374967a27ce3b46244e2e1fba60)
