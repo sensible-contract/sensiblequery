@@ -156,3 +156,35 @@ func PushTxs(ctx *gin.Context) {
 	})
 
 }
+
+// GetRawMempool
+// @Summary GetRawMempool, get txid list in mempool
+// @Produce json
+// @Success 200 {object} model.Response{data=[]string} "{"code": 0, "data": "[<txid>]", "msg": "ok"}"
+// @Router /getrawmempool [get]
+func GetRawMempool(ctx *gin.Context) {
+	logger.Log.Info("GetRawMempool enter")
+
+	response, err := rpcClient.Call("getrawmempool", []string{})
+	if err != nil {
+		logger.Log.Info("call failed", zap.Error(err))
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "rpc failed"})
+		return
+	}
+	logger.Log.Info("Receive remote return", zap.Any("response", response))
+
+	if response.Error != nil {
+		ctx.JSON(http.StatusOK, model.Response{
+			Code: response.Error.Code,
+			Msg:  response.Error.Message,
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, model.Response{
+		Code: 0,
+		Msg:  "ok",
+		Data: response.Result,
+	})
+
+}

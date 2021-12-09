@@ -62,6 +62,7 @@ func main() {
 
 	router.GET("/", controller.Satotx)
 
+	router.GET("/getrawmempool", controller.GetRawMempool)
 	router.POST("/pushtx", controller.PushTx)
 	router.POST("/pushtxs", controller.PushTxs)
 
