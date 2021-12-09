@@ -21,8 +21,12 @@ func txOutHistoryResultSRF(rows *sql.Rows) (interface{}, error) {
 }
 
 //////////////// address
-func GetHistoryByAddressAndType(cursor, size int, addressHex string, historyType model.HistoryType) (txOutsRsp []*model.TxOutHistoryResp, err error) {
+func GetHistoryByAddressAndTypeByHeightRange(cursor, size, blkStartHeight, blkEndHeight int, addressHex string, historyType model.HistoryType) (txOutsRsp []*model.TxOutHistoryResp, err error) {
 	maxOffset := cursor + size
+
+	if blkEndHeight == 0 {
+		blkEndHeight = 4294967295 + 1 // enable mempool
+	}
 
 	codehashMatch := ""
 	if historyType == model.HISTORY_CONTRACT_ONLY {
@@ -35,7 +39,7 @@ SELECT txid, idx, address, codehash, genesis, satoshi, script_type, script_pk, h
     SELECT utxid AS txid, vout AS idx, address, codehash, genesis, satoshi, script_type, script_pk, height, utxidx AS txidx, 1 AS io_type FROM txout
     WHERE (utxid, vout, height) in (
         SELECT utxid, vout, height FROM txout_address_height
-        WHERE address = unhex('%s') %s
+        WHERE height >= %d AND height < %d AND address = unhex('%s') %s
         ORDER BY height DESC, utxidx DESC
         LIMIT %d
       )
@@ -45,8 +49,7 @@ SELECT txid, idx, address, codehash, genesis, satoshi, script_type, script_pk, h
     UNION ALL
 
     SELECT utxid AS txid, vout AS idx, address, codehash, genesis, satoshi, script_type, script_pk, height, utxidx AS txidx, 1 AS io_type FROM txout
-    WHERE height >= 4294967295 AND
-          address = unhex('%s') %s
+    WHERE height >= 4294967295 AND height < %d AND address = unhex('%s') %s
     ORDER BY height DESC, utxidx DESC
     LIMIT %d
 
@@ -55,7 +58,7 @@ SELECT txid, idx, address, codehash, genesis, satoshi, script_type, script_pk, h
     SELECT txid, idx, address, codehash, genesis, satoshi, script_type, script_pk, height, txidx, 0 AS io_type FROM txin
     WHERE (txid, idx, height) in (
         SELECT txid, idx, height FROM txin_address_height
-        WHERE address = unhex('%s') %s
+        WHERE height >= %d AND height < %d AND address = unhex('%s') %s
         ORDER BY height DESC, txidx DESC
         LIMIT %d
       )
@@ -65,22 +68,29 @@ SELECT txid, idx, address, codehash, genesis, satoshi, script_type, script_pk, h
     UNION ALL
 
     SELECT txid, idx, address, codehash, genesis, satoshi, script_type, script_pk, height, txidx, 0 AS io_type FROM txin
-    WHERE height >= 4294967295 AND
-          address = unhex('%s') %s
+    WHERE height >= 4294967295 AND height < %d AND address = unhex('%s') %s
     ORDER BY height DESC, txidx DESC
     LIMIT %d
 
 ) AS history
 LEFT JOIN (
     SELECT height, blocktime FROM blk_height
+    WHERE height >= %d AND height < %d AND height >= 660000
 ) AS blk
 USING height
 ORDER BY height DESC, txidx DESC
 LIMIT %d, %d`,
+		blkStartHeight, blkEndHeight,
 		addressHex, codehashMatch, maxOffset, maxOffset,
+		blkEndHeight,
 		addressHex, codehashMatch, maxOffset,
+
+		blkStartHeight, blkEndHeight,
 		addressHex, codehashMatch, maxOffset, maxOffset,
+		blkEndHeight,
 		addressHex, codehashMatch, maxOffset,
+
+		blkStartHeight, blkEndHeight,
 		cursor, size)
 	return GetHistoryBySql(psql)
 }
