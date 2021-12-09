@@ -26,7 +26,7 @@ func GetHistoryByAddressAndType(cursor, size int, addressHex string, historyType
 
 	codehashMatch := ""
 	if historyType == model.HISTORY_CONTRACT_ONLY {
-		codehashMatch = "AND codehash != unhex('')"
+		codehashMatch = "AND codehash != '' AND codehash != unhex('00')"
 	}
 
 	psql := fmt.Sprintf(`
