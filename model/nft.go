@@ -60,3 +60,29 @@ type NFTSellResp struct {
 	Price           int    `json:"price"`           // 当前售卖NFT的出售价格(satoshi)
 	IsReady         bool   `json:"isReady"`         // 当前售卖NFT是否已准备好(转出到售卖合约)
 }
+
+type NFTAuctionResp struct {
+	Height  int    `json:"height"`  // 当前交易被打包的区块高度
+	Idx     int    `json:"idx"`     // 输出被花费的txid所在区块内序号
+	TxIdHex string `json:"txid"`    // 拍卖合约txid
+	Vout    int    `json:"vout"`    // 拍卖合约输出序号
+	Satoshi int    `json:"satoshi"` // 拍卖合约输出的satoshi
+
+	CodeHashHex   string `json:"codehash"`   // 当前拍卖NFT合约hash160(CodePart)
+	GenesisHex    string `json:"genesis"`    // 当前拍卖NFT的genesis
+	SensibleIdHex string `json:"sensibleId"` // 当前拍卖NFT合约的sensibleId，即genesisTx的outpoint，Hex编码
+
+	NFTCodeHashHex string `json:"nftCodehash"` // 当前拍卖NFT的codehash
+	NFTIDHex       string `json:"nftID"`       // 当前拍卖NFT的nftId
+
+	FeeAmount     int    `json:"feeAmount"`     // 当前拍卖手续费
+	FeeAddress    string `json:"feeAddress"`    // 当前拍卖手续费的地址
+	StartBsvPrice int    `json:"startBsvPrice"` // 当前拍卖NFT的起拍价格(satoshi)
+	SenderAddress string `json:"senderAddress"` // 当前拍卖发起人的地址
+	EndTimestamp  int    `json:"bidTimestamp"`  // 当前拍卖结束的时间戳
+	BidTimestamp  int    `json:"bidTimestamp"`  // 当前拍卖出价的时间戳
+	BidBsvPrice   int    `json:"bidBsvPrice"`   // 当前拍卖NFT的出价价格(satoshi)
+	BidderAddress string `json:"bidderAddress"` // 当前拍卖出价人的地址
+
+	IsReady bool `json:"isReady"` // 当前拍卖NFT是否已准备好(转出到拍卖合约)
+}

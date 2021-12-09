@@ -97,6 +97,8 @@ func main() {
 	router.GET("/nft/sell/utxo/:codehash/:genesis", controller.GetNFTSellUtxoByGenesis)
 	router.GET("/nft/sell/utxo-detail/:codehash/:genesis/:token_index", controller.GetNFTSellUtxoDetail)
 
+	router.GET("/nft/auction/utxo-detail/:codehash/:nftid", controller.GetNFTAuctionUtxoDetail)
+
 	router.GET("/ft/utxo-data/:codehash/:genesis/:address", controller.GetFTUtxoData)
 	router.GET("/nft/utxo-data/:codehash/:genesis/:address", controller.GetNFTUtxoData)
 

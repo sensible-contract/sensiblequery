@@ -221,3 +221,48 @@ func GetNFTSellUtxoDetail(ctx *gin.Context) {
 		Data: result,
 	})
 }
+
+// GetNFTAuctionUtxoDetail
+// @Summary 通过拍卖的CodeHash和NFT ID获取具体NFTAuction合约utxo
+// @Tags UTXO, token NFT
+// @Produce  json
+// @Param codehash path string true "Auction Code Hash160" default(844c56bb99afc374967a27ce3b46244e2e1fba60)
+// @Param nftid path string true "NFT ID" default(74967a27ce3b46244e2e1fba60844c56bb99afc3)
+// @Param ready query boolean true "仅返回ready状态的记录" default(true)
+// @Success 200 {object} model.Response{data=[]model.NFTAuctionResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Router /nft/auction/utxo-detail/{codehash}/{nftid} [get]
+func GetNFTAuctionUtxoDetail(ctx *gin.Context) {
+	logger.Log.Info("GetNFTAuctionUtxoDetail enter")
+
+	codeHashHex := ctx.Param("codehash")
+	// check
+	codeHash, err := hex.DecodeString(codeHashHex)
+	if err != nil {
+		logger.Log.Info("codeHash invalid", zap.Error(err))
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "codeHash invalid"})
+		return
+	}
+
+	nftIdHex := ctx.Param("nftid")
+	// check
+	nftId, err := hex.DecodeString(nftIdHex)
+	if err != nil {
+		logger.Log.Info("nftId invalid", zap.Error(err))
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "nftId invalid"})
+		return
+	}
+
+	isReadyOnly := (ctx.DefaultQuery("ready", "true") == "true")
+	result, err := service.GetNFTAuctionUtxoByNFTIDMerge(codeHash, nftId, isReadyOnly)
+	if err != nil {
+		logger.Log.Info("GetNFTAuctionUtxoByNFTIDMerge", zap.Error(err))
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get txo failed"})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, model.Response{
+		Code: 0,
+		Msg:  "ok",
+		Data: result,
+	})
+}
