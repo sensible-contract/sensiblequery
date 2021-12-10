@@ -46,7 +46,7 @@ func GetNFTAuctionUtxoByNFTIDMerge(codeHash, nftId []byte, isReadyOnly bool) (nf
 }
 
 func GetNFTAuctionUtxoByKey(key string) (nftAuctionsRsp []*model.NFTAuctionResp, err error) {
-	utxoOutpoints, err := rdb.ZRange(ctx, key, 0, 16).Result()
+	utxoOutpoints, err := rdb.ZRevRange(ctx, key, 0, 16).Result()
 	if err != nil {
 		logger.Log.Info("GetNFTAuctionUtxoByKey redis failed", zap.Error(err))
 		return
