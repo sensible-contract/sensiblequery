@@ -15,13 +15,13 @@ import (
 //////////////// address utxo
 func GetNFTAuctionUtxoByNFTIDMerge(codeHash, nftId []byte, isReadyOnly bool) (nftAuctionsRsp []*model.NFTAuctionResp, err error) {
 	// fixme: 可能被恶意创建sell utxo
-	key := "mp:{nau" + string(nftId) + string(codeHash) + "}"
+	key := "mp:nad" + string(codeHash) + string(nftId)
 	respMempool, err := GetNFTAuctionUtxoByKey(key)
 	if err != nil {
 		return nil, err
 	}
 
-	key = "{nau" + string(nftId) + string(codeHash) + "}"
+	key = "nad" + string(codeHash) + string(nftId)
 	resp, err := GetNFTAuctionUtxoByKey(key)
 	if err != nil {
 		return nil, err
