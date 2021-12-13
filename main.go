@@ -135,11 +135,13 @@ func main() {
 	router.GET("/ft/summary-data/:address",
 		cache.CacheByRequestURI(store, 2*time.Second), controller.ListAllFTSummaryDataByOwner)
 
-	// without cache
-	router.GET("/ft/balance/:codehash/:genesis/:address", controller.GetFTBalanceByOwner)
+	router.GET("/ft/balance/:codehash/:genesis/:address", controller.GetFTBalanceByOwner) // without cache
 
 	router.GET("/ft/history/:codehash/:genesis/:address",
 		cache.CacheByRequestURI(store, 10*time.Second), controller.GetFTHistoryByGenesis)
+
+	router.GET("/ft/income-history/:codehash/:genesis/:address",
+		cache.CacheByRequestURI(store, 10*time.Second), controller.GetFTIncomeHistoryByGenesis)
 
 	router.GET("/nft/info/all",
 		cache.CacheByRequestURI(store, 10*time.Second), controller.ListAllNFTInfo)
@@ -170,6 +172,7 @@ func main() {
 
 	router.GET("/contract/history/:codehash/:genesis/:address",
 		cache.CacheByRequestURI(store, 10*time.Second), controller.GetHistoryByGenesis)
+
 	router.GET("/token/info",
 		cache.CacheByRequestURI(store, 10*time.Second), controller.ListAllTokenInfo)
 
