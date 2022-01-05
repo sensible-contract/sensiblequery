@@ -70,7 +70,7 @@ func getNFTSellUtxoFromRedis(utxoOutpoints []string) (nftSellsRsp []*model.NFTSe
 			Height:  int(txout.BlockHeight),
 			Idx:     int(txout.TxIdx),
 		}
-		txo := scriptDecoder.ExtractPkScriptForTxo(txout.Script, txout.ScriptType)
+		txo := scriptDecoder.ExtractPkScriptForTxo(txout.PkScript, txout.ScriptType)
 		if txo.CodeType != scriptDecoder.CodeType_NONE && txo.CodeType != scriptDecoder.CodeType_SENSIBLE {
 			nftSellRsp.CodeHashHex = hex.EncodeToString(txo.CodeHash[:])
 			nftSellRsp.GenesisHex = hex.EncodeToString(txo.GenesisId[:txo.GenesisIdLen])
@@ -81,7 +81,7 @@ func getNFTSellUtxoFromRedis(utxoOutpoints []string) (nftSellsRsp []*model.NFTSe
 			nftSellRsp.Price = int(txo.NFTSell.Price)
 
 			// 设置准备状态
-			contractHashAsAddressPkh := blkparser.GetHash160(txout.Script)
+			contractHashAsAddressPkh := blkparser.GetHash160(txout.PkScript)
 			countRsp, err := GetNFTCountByCodeHashGenesisAddress(txo.CodeHash[:], txo.GenesisId[:txo.GenesisIdLen], contractHashAsAddressPkh)
 			if err == nil && countRsp.Count+countRsp.PendingCount > 0 {
 				nftSellRsp.IsReady = true

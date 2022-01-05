@@ -91,7 +91,7 @@ func getNFTAuctionUtxoFromRedis(utxoOutpoints []string) (nftAuctionsRsp []*model
 			Height:  int(txout.BlockHeight),
 			Idx:     int(txout.TxIdx),
 		}
-		txo := scriptDecoder.ExtractPkScriptForTxo(txout.Script, txout.ScriptType)
+		txo := scriptDecoder.ExtractPkScriptForTxo(txout.PkScript, txout.ScriptType)
 		if txo.CodeType != scriptDecoder.CodeType_NONE && txo.CodeType != scriptDecoder.CodeType_SENSIBLE {
 			nftAuctionRsp.CodeHashHex = hex.EncodeToString(txo.CodeHash[:])
 		}
@@ -111,7 +111,7 @@ func getNFTAuctionUtxoFromRedis(utxoOutpoints []string) (nftAuctionsRsp []*model
 			nftAuctionRsp.BidderAddress = utils.EncodeAddress(txo.NFTAuction.BidderAddressPkh[:], utils.PubKeyHashAddrID)
 
 			// 设置准备状态
-			contractHashAsAddressPkh := blkparser.GetHash160(txout.Script)
+			contractHashAsAddressPkh := blkparser.GetHash160(txout.PkScript)
 			countRsp, err := GetNFTCountByCodeHashGenesisAddress(
 				txo.NFTAuction.NFTCodeHash[:],
 				txo.NFTAuction.NFTID[:], contractHashAsAddressPkh)

@@ -75,7 +75,7 @@ func getUtxoFromRedis(utxoOutpoints []string) (txOutsRsp []*model.TxOutResp, err
 		txOutDO := model.TxOutDO{
 			Height:     txout.BlockHeight,
 			Idx:        uint32(txout.TxIdx),
-			ScriptPk:   txout.Script,
+			ScriptPk:   txout.PkScript,
 			Satoshi:    txout.Satoshi,
 			TxId:       txout.UTxid, // 32
 			Vout:       txout.Vout,  // 4
