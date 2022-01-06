@@ -2,9 +2,12 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
+	"runtime"
+	"runtime/debug"
 	"sensiblequery/controller"
 	"sensiblequery/dao/rdb"
 	_ "sensiblequery/docs"
@@ -209,6 +212,24 @@ func main() {
 		}
 	}()
 
+	// GC
+	go func() {
+		for {
+			runtime.GC()
+			var rtm runtime.MemStats
+			runtime.ReadMemStats(&rtm)
+			// free memory when large idle
+			if rtm.HeapIdle-rtm.HeapReleased > 1*1024*1024*1024 {
+				logger.Log.Info("GC",
+					zap.String("mAlloc", byteCountBinary(rtm.HeapAlloc)),
+					zap.String("mIdle", byteCountBinary(rtm.HeapIdle-rtm.HeapReleased)),
+				)
+				debug.FreeOSMemory()
+			}
+			time.Sleep(time.Second * 10)
+		}
+	}()
+
 	quit := make(chan os.Signal)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
@@ -223,4 +244,17 @@ func main() {
 		)
 
 	}
+}
+
+func byteCountBinary(b uint64) string {
+	const unit = 1024
+	if b < unit {
+		return fmt.Sprintf("%d B", b)
+	}
+	div, exp := uint64(unit), 0
+	for n := b / unit; n >= unit; n /= unit {
+		div *= unit
+		exp++
+	}
+	return fmt.Sprintf("%.1f %ciB", float64(b)/float64(div), "KMGTPE"[exp])
 }
