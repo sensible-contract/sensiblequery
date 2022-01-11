@@ -75,7 +75,7 @@ SELECT txid, idx, address, codehash, genesis, satoshi, script_type, script_pk, h
 ) AS history
 LEFT JOIN (
     SELECT height, blocktime FROM blk_height
-    WHERE height >= %d AND height < %d AND height >= 660000
+    WHERE height >= %d AND height < %d
 ) AS blk
 USING height
 ORDER BY height DESC, txidx DESC
@@ -158,7 +158,7 @@ SELECT txid, idx, address, codehash, genesis, satoshi, script_type, script_pk, h
 ) AS history
 LEFT JOIN (
     SELECT height, blocktime FROM blk_height
-    WHERE height >= %d AND height < %d AND height >= 660000
+    WHERE height >= %d AND height < %d
 ) AS blk
 USING height
 ORDER BY height DESC, txidx DESC
@@ -246,7 +246,7 @@ SELECT txid, idx, address, codehash, genesis, satoshi, script_type, script_pk, h
 ) AS history
 LEFT JOIN (
     SELECT height, blocktime FROM blk_height
-    WHERE height >= %d AND height < %d AND height >= 660000
+    WHERE height >= %d AND height < %d
 ) AS blk
 USING height
 ORDER BY height DESC, txidx DESC

@@ -31,7 +31,7 @@ func GetTxsHistoryByAddressAndTypeByHeightRange(cursor, size, blkStartHeight, bl
 SELECT %s FROM blktx_height
 LEFT JOIN  (
     SELECT height, blocktime FROM blk_height
-    WHERE height >= %d AND height < %d AND height >= 660000
+    WHERE height >= %d AND height < %d
 ) AS blk
 USING height
 WHERE (txid, height) in (
@@ -120,7 +120,7 @@ func GetTxsHistoryByGenesisByHeightRange(cursor, size, blkStartHeight, blkEndHei
 SELECT %s FROM blktx_height
 LEFT JOIN  (
     SELECT height, blocktime FROM blk_height
-    WHERE height >= %d AND height < %d AND height >= 660000
+    WHERE height >= %d AND height < %d
 ) AS blk
 USING height
 WHERE (txid, height) in (

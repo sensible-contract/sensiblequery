@@ -13,13 +13,13 @@ import (
 	"go.uber.org/zap"
 )
 
-const MAX_HISTORY_LIMIT = 1024000
+const MAX_HISTORY_LIMIT = 102400
 
 // GetTxsHistoryByAddress
 // @Summary 通过地址address获取相关tx历史列表，返回tx概要
 // @Tags History
 // @Produce  json
-// @Param start query int true "Start Block Height" default(0)
+// @Param start query int true "Start Block Height" default(666666)
 // @Param end query int true "End Block Height, (0 to get mempool data)" default(0)
 // @Param cursor query int true "起始游标" default(0)
 // @Param size query int true "返回记录数量" default(16)
@@ -35,7 +35,7 @@ func GetTxsHistoryByAddress(ctx *gin.Context) {
 // @Summary 通过地址address获取合约相关tx历史列表，返回tx概要
 // @Tags History
 // @Produce  json
-// @Param start query int true "Start Block Height" default(0)
+// @Param start query int true "Start Block Height" default(666666)
 // @Param end query int true "End Block Height, (0 to get mempool data)" default(0)
 // @Param cursor query int true "起始游标" default(0)
 // @Param size query int true "返回记录数量" default(16)
@@ -51,7 +51,7 @@ func GetTxsHistoryByAddressAndType(ctx *gin.Context, historyType model.HistoryTy
 	logger.Log.Info("GetTxsHistoryByAddressAndType enter")
 
 	// check height
-	blkStartHeightString := ctx.DefaultQuery("start", "0")
+	blkStartHeightString := ctx.DefaultQuery("start", "666666")
 	blkStartHeight, err := strconv.Atoi(blkStartHeightString)
 	if err != nil || blkStartHeight < 0 {
 		logger.Log.Info("blk start height invalid", zap.Error(err))
@@ -117,7 +117,7 @@ func GetTxsHistoryByAddressAndType(ctx *gin.Context, historyType model.HistoryTy
 // @Summary 通过地址address获取相关tx历史列表，返回详细输入/输出
 // @Tags History
 // @Produce  json
-// @Param start query int true "Start Block Height" default(0)
+// @Param start query int true "Start Block Height" default(666666)
 // @Param end query int true "End Block Height, (0 to get mempool data)" default(0)
 // @Param cursor query int true "起始游标" default(0)
 // @Param size query int true "返回记录数量" default(16)
@@ -133,7 +133,7 @@ func GetHistoryByAddress(ctx *gin.Context) {
 // @Summary 通过地址address获取合约相关tx历史列表，返回详细输入/输出
 // @Tags History
 // @Produce  json
-// @Param start query int true "Start Block Height" default(0)
+// @Param start query int true "Start Block Height" default(666666)
 // @Param end query int true "End Block Height, (0 to get mempool data)" default(0)
 // @Param cursor query int true "起始游标" default(0)
 // @Param size query int true "返回记录数量" default(16)
@@ -149,7 +149,7 @@ func GetHistoryByAddressAndType(ctx *gin.Context, historyType model.HistoryType)
 	logger.Log.Info("GetHistoryByAddressAndType enter")
 
 	// check height
-	blkStartHeightString := ctx.DefaultQuery("start", "0")
+	blkStartHeightString := ctx.DefaultQuery("start", "666666")
 	blkStartHeight, err := strconv.Atoi(blkStartHeightString)
 	if err != nil || blkStartHeight < 0 {
 		logger.Log.Info("blk start height invalid", zap.Error(err))
@@ -213,7 +213,7 @@ func GetHistoryByAddressAndType(ctx *gin.Context, historyType model.HistoryType)
 // @Summary 通过溯源genesis获取相关tx历史列表，返回详细输入/输出
 // @Tags History
 // @Produce  json
-// @Param start query int true "Start Block Height" default(0)
+// @Param start query int true "Start Block Height" default(666666)
 // @Param end query int true "End Block Height, (0 to get mempool data)" default(0)
 // @Param cursor query int true "起始游标" default(0)
 // @Param size query int true "返回记录数量" default(16)
@@ -226,7 +226,7 @@ func GetHistoryByGenesis(ctx *gin.Context) {
 	logger.Log.Info("GetHistoryByGenesis enter")
 
 	// check height
-	blkStartHeightString := ctx.DefaultQuery("start", "0")
+	blkStartHeightString := ctx.DefaultQuery("start", "666666")
 	blkStartHeight, err := strconv.Atoi(blkStartHeightString)
 	if err != nil || blkStartHeight < 0 {
 		logger.Log.Info("blk start height invalid", zap.Error(err))
@@ -307,7 +307,7 @@ func GetHistoryByGenesis(ctx *gin.Context) {
 // @Summary 通过FT合约CodeHash+溯源genesis获取地址相关tx历史列表，返回详细输入/输出
 // @Tags History, token FT
 // @Produce  json
-// @Param start query int true "Start Block Height" default(0)
+// @Param start query int true "Start Block Height" default(666666)
 // @Param end query int true "End Block Height, (0 to get mempool data)" default(0)
 // @Param cursor query int true "起始游标" default(0)
 // @Param size query int true "返回记录数量" default(10)
@@ -325,7 +325,7 @@ func GetFTHistoryByGenesis(ctx *gin.Context) {
 // @Summary 通过NFT合约CodeHash+溯源genesis获取地址相关tx历史列表，返回详细输入/输出
 // @Tags History, token NFT
 // @Produce  json
-// @Param start query int true "Start Block Height" default(0)
+// @Param start query int true "Start Block Height" default(666666)
 // @Param end query int true "End Block Height, (0 to get mempool data)" default(0)
 // @Param cursor query int true "起始游标" default(0)
 // @Param size query int true "返回记录数量" default(10)
@@ -343,7 +343,7 @@ func GetNFTHistoryByGenesis(ctx *gin.Context) {
 // @Summary 通过FT合约CodeHash+溯源genesis获取地址相关tx历史列表，返回详细输出历史，并附带输入来源
 // @Tags History, token FT
 // @Produce  json
-// @Param start query int true "Start Block Height" default(0)
+// @Param start query int true "Start Block Height" default(666666)
 // @Param end query int true "End Block Height, (0 to get mempool data)" default(0)
 // @Param cursor query int true "起始游标" default(0)
 // @Param size query int true "返回记录数量" default(10)
@@ -356,7 +356,7 @@ func GetFTIncomeHistoryByGenesis(ctx *gin.Context) {
 	logger.Log.Info("GetFTIncomeHistoryByGenesis enter")
 
 	// check height
-	blkStartHeightString := ctx.DefaultQuery("start", "0")
+	blkStartHeightString := ctx.DefaultQuery("start", "666666")
 	blkStartHeight, err := strconv.Atoi(blkStartHeightString)
 	if err != nil || blkStartHeight < 0 {
 		logger.Log.Info("blk start height invalid", zap.Error(err))
