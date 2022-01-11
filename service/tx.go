@@ -29,7 +29,7 @@ func txResultSRF(rows *sql.Rows) (interface{}, error) {
 
 func GetBlockTxsByBlockHeight(cursor, size, blkHeight int) (txsRsp []*model.TxInfoResp, err error) {
 	psql := fmt.Sprintf("SELECT %s FROM blktx_height WHERE height = %d AND txidx >= %d ORDER BY txidx LIMIT %d", SQL_FIELEDS_TX, blkHeight, cursor, size)
-	return GetBlockTxsBySql(psql)
+	return GetBlockTxsBySql(psql, false)
 }
 
 func GetBlockTxsByBlockId(cursor, size int, blkidHex string) (txsRsp []*model.TxInfoResp, err error) {
@@ -42,10 +42,10 @@ WHERE height IN (
 ORDER BY txidx
 LIMIT %d`, SQL_FIELEDS_TX, blkidHex, cursor, size)
 
-	return GetBlockTxsBySql(psql)
+	return GetBlockTxsBySql(psql, false)
 }
 
-func GetBlockTxsBySql(psql string) (txsRsp []*model.TxInfoResp, err error) {
+func GetBlockTxsBySql(psql string, withBlkId bool) (txsRsp []*model.TxInfoResp, err error) {
 	txsRet, err := clickhouse.ScanAll(psql, txResultSRF)
 	if err != nil {
 		logger.Log.Info("query txs by blkid failed", zap.Error(err))
@@ -56,7 +56,7 @@ func GetBlockTxsBySql(psql string) (txsRsp []*model.TxInfoResp, err error) {
 	}
 	txs := txsRet.([]*model.TxDO)
 	for _, tx := range txs {
-		txsRsp = append(txsRsp, &model.TxInfoResp{
+		txi := &model.TxInfoResp{
 			TxIdHex:    blkparser.HashString(tx.TxId),
 			InCount:    int(tx.InCount),
 			OutCount:   int(tx.OutCount),
@@ -64,15 +64,19 @@ func GetBlockTxsBySql(psql string) (txsRsp []*model.TxInfoResp, err error) {
 			LockTime:   int(tx.LockTime),
 			InSatoshi:  int(tx.InSatoshi),
 			OutSatoshi: int(tx.OutSatoshi),
-
-			Height: int(tx.Height),
-			// BlockIdHex: blkparser.HashString(tx.BlockId),
-			Idx: int(tx.Idx),
-		})
+			Height:     int(tx.Height),
+			Idx:        int(tx.Idx),
+		}
+		if withBlkId {
+			txi.BlockTime = int(tx.BlockTime)
+			txi.BlockIdHex = blkparser.HashString(tx.BlockId)
+		}
+		txsRsp = append(txsRsp, txi)
 	}
 	return
 }
 
+////////////////
 func GetTxById(txidHex string) (txRsp *model.TxInfoResp, err error) {
 	psql := fmt.Sprintf(`
 SELECT %s FROM blktx_height

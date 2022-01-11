@@ -167,8 +167,12 @@ func main() {
 
 	router.GET("/nft/history/:codehash/:genesis/:address",
 		cache.CacheByRequestURI(store, 10*time.Second), controller.GetNFTHistoryByGenesis)
+
 	router.GET("/address/:address/history",
 		cache.CacheByRequestURI(store, 10*time.Second), controller.GetHistoryByAddress)
+
+	router.GET("/address/:address/history/tx",
+		cache.CacheByRequestURI(store, 10*time.Second), controller.GetTxsHistoryByAddress)
 
 	router.GET("/address/:address/contract-history",
 		cache.CacheByRequestURI(store, 10*time.Second), controller.GetContractHistoryByAddress)

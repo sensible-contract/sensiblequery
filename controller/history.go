@@ -15,6 +15,104 @@ import (
 
 const MAX_HISTORY_LIMIT = 1024000
 
+// GetTxsHistoryByAddress
+// @Summary 通过地址address获取相关tx历史列表，返回tx概要
+// @Tags History
+// @Produce  json
+// @Param start query int true "Start Block Height" default(0)
+// @Param end query int true "End Block Height, (0 to get mempool data)" default(0)
+// @Param cursor query int true "起始游标" default(0)
+// @Param size query int true "返回记录数量" default(16)
+// @Param address path string true "Address" default(17SkEw2md5avVNyYgj6RiXuQKNwkXaxFyQ)
+// @Success 200 {object} model.Response{data=[]model.TxInfoResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Router /address/{address}/history/tx [get]
+func GetTxsHistoryByAddress(ctx *gin.Context) {
+	logger.Log.Info("GetTxsHistoryByAddress enter")
+	GetTxsHistoryByAddressAndType(ctx, model.HISTORY_CONTRACT_P2PKH_BOTH)
+}
+
+// GetContractTxsHistoryByAddress
+// @Summary 通过地址address获取合约相关tx历史列表，返回tx概要
+// @Tags History
+// @Produce  json
+// @Param start query int true "Start Block Height" default(0)
+// @Param end query int true "End Block Height, (0 to get mempool data)" default(0)
+// @Param cursor query int true "起始游标" default(0)
+// @Param size query int true "返回记录数量" default(16)
+// @Param address path string true "Address" default(17SkEw2md5avVNyYgj6RiXuQKNwkXaxFyQ)
+// @Success 200 {object} model.Response{data=[]model.TxInfoResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Router /address/{address}/contract-history/tx [get]
+func GetContractTxsHistoryByAddress(ctx *gin.Context) {
+	logger.Log.Info("GetContractTxsHistoryByAddress enter")
+	GetTxsHistoryByAddressAndType(ctx, model.HISTORY_CONTRACT_ONLY)
+}
+
+func GetTxsHistoryByAddressAndType(ctx *gin.Context, historyType model.HistoryType) {
+	logger.Log.Info("GetTxsHistoryByAddressAndType enter")
+
+	// check height
+	blkStartHeightString := ctx.DefaultQuery("start", "0")
+	blkStartHeight, err := strconv.Atoi(blkStartHeightString)
+	if err != nil || blkStartHeight < 0 {
+		logger.Log.Info("blk start height invalid", zap.Error(err))
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "blk start height invalid"})
+		return
+	}
+	blkEndHeightString := ctx.DefaultQuery("end", "0")
+	blkEndHeight, err := strconv.Atoi(blkEndHeightString)
+	if err != nil || blkEndHeight < 0 {
+		logger.Log.Info("blk end height invalid", zap.Error(err))
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "blk end height invalid"})
+		return
+	}
+
+	if blkEndHeight > 0 && (blkEndHeight <= blkStartHeight || (blkEndHeight-blkStartHeight > 10000)) {
+		logger.Log.Info("blk end height invalid", zap.Error(err))
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "blk end height invalid"})
+		return
+	}
+
+	// get cursor/size
+	cursorString := ctx.DefaultQuery("cursor", "0")
+	cursor, err := strconv.Atoi(cursorString)
+	if err != nil || cursor < 0 {
+		logger.Log.Info("cursor invalid", zap.Error(err))
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "cursor invalid"})
+		return
+	}
+	sizeString := ctx.DefaultQuery("size", "16")
+	size, err := strconv.Atoi(sizeString)
+	if err != nil || size <= 0 || cursor+size > MAX_HISTORY_LIMIT {
+		logger.Log.Info("size invalid", zap.Error(err))
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "size invalid"})
+		return
+	}
+
+	address := ctx.Param("address")
+	// check
+	addressPkh, err := utils.DecodeAddress(address)
+	if err != nil {
+		logger.Log.Info("address invalid", zap.Error(err))
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "address invalid"})
+		return
+	}
+
+	result, err := service.GetTxsHistoryByAddressAndTypeByHeightRange(cursor, size, blkStartHeight, blkEndHeight, hex.EncodeToString(addressPkh), historyType)
+	if err != nil {
+		logger.Log.Info("get txs history failed", zap.Error(err))
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get txs history failed"})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, model.Response{
+		Code: 0,
+		Msg:  "ok",
+		Data: result,
+	})
+}
+
+////////////////
+
 // GetHistoryByAddress
 // @Summary 通过地址address获取相关tx历史列表，返回详细输入/输出
 // @Tags History
