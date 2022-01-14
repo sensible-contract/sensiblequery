@@ -13,7 +13,9 @@ import (
 	"go.uber.org/zap"
 )
 
+const MAX_HISTORY_SIZE = 2048
 const MAX_HISTORY_LIMIT = 102400
+const MAX_HISTORY_BLOCK_RANGE = 100000
 
 // GetTxsHistoryByAddress
 // @Summary 通过地址address获取相关tx历史列表，返回tx概要
@@ -66,7 +68,7 @@ func GetTxsHistoryByAddressAndType(ctx *gin.Context, historyType model.HistoryTy
 		return
 	}
 
-	if blkEndHeight > 0 && (blkEndHeight <= blkStartHeight || (blkEndHeight-blkStartHeight > 10000)) {
+	if blkEndHeight > 0 && (blkEndHeight <= blkStartHeight || (blkEndHeight-blkStartHeight > MAX_HISTORY_BLOCK_RANGE)) {
 		logger.Log.Info("blk end height invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "blk end height invalid"})
 		return
@@ -82,7 +84,7 @@ func GetTxsHistoryByAddressAndType(ctx *gin.Context, historyType model.HistoryTy
 	}
 	sizeString := ctx.DefaultQuery("size", "16")
 	size, err := strconv.Atoi(sizeString)
-	if err != nil || size <= 0 || cursor+size > MAX_HISTORY_LIMIT {
+	if err != nil || size <= 0 || size > MAX_HISTORY_SIZE || cursor+size > MAX_HISTORY_LIMIT {
 		logger.Log.Info("size invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "size invalid"})
 		return
@@ -164,7 +166,7 @@ func GetHistoryByAddressAndType(ctx *gin.Context, historyType model.HistoryType)
 		return
 	}
 
-	if blkEndHeight > 0 && (blkEndHeight <= blkStartHeight || (blkEndHeight-blkStartHeight > 10000)) {
+	if blkEndHeight > 0 && (blkEndHeight <= blkStartHeight || (blkEndHeight-blkStartHeight > MAX_HISTORY_BLOCK_RANGE)) {
 		logger.Log.Info("blk end height invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "blk end height invalid"})
 		return
@@ -180,7 +182,7 @@ func GetHistoryByAddressAndType(ctx *gin.Context, historyType model.HistoryType)
 	}
 	sizeString := ctx.DefaultQuery("size", "16")
 	size, err := strconv.Atoi(sizeString)
-	if err != nil || size <= 0 || cursor+size > MAX_HISTORY_LIMIT {
+	if err != nil || size <= 0 || size > MAX_HISTORY_SIZE || cursor+size > MAX_HISTORY_LIMIT {
 		logger.Log.Info("size invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "size invalid"})
 		return
@@ -241,7 +243,7 @@ func GetHistoryByGenesis(ctx *gin.Context) {
 		return
 	}
 
-	if blkEndHeight > 0 && (blkEndHeight <= blkStartHeight || (blkEndHeight-blkStartHeight > 10000)) {
+	if blkEndHeight > 0 && (blkEndHeight <= blkStartHeight || (blkEndHeight-blkStartHeight > MAX_HISTORY_BLOCK_RANGE)) {
 		logger.Log.Info("blk end height invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "blk end height invalid"})
 		return
@@ -257,7 +259,7 @@ func GetHistoryByGenesis(ctx *gin.Context) {
 	}
 	sizeString := ctx.DefaultQuery("size", "16")
 	size, err := strconv.Atoi(sizeString)
-	if err != nil || size <= 0 || cursor+size > MAX_HISTORY_LIMIT {
+	if err != nil || size <= 0 || size > MAX_HISTORY_SIZE || cursor+size > MAX_HISTORY_LIMIT {
 		logger.Log.Info("size invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "size invalid"})
 		return
@@ -371,7 +373,7 @@ func GetFTIncomeHistoryByGenesis(ctx *gin.Context) {
 		return
 	}
 
-	if blkEndHeight > 0 && (blkEndHeight <= blkStartHeight || (blkEndHeight-blkStartHeight > 10000)) {
+	if blkEndHeight > 0 && (blkEndHeight <= blkStartHeight || (blkEndHeight-blkStartHeight > MAX_HISTORY_BLOCK_RANGE)) {
 		logger.Log.Info("blk end height invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "blk end height invalid"})
 		return
@@ -387,7 +389,7 @@ func GetFTIncomeHistoryByGenesis(ctx *gin.Context) {
 	}
 	sizeString := ctx.DefaultQuery("size", "16")
 	size, err := strconv.Atoi(sizeString)
-	if err != nil || size <= 0 || cursor+size > MAX_HISTORY_LIMIT {
+	if err != nil || size <= 0 || size > MAX_HISTORY_SIZE || cursor+size > MAX_HISTORY_LIMIT {
 		logger.Log.Info("size invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "size invalid"})
 		return
