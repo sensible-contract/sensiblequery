@@ -46,6 +46,13 @@ LIMIT %d`, SQL_FIELEDS_TX, blkidHex, cursor, size)
 }
 
 func GetBlockTxsBySql(psql string, withBlkId bool) (txsRsp []*model.TxInfoResp, err error) {
+	// confirmations
+	bestHeight, err := GetBestBlockHeight()
+	if err != nil {
+		logger.Log.Info("best block failed", zap.Error(err))
+	}
+
+	// txinfo
 	txsRet, err := clickhouse.ScanAll(psql, txResultSRF)
 	if err != nil {
 		logger.Log.Info("query txs by blkid failed", zap.Error(err))
@@ -70,6 +77,15 @@ func GetBlockTxsBySql(psql string, withBlkId bool) (txsRsp []*model.TxInfoResp, 
 		if withBlkId {
 			txi.BlockTime = int(tx.BlockTime)
 			txi.BlockIdHex = blkparser.HashString(tx.BlockId)
+		}
+
+		if bestHeight > 0 {
+			if txi.Height == 4294967295 {
+				txi.Confirmations = 0
+			}
+			txi.Confirmations = bestHeight - txi.Height + 1
+		} else {
+			txi.Confirmations = -1
 		}
 		txsRsp = append(txsRsp, txi)
 	}
@@ -114,6 +130,13 @@ LIMIT 1`, SQL_FIELEDS_TX_TIMESTAMP, blkHeight, blkHeight, txidHex)
 }
 
 func GetTxBySql(psql string) (txRsp *model.TxInfoResp, err error) {
+	// confirmations
+	bestHeight, err := GetBestBlockHeight()
+	if err != nil {
+		logger.Log.Info("best block failed", zap.Error(err))
+	}
+
+	// txinfo
 	txRet, err := clickhouse.ScanOne(psql, txResultSRF)
 	if err != nil {
 		logger.Log.Info("query tx failed", zap.Error(err))
@@ -136,6 +159,16 @@ func GetTxBySql(psql string) (txRsp *model.TxInfoResp, err error) {
 		BlockIdHex: blkparser.HashString(tx.BlockId),
 		Idx:        int(tx.Idx),
 	}
+
+	if bestHeight > 0 {
+		if txRsp.Height == 4294967295 {
+			txRsp.Confirmations = 0
+		}
+		txRsp.Confirmations = bestHeight - txRsp.Height + 1
+	} else {
+		txRsp.Confirmations = -1
+	}
+
 	return
 }
 

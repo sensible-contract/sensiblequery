@@ -10,6 +10,7 @@ import (
 	"sensiblequery/logger"
 	"sensiblequery/model"
 
+	"github.com/go-redis/redis/v8"
 	"go.uber.org/zap"
 )
 
@@ -228,4 +229,19 @@ SELECT toUInt32(quantileExact(blocktime)) FROM (
 	mtp = blkRet.(int)
 
 	return mtp, nil
+}
+
+////////////////
+func GetBestBlockHeight() (height int, err error) {
+	// get decimal from f info
+	height, err = rdb.HGet(ctx, "info", "blocks_total").Int()
+	if err == redis.Nil {
+		height = 0
+		logger.Log.Info("GetBestBlockHeight, but info missing")
+	} else if err != nil {
+		logger.Log.Info("GetBestBlockHeight, but redis failed", zap.Error(err))
+		return
+	}
+
+	return height, nil
 }

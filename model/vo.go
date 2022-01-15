@@ -52,17 +52,18 @@ type BlockInfoResp struct {
 }
 
 type TxInfoResp struct {
-	TxIdHex    string `json:"txid"`
-	InCount    int    `json:"nIn"`        // Tx包括的输入条数
-	OutCount   int    `json:"nOut"`       // Tx包括的输出条数
-	TxSize     int    `json:"size"`       // Tx字节数
-	LockTime   int    `json:"locktime"`   // Tx Locktime
-	InSatoshi  int    `json:"inSatoshi"`  // Tx输入的satoshi总和
-	OutSatoshi int    `json:"outSatoshi"` // Tx输出的satoshi总和
-	BlockTime  int    `json:"timestamp"`  // Tx所在区块的时间戳
-	Height     int    `json:"height"`     // Tx所在区块的高度
-	BlockIdHex string `json:"blkid"`      // Tx所在区块的Id
-	Idx        int    `json:"idx"`        // Tx在区块中的顺序号
+	TxIdHex       string `json:"txid"`
+	InCount       int    `json:"nIn"`           // Tx包括的输入条数
+	OutCount      int    `json:"nOut"`          // Tx包括的输出条数
+	TxSize        int    `json:"size"`          // Tx字节数
+	LockTime      int    `json:"locktime"`      // Tx Locktime
+	InSatoshi     int    `json:"inSatoshi"`     // Tx输入的satoshi总和
+	OutSatoshi    int    `json:"outSatoshi"`    // Tx输出的satoshi总和
+	BlockTime     int    `json:"timestamp"`     // Tx所在区块的时间戳
+	Height        int    `json:"height"`        // Tx所在区块的高度
+	BlockIdHex    string `json:"blkid"`         // Tx所在区块的Id
+	Idx           int    `json:"idx"`           // Tx在区块中的顺序号
+	Confirmations int    `json:"confirmations"` // Tx的确认数
 }
 
 type TxInSpentResp struct {
