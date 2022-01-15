@@ -82,8 +82,9 @@ func GetBlockTxsBySql(psql string, withBlkId bool) (txsRsp []*model.TxInfoResp, 
 		if bestHeight > 0 {
 			if txi.Height == 4294967295 {
 				txi.Confirmations = 0
+			} else {
+				txi.Confirmations = bestHeight - txi.Height + 1
 			}
-			txi.Confirmations = bestHeight - txi.Height + 1
 		} else {
 			txi.Confirmations = -1
 		}
@@ -163,8 +164,9 @@ func GetTxBySql(psql string) (txRsp *model.TxInfoResp, err error) {
 	if bestHeight > 0 {
 		if txRsp.Height == 4294967295 {
 			txRsp.Confirmations = 0
+		} else {
+			txRsp.Confirmations = bestHeight - txRsp.Height + 1
 		}
-		txRsp.Confirmations = bestHeight - txRsp.Height + 1
 	} else {
 		txRsp.Confirmations = -1
 	}
