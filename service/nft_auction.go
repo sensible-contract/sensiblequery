@@ -102,6 +102,7 @@ func getNFTAuctionUtxoFromRedis(utxoOutpoints []string) (nftAuctionsRsp []*model
 			nftAuctionRsp.NFTCodeHashHex = hex.EncodeToString(txo.NFTAuction.NFTCodeHash[:])
 			nftAuctionRsp.NFTIDHex = hex.EncodeToString(txo.NFTAuction.NFTID[:])
 			nftAuctionRsp.FeeAmount = int(txo.NFTAuction.FeeAmount)
+			nftAuctionRsp.FeeRate = int(txo.NFTAuction.FeeRate)
 			nftAuctionRsp.FeeAddress = utils.EncodeAddress(txo.NFTAuction.FeeAddressPkh[:], utils.PubKeyHashAddrID)
 			nftAuctionRsp.StartBsvPrice = int(txo.NFTAuction.StartBsvPrice)
 			nftAuctionRsp.SenderAddress = utils.EncodeAddress(txo.NFTAuction.SenderAddressPkh[:], utils.PubKeyHashAddrID)

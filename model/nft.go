@@ -75,6 +75,7 @@ type NFTAuctionResp struct {
 	NFTCodeHashHex string `json:"nftCodehash"` // 当前拍卖NFT的codehash
 	NFTIDHex       string `json:"nftID"`       // 当前拍卖NFT的nftId
 
+	FeeRate       int    `json:"feeRate"`       // 当前拍卖手续费比例
 	FeeAmount     int    `json:"feeAmount"`     // 当前拍卖手续费
 	FeeAddress    string `json:"feeAddress"`    // 当前拍卖手续费的地址
 	StartBsvPrice int    `json:"startBsvPrice"` // 当前拍卖NFT的起拍价格(satoshi)
