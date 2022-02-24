@@ -178,6 +178,87 @@ LIMIT %d, %d`,
 	return GetHistoryBySql(psql)
 }
 
+//////////////// genesis with out address
+func GetAllHistoryByGenesisByHeightRange(cursor, size, blkStartHeight, blkEndHeight int, codehashHex, genesisHex string, isDesc bool) (txOutsRsp []*model.TxOutHistoryResp, err error) {
+	logger.Log.Info("query tx history by codehash/genesis on all address ")
+
+	if blkEndHeight == 0 {
+		blkEndHeight = 4294967295 + 1 // enable mempool
+	}
+	order := ""
+	if isDesc {
+		order = "DESC"
+	}
+	codehashMatch := ""
+	genesisMatch := ""
+	if codehashHex != "0000000000000000000000000000000000000000" {
+		codehashMatch = fmt.Sprintf("codehash = unhex('%s') AND", codehashHex)
+		genesisMatch = fmt.Sprintf("genesis = unhex('%s')", genesisHex)
+	}
+	maxOffset := cursor + size
+	// script_pk -> ''
+	psql := fmt.Sprintf(`
+SELECT txid, idx, address, codehash, genesis, satoshi, script_type, script_pk, height, txidx, io_type, blk.blocktime FROM
+(
+    SELECT utxid AS txid, vout AS idx, address, codehash, genesis, satoshi, script_type, script_pk, height, utxidx AS txidx, 1 AS io_type FROM txout
+    WHERE (utxid, vout, height) in (
+        SELECT utxid, vout, height FROM txout_genesis_height
+        WHERE height >= %d AND height < %d AND %s %s
+        ORDER BY height %s, utxidx %s, codehash %s, genesis %s
+        LIMIT %d
+      )
+    ORDER BY height %s, utxidx %s
+    LIMIT %d
+
+    UNION ALL
+
+    SELECT utxid AS txid, vout AS idx, address, codehash, genesis, satoshi, script_type, script_pk, height, utxidx AS txidx, 1 AS io_type FROM txout
+    WHERE height >= 4294967295 AND height < %d AND %s %s
+    ORDER BY height %s, utxidx %s, codehash %s, genesis %s
+    LIMIT %d
+
+    UNION ALL
+
+    SELECT txid, idx, address, codehash, genesis, satoshi, script_type, script_pk, height, txidx, 0 AS io_type FROM txin
+    WHERE (txid, idx, height) in (
+        SELECT txid, idx, height FROM txin_genesis_height
+        WHERE height >= %d AND height < %d AND %s %s
+        ORDER BY height %s, txidx %s, codehash %s, genesis %s
+        LIMIT %d
+      )
+    ORDER BY height %s, txidx %s
+    LIMIT %d
+
+    UNION ALL
+
+    SELECT txid, idx, address, codehash, genesis, satoshi, script_type, script_pk, height, txidx, 0 AS io_type FROM txin
+    WHERE height >= 4294967295 AND height < %d AND %s %s
+    ORDER BY height %s, txidx %s, codehash %s, genesis %s
+    LIMIT %d
+
+) AS history
+LEFT JOIN (
+    SELECT height, blocktime FROM blk_height
+    WHERE height >= %d AND height < %d
+) AS blk
+USING height
+ORDER BY height %s, txidx %s
+LIMIT %d, %d`,
+		blkStartHeight, blkEndHeight,
+		codehashMatch, genesisMatch, order, order, order, order, maxOffset, order, order, maxOffset,
+		blkEndHeight,
+		codehashMatch, genesisMatch, order, order, order, order, maxOffset,
+
+		blkStartHeight, blkEndHeight,
+		codehashMatch, genesisMatch, order, order, order, order, maxOffset, order, order, maxOffset,
+		blkEndHeight,
+		codehashMatch, genesisMatch, order, order, order, order, maxOffset,
+
+		blkStartHeight, blkEndHeight, order, order,
+		cursor, size)
+	return GetHistoryBySql(psql)
+}
+
 //////////////// genesis
 func GetIncomeHistoryByGenesisByHeightRange(cursor, size, blkStartHeight, blkEndHeight int, codehashHex, genesisHex, addressHex string) (txOutsRsp []*model.TxOutHistoryResp, err error) {
 	logger.Log.Info("query tx income history by codehash/genesis for", zap.String("address", addressHex))

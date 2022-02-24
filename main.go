@@ -181,6 +181,9 @@ func main() {
 	router.GET("/contract/history/:codehash/:genesis/:address",
 		cache.CacheByRequestURI(store, 10*time.Second), controller.GetHistoryByGenesis)
 
+	router.GET("/contract/history/:codehash/:genesis",
+		cache.CacheByRequestURI(store, 10*time.Second), controller.GetAllHistoryByGenesis)
+
 	router.GET("/token/info",
 		cache.CacheByRequestURI(store, 10*time.Second), controller.ListAllTokenInfo)
 
