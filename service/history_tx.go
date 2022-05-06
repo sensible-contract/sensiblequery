@@ -30,7 +30,7 @@ func GetTxsHistoryByAddressAndTypeByHeightRange(cursor, size, blkStartHeight, bl
 	psql := fmt.Sprintf(`
 SELECT %s FROM blktx_height
 LEFT JOIN  (
-    SELECT height, blocktime FROM blk_height
+    SELECT height, blkid, blocktime FROM blk_height
     WHERE height >= %d AND height < %d
 ) AS blk
 USING height
@@ -119,7 +119,7 @@ func GetTxsHistoryByGenesisByHeightRange(cursor, size, blkStartHeight, blkEndHei
 	psql := fmt.Sprintf(`
 SELECT %s FROM blktx_height
 LEFT JOIN  (
-    SELECT height, blocktime FROM blk_height
+    SELECT height, blkid, blocktime FROM blk_height
     WHERE height >= %d AND height < %d
 ) AS blk
 USING height

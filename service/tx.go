@@ -13,8 +13,8 @@ import (
 )
 
 const (
-	SQL_FIELEDS_TX           = "txid, nin, nout, txsize, locktime, invalue, outvalue, 0, height, blkid, txidx"
-	SQL_FIELEDS_TX_TIMESTAMP = "txid, nin, nout, txsize, locktime, invalue, outvalue, blk.blocktime, height, blkid, txidx"
+	SQL_FIELEDS_TX           = "txid, nin, nout, txsize, locktime, invalue, outvalue, 0, height, '', txidx"
+	SQL_FIELEDS_TX_TIMESTAMP = "txid, nin, nout, txsize, locktime, invalue, outvalue, blk.blocktime, height, blk.blkid, txidx"
 )
 
 //////////////// tx
@@ -98,7 +98,7 @@ func GetTxById(txidHex string) (txRsp *model.TxInfoResp, err error) {
 	psql := fmt.Sprintf(`
 SELECT %s FROM blktx_height
 LEFT JOIN  (
-    SELECT height, blocktime FROM blk_height
+    SELECT height, blkid, blocktime FROM blk_height
     WHERE height IN (
         SELECT height FROM tx_height
         WHERE txid = unhex('%s')
@@ -120,7 +120,7 @@ func GetTxByIdInsideHeight(blkHeight int, txidHex string) (txRsp *model.TxInfoRe
 	psql := fmt.Sprintf(`
 SELECT %s FROM blktx_height
 LEFT JOIN (
-    SELECT height, blocktime FROM blk_height
+    SELECT height, blkid, blocktime FROM blk_height
     WHERE height = %d
     LIMIT 1
 ) AS blk
