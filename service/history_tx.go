@@ -34,8 +34,8 @@ LEFT JOIN  (
     WHERE height >= %d AND height < %d
 ) AS blk
 USING height
-WHERE (txid, height) in (
-    SELECT txid, height FROM
+WHERE (height, txidx, substring(txid, 1, 12)) in (
+    SELECT height, txidx, txid FROM
     (
         SELECT utxid AS txid, height, utxidx AS txidx FROM txout_address_height
         WHERE height >= %d AND height < %d AND address = unhex('%s') %s
@@ -45,7 +45,7 @@ WHERE (txid, height) in (
 
       UNION ALL
 
-        SELECT utxid AS txid, height, utxidx AS txidx FROM txout
+        SELECT substring(utxid, 1, 12) AS txid, height, utxidx AS txidx FROM txout
         WHERE height >= 4294967295 AND height < %d AND address = unhex('%s') %s
         GROUP BY txid, height, txidx
         ORDER BY height DESC, txidx DESC
@@ -61,7 +61,7 @@ WHERE (txid, height) in (
 
       UNION ALL
 
-        SELECT txid, height, txidx FROM txin
+        SELECT substring(txid, 1, 12), height, txidx FROM txin
         WHERE height >= 4294967295 AND height < %d AND address = unhex('%s') %s
         GROUP BY txid, height, txidx
         ORDER BY height DESC, txidx DESC
@@ -123,8 +123,8 @@ LEFT JOIN  (
     WHERE height >= %d AND height < %d
 ) AS blk
 USING height
-WHERE (txid, height) in (
-    SELECT txid, height FROM
+WHERE (substring(txid, 1, 12), height, txidx) in (
+    SELECT txid, height, txidx FROM
     (
         SELECT utxid AS txid, height, utxidx AS txidx FROM txout_genesis_height
         WHERE height >= %d AND height < %d AND %s %s (address = unhex('%s') %s)
@@ -134,7 +134,7 @@ WHERE (txid, height) in (
 
       UNION ALL
 
-        SELECT utxid AS txid, height, utxidx AS txidx FROM txout
+        SELECT substring(utxid, 1, 12) AS txid, height, utxidx AS txidx FROM txout
         WHERE height >= 4294967295 AND height < %d AND %s %s (address = unhex('%s') %s)
         GROUP BY txid, height, txidx
         ORDER BY height DESC, txidx DESC, codehash DESC, genesis DESC
@@ -150,7 +150,7 @@ WHERE (txid, height) in (
 
       UNION ALL
 
-        SELECT txid, height, txidx FROM txin
+        SELECT substring(txid, 1, 12), height, txidx FROM txin
         WHERE height >= 4294967295 AND height < %d AND %s %s (address = unhex('%s') %s)
         GROUP BY txid, height, txidx
         ORDER BY height DESC, txidx DESC, codehash DESC, genesis DESC

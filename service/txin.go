@@ -22,7 +22,6 @@ const (
 
 	SQL_FIELEDS_TXIN = `height, txid, idx, script_sig, nsequence,
        height_txo, utxid, vout, address, codehash, genesis, satoshi, script_type, script_pk`
-	SQL_FIELEDS_TXIN_SPENT = "height, txid, idx, utxid, vout"
 )
 
 //////////////// txin
@@ -57,7 +56,7 @@ WHERE txid = unhex('%s') AND
     )) AND
       idx >= %d
 ORDER BY idx
-LIMIT %d`, SQL_FIELEDS_TXIN, txidHex, txidHex, cursor, size)
+LIMIT %d`, SQL_FIELEDS_TXIN, txidHex, txidHex[:24], cursor, size)
 
 	return GetTxInputsBySql(psql)
 }
@@ -100,7 +99,7 @@ WHERE txid = unhex('%s') AND
         SELECT height FROM tx_height
         WHERE txid = unhex('%s')
     ))
-LIMIT 1`, SQL_FIELEDS_TXIN, txidHex, index, txidHex)
+LIMIT 1`, SQL_FIELEDS_TXIN, txidHex, index, txidHex[:24])
 
 	return GetTxInputBySql(psql)
 }
@@ -132,7 +131,7 @@ func GetTxInputBySql(psql string) (txInRsp *model.TxInResp, err error) {
 
 func GetTxOutputSpentStatusByTxIdAndIdx(txidHex string, index int) (txInRsp *model.TxInSpentResp, err error) {
 	psql := fmt.Sprintf(`
-SELECT %s FROM txin_spent
+SELECT height, txid, idx, unhex('%s'), %d FROM txin_spent
 WHERE utxid = unhex('%s') AND
        vout = %d AND
     (height = 4294967295 OR
@@ -141,7 +140,8 @@ WHERE utxid = unhex('%s') AND
         WHERE utxid = unhex('%s') AND
                vout = %d
     ))
-LIMIT 1`, SQL_FIELEDS_TXIN_SPENT, txidHex, index, txidHex, index)
+LIMIT 1
+`, txidHex, index, txidHex[:24], index, txidHex[:24], index)
 
 	txInRet, err := clickhouse.ScanOne(psql, txInSpentResultSRF)
 	if err != nil {

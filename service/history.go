@@ -37,7 +37,7 @@ func GetHistoryByAddressAndTypeByHeightRange(cursor, size, blkStartHeight, blkEn
 SELECT txid, idx, address, codehash, genesis, satoshi, script_type, script_pk, height, txidx, io_type, blk.blocktime FROM
 (
     SELECT utxid AS txid, vout AS idx, address, codehash, genesis, satoshi, script_type, script_pk, height, utxidx AS txidx, 1 AS io_type FROM txout
-    WHERE (utxid, vout, height) in (
+    WHERE (substring(utxid, 1, 12), vout, height) in (
         SELECT utxid, vout, height FROM txout_address_height
         WHERE height >= %d AND height < %d AND address = unhex('%s') %s
         ORDER BY height DESC, utxidx DESC
@@ -56,7 +56,7 @@ SELECT txid, idx, address, codehash, genesis, satoshi, script_type, script_pk, h
     UNION ALL
 
     SELECT txid, idx, address, codehash, genesis, satoshi, script_type, script_pk, height, txidx, 0 AS io_type FROM txin
-    WHERE (txid, idx, height) in (
+    WHERE (substring(txid, 1, 12), idx, height) in (
         SELECT txid, idx, height FROM txin_address_height
         WHERE height >= %d AND height < %d AND address = unhex('%s') %s
         ORDER BY height DESC, txidx DESC
@@ -120,7 +120,7 @@ func GetHistoryByGenesisByHeightRange(cursor, size, blkStartHeight, blkEndHeight
 SELECT txid, idx, address, codehash, genesis, satoshi, script_type, script_pk, height, txidx, io_type, blk.blocktime FROM
 (
     SELECT utxid AS txid, vout AS idx, address, codehash, genesis, satoshi, script_type, script_pk, height, utxidx AS txidx, 1 AS io_type FROM txout
-    WHERE (utxid, vout, height) in (
+    WHERE (substring(utxid, 1, 12), vout, height) in (
         SELECT utxid, vout, height FROM txout_genesis_height
         WHERE height >= %d AND height < %d AND %s %s (address = unhex('%s') %s)
         ORDER BY height DESC, utxidx DESC, codehash DESC, genesis DESC
@@ -139,7 +139,7 @@ SELECT txid, idx, address, codehash, genesis, satoshi, script_type, script_pk, h
     UNION ALL
 
     SELECT txid, idx, address, codehash, genesis, satoshi, script_type, script_pk, height, txidx, 0 AS io_type FROM txin
-    WHERE (txid, idx, height) in (
+    WHERE (substring(txid, 1, 12), idx, height) in (
         SELECT txid, idx, height FROM txin_genesis_height
         WHERE height >= %d AND height < %d AND %s %s (address = unhex('%s') %s)
         ORDER BY height DESC, txidx DESC, codehash DESC, genesis DESC
@@ -201,7 +201,7 @@ func GetAllHistoryByGenesisByHeightRange(cursor, size, blkStartHeight, blkEndHei
 SELECT txid, idx, address, codehash, genesis, satoshi, script_type, script_pk, height, txidx, io_type, blk.blocktime FROM
 (
     SELECT utxid AS txid, vout AS idx, address, codehash, genesis, satoshi, script_type, script_pk, height, utxidx AS txidx, 1 AS io_type FROM txout
-    WHERE (utxid, vout, height) in (
+    WHERE (substring(utxid, 1, 12), vout, height) in (
         SELECT utxid, vout, height FROM txout_genesis_height
         WHERE height >= %d AND height < %d AND %s %s
         ORDER BY height %s, utxidx %s, codehash %s, genesis %s
@@ -220,7 +220,7 @@ SELECT txid, idx, address, codehash, genesis, satoshi, script_type, script_pk, h
     UNION ALL
 
     SELECT txid, idx, address, codehash, genesis, satoshi, script_type, script_pk, height, txidx, 0 AS io_type FROM txin
-    WHERE (txid, idx, height) in (
+    WHERE (substring(txid, 1, 12), idx, height) in (
         SELECT txid, idx, height FROM txin_genesis_height
         WHERE height >= %d AND height < %d AND %s %s
         ORDER BY height %s, txidx %s, codehash %s, genesis %s
@@ -284,7 +284,7 @@ func GetIncomeHistoryByGenesisByHeightRange(cursor, size, blkStartHeight, blkEnd
 SELECT txid, idx, address, codehash, genesis, satoshi, script_type, script_pk, height, txidx, io_type, blk.blocktime FROM
 (
     SELECT utxid AS txid, vout AS idx, address, codehash, genesis, satoshi, script_type, script_pk, height, utxidx AS txidx, 1 AS io_type FROM txout
-    WHERE (utxid, vout, height) in (
+    WHERE (substring(utxid, 1, 12), vout, height) in (
         SELECT utxid, vout, height FROM txout_genesis_height
         WHERE height >= %d AND height < %d AND %s %s (address = unhex('%s') %s)
         ORDER BY height DESC, utxidx DESC, codehash DESC, genesis DESC
@@ -303,7 +303,7 @@ SELECT txid, idx, address, codehash, genesis, satoshi, script_type, script_pk, h
     UNION ALL
 
     SELECT txid, idx, address, codehash, genesis, satoshi, script_type, script_pk, height, txidx, 0 AS io_type FROM txin
-    WHERE (txid, height, codehash, genesis) in (
+    WHERE (substring(txid, 1, 12), height, codehash, genesis) in (
         SELECT utxid, height, codehash, genesis FROM txout_genesis_height
         WHERE height >= %d AND height < %d AND %s %s (address = unhex('%s') %s)
         ORDER BY height DESC, utxidx DESC, codehash DESC, genesis DESC

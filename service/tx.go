@@ -112,7 +112,7 @@ WHERE (height = 4294967295 OR
     WHERE txid = unhex('%s')
 )) AND txid = unhex('%s')
 ORDER BY height
-LIMIT 1`, SQL_FIELEDS_TX_TIMESTAMP, txidHex, txidHex, txidHex)
+LIMIT 1`, SQL_FIELEDS_TX_TIMESTAMP, txidHex[:24], txidHex[:24], txidHex)
 	return GetTxBySql(psql)
 }
 
@@ -192,7 +192,7 @@ WHERE (height = 4294967295 OR
     SELECT height FROM tx_height
     WHERE txid = unhex('%s')
 )) AND txid = unhex('%s')
-LIMIT 1`, txidHex, txidHex)
+LIMIT 1`, txidHex[:24], txidHex)
 
 	txRet, err := clickhouse.ScanOne(psql, rawtxResultSRF)
 	if err != nil {

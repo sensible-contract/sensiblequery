@@ -20,8 +20,7 @@ const (
 	SQL_FIELEDS_TXOUT_WITHOUT_SCRIPT        = "utxid, vout, address, genesis, satoshi, script_type, '', height, txidx"
 	SQL_FIELEDS_TXOUT_STATUS_WITHOUT_SCRIPT = SQL_FIELEDS_TXOUT_WITHOUT_SCRIPT + ", u.txid, u.height"
 
-	SQL_FIELEDS_TXOUT        = "utxid, vout, address, codehash, genesis, satoshi, script_type, script_pk, height, utxidx"
-	SQL_FIELEDS_TXOUT_STATUS = SQL_FIELEDS_TXOUT + ", u.txid, u.height"
+	SQL_FIELEDS_TXOUT = "utxid, vout, address, codehash, genesis, satoshi, script_type, script_pk, height, utxidx"
 )
 
 //////////////// txout
@@ -37,10 +36,11 @@ func txOutStatusResultSRF(rows *sql.Rows) (interface{}, error) {
 
 func GetTxOutputsByTxId(cursor, size int, txidHex string) (txOutsRsp []*model.TxOutStatusResp, err error) {
 	psql := fmt.Sprintf(`
-SELECT %s FROM txout
+SELECT utxid, vout, address, codehash, genesis, satoshi, script_type, script_pk, height, utxidx,
+       u.txid, u.height FROM txout
 LEFT JOIN
 (
-    SELECT utxid, vout, txid, height FROM txin_spent
+    SELECT vout, txid, height FROM txin_spent
     WHERE utxid = unhex('%s') AND
            vout >= %d AND
         (height = 4294967295 OR
@@ -52,7 +52,7 @@ LEFT JOIN
                     ))
     ORDER BY vout
     LIMIT %d
-) AS u USING (utxid, vout)
+) AS u USING vout
 WHERE utxid = unhex('%s') AND
        vout >= %d AND
     (height = 4294967295 OR
@@ -61,19 +61,21 @@ WHERE utxid = unhex('%s') AND
                ))
 ORDER BY vout
 LIMIT %d
-`, SQL_FIELEDS_TXOUT_STATUS, // need without script?
-		txidHex, cursor, txidHex, cursor, size, size,
-		txidHex, cursor, txidHex, size)
+`, // need without script?
+		txidHex[:24], cursor, txidHex[:24], cursor, size, size,
+		txidHex, cursor, txidHex[:24], size)
 
 	return GetTxOutputsBySql(psql)
 }
 
 func GetTxOutputsByTxIdInsideHeight(cursor, size, blkHeight int, txidHex string) (txOutsRsp []*model.TxOutStatusResp, err error) {
 	psql := fmt.Sprintf(`
-SELECT %s FROM txout
+SELECT utxid, vout, address, codehash, genesis, satoshi, script_type, script_pk, height, utxidx,
+       u.txid, u.height FROM txout
 LEFT JOIN
 (
-    SELECT utxid, vout, txid, height FROM txin_spent
+
+    SELECT vout, txid, height FROM txin_spent
     WHERE utxid = unhex('%s') AND
            vout >= %d AND
          (height == 4294967295 OR
@@ -85,14 +87,15 @@ LEFT JOIN
                     ))
     ORDER BY vout
     LIMIT %d
-) AS u USING (utxid, vout)
+
+) AS u USING vout
 WHERE height = %d AND
      utxid = unhex('%s') AND
       vout >= %d
 ORDER BY vout
 LIMIT %d
-`, SQL_FIELEDS_TXOUT_STATUS, // need without script?
-		txidHex, cursor, txidHex, cursor, size, size,
+`, // need without script?
+		txidHex[:24], cursor, txidHex[:24], cursor, size, size,
 		blkHeight, txidHex, cursor, size)
 
 	return GetTxOutputsBySql(psql)
@@ -131,7 +134,7 @@ WHERE utxid = unhex('%s') AND
             SELECT height FROM tx_height
             WHERE txid = unhex('%s')
        ))
-LIMIT 1`, SQL_FIELEDS_TXOUT, txidHex, index, txidHex)
+LIMIT 1`, SQL_FIELEDS_TXOUT, txidHex, index, txidHex[:24])
 	return GetTxOutputBySql(psql)
 }
 

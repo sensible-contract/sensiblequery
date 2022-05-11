@@ -56,11 +56,12 @@ func DecodeVarIntForTx(raw []byte) (cnt uint, cnt_size uint) {
 }
 
 func HashString(data []byte) (res string) {
-	reverseData := make([]byte, 32)
+	n := len(data) // 32
+	reverseData := make([]byte, n)
 
 	// need reverse
-	for i := 0; i < 32; i++ {
-		reverseData[i] = data[32-i-1]
+	for i := 0; i < n; i++ {
+		reverseData[i] = data[n-i-1]
 	}
 	return hex.EncodeToString(reverseData)
 }
