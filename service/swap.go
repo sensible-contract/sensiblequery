@@ -25,12 +25,7 @@ func GetContractSwapDataInBlocksByHeightRange(cursor, size, blkStartHeight, blkE
 		blkEndHeight = 4294967295 + 1 // enable mempool
 	}
 	psql := fmt.Sprintf(`
-SELECT height, blk.blocktime, code_type, operation, in_value1, in_value2, in_value3, out_value1, out_value2, out_value3, txidx, txid FROM blktx_contract_height
-LEFT JOIN (
-    SELECT height, blocktime FROM blk_height
-    WHERE height >= %d AND height < %d
-) AS blk
-USING height
+SELECT height, blocktime, code_type, operation, in_value1, in_value2, in_value3, out_value1, out_value2, out_value3, txidx, txid FROM blktx_contract_height
 WHERE height >= %d AND height < %d AND
     code_type = %d AND
      codehash = unhex('%s') AND
@@ -38,7 +33,7 @@ WHERE height >= %d AND height < %d AND
 ORDER BY height DESC, txidx DESC
 LIMIT %d, %d`,
 		blkStartHeight, blkEndHeight,
-		blkStartHeight, blkEndHeight, codeType, codeHashHex, genesisHex, cursor, size)
+		codeType, codeHashHex, genesisHex, cursor, size)
 
 	blksRet, err := clickhouse.ScanAll(psql, contractSwapDataResultSRF)
 	if err != nil {
