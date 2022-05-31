@@ -41,7 +41,7 @@ func mergeUtxoByKeys(addressUtxoConfirmed, addressUtxoSpentUnconfirmed, oldUtxoK
 func getNFTSellUtxoFromRedis(utxoOutpoints []string) (nftSellsRsp []*model.NFTSellResp, err error) {
 	logger.Log.Info("getNFTSellUtxoFromRedis redis", zap.Int("nUTXO", len(utxoOutpoints)))
 	nftSellsRsp = make([]*model.NFTSellResp, 0)
-	pipe := rdb.Pipeline()
+	pipe := pika.Pipeline()
 
 	outpointsCmd := make([]*redis.StringCmd, 0)
 	for _, outpoint := range utxoOutpoints {

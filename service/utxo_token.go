@@ -50,7 +50,7 @@ func getNFTUtxoByTokenIndex(key string, tokenIndex string) (txOutsRsp *model.TxO
 func getUtxoFromRedis(utxoOutpoints []string) (txOutsRsp []*model.TxOutResp, err error) {
 	logger.Log.Info("getUtxoFromRedis redis", zap.Int("nUTXO", len(utxoOutpoints)))
 	txOutsRsp = make([]*model.TxOutResp, 0)
-	pipe := rdb.Pipeline()
+	pipe := pika.Pipeline()
 
 	outpointsCmd := make([]*redis.StringCmd, 0)
 	for _, outpoint := range utxoOutpoints {

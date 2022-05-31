@@ -175,7 +175,7 @@ func GetUtxoOutpointsByAddress(cursor, size int, codeHash, genesisId, addressPkh
 func getNonTokenUtxoFromRedis(utxoOutpoints []string) (txOutsRsp []*model.TxStandardOutResp, err error) {
 	logger.Log.Info("getNonTokenUtxoFromRedis", zap.Int("nOutpoints", len(utxoOutpoints)))
 	txOutsRsp = make([]*model.TxStandardOutResp, 0)
-	pipe := rdb.Pipeline()
+	pipe := pika.Pipeline()
 
 	outpointsCmd := make([]*redis.StringCmd, 0)
 	for _, outpoint := range utxoOutpoints {
