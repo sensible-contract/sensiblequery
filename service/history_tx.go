@@ -68,9 +68,9 @@ WHERE (height, txidx, substring(txid, 1, 12)) in (
         LIMIT %d
     ) AS txlist
     ORDER BY height DESC, txidx DESC
-    LIMIT %d, %d
 )
 ORDER BY height DESC, txidx DESC
+LIMIT %d, %d
 `,
 		SQL_FIELEDS_TX_TIMESTAMP,
 		blkStartHeight, blkEndHeight,
@@ -157,9 +157,9 @@ WHERE (substring(txid, 1, 12), height, txidx) in (
         LIMIT %d
     ) AS txlist
     ORDER BY height DESC, txidx DESC
-    LIMIT %d, %d
 )
 ORDER BY height DESC, txidx DESC
+LIMIT %d, %d
 `,
 		SQL_FIELEDS_TX_TIMESTAMP,
 		blkStartHeight, blkEndHeight,
