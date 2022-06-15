@@ -11,6 +11,7 @@ import (
 	"sensiblequery/controller"
 	"sensiblequery/dao/rdb"
 	_ "sensiblequery/docs"
+	"sensiblequery/lib/midware"
 	"sensiblequery/logger"
 	"syscall"
 	"time"
@@ -53,6 +54,8 @@ func main() {
 	router := gin.New()
 	router.Use(ginzap.Ginzap(logger.Log, time.RFC3339, true))
 	router.Use(ginzap.RecoveryWithZap(logger.Log, true))
+	router.Use(midware.Metrics())
+
 	router.Use(gzip.Gzip(gzip.DefaultCompression, gzip.WithDecompressFn(gzip.DefaultDecompressHandle)))
 
 	// go get -u github.com/swaggo/swag/cmd/swag@v1.6.7
@@ -62,6 +65,8 @@ func main() {
 	store := persist.NewRedisStore(rdb.CacheClient)
 
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
+
+	midware.CreateMetricsEndpoint(router)
 
 	router.GET("/", controller.Satotx)
 
