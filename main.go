@@ -132,7 +132,7 @@ func main() {
 	router.GET("/ft/codehash-info/:codehash",
 		cache.CacheByRequestURI(store, 10*time.Second), controller.ListFTSummary)
 	router.GET("/ft/genesis-info/:codehash/:genesis",
-		cache.CacheByRequestURI(store, 10*time.Second), controller.ListFTInfoByGenesis)
+		cache.CacheByRequestURI(store, 60*time.Second), controller.ListFTInfoByGenesis)
 
 	router.GET("/ft/transfer-times/:codehash/:genesis",
 		cache.CacheByRequestURI(store, 10*time.Second), controller.GetFTTransferVolumeInBlockRange)
@@ -159,7 +159,7 @@ func main() {
 	router.GET("/nft/codehash-info/:codehash",
 		cache.CacheByRequestURI(store, 10*time.Second), controller.ListNFTSummary)
 	router.GET("/nft/genesis-info/:codehash/:genesis",
-		cache.CacheByRequestURI(store, 10*time.Second), controller.ListNFTInfoByGenesis)
+		cache.CacheByRequestURI(store, 60*time.Second), controller.ListNFTInfoByGenesis)
 
 	router.GET("/nft/transfer-times/:codehash/:genesis/:tokenid",
 		cache.CacheByRequestURI(store, 10*time.Second), controller.GetNFTTransferTimesInBlockRange)
