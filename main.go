@@ -70,129 +70,132 @@ func main() {
 
 	router.GET("/", controller.Satotx)
 
-	router.GET("/getrawmempool", controller.GetRawMempool)
 	router.POST("/pushtx", controller.PushTx)
 	router.POST("/pushtxs", controller.PushTxs)
 
-	router.GET("/blockchain/info", controller.GetBlockchainInfo)
+	mainAPI := router.Group("/", midware.VerifySignatureForHttpGet())
 
-	router.GET("/mempool/info", controller.GetMempoolInfo)
+	mainAPI.GET("/getrawmempool", controller.GetRawMempool)
 
-	router.GET("/blocks", controller.GetBlocksByHeightRange)
+	mainAPI.GET("/blockchain/info", controller.GetBlockchainInfo)
 
-	router.GET("/block/id/:blkid", controller.GetBlockById)
-	router.GET("/block/txs/:blkid", controller.GetBlockTxsByBlockId)
+	mainAPI.GET("/mempool/info", controller.GetMempoolInfo)
 
-	router.GET("/rawtx/:txid", controller.GetRawTxById)
-	router.GET("/relay/:txid", controller.RelayTxById)
+	mainAPI.GET("/blocks", controller.GetBlocksByHeightRange)
 
-	router.GET("/tx/:txid", controller.GetTxById)
-	router.GET("/tx/:txid/ins", controller.GetTxInputsByTxId)
-	router.GET("/tx/:txid/outs", controller.GetTxOutputsByTxId)
+	mainAPI.GET("/block/id/:blkid", controller.GetBlockById)
+	mainAPI.GET("/block/txs/:blkid", controller.GetBlockTxsByBlockId)
 
-	router.GET("/tx/:txid/in/:index", controller.GetTxInputByTxIdAndIdx)
-	router.GET("/tx/:txid/out/:index", controller.GetTxOutputByTxIdAndIdx)
+	mainAPI.GET("/rawtx/:txid", controller.GetRawTxById)
+	mainAPI.GET("/relay/:txid", controller.RelayTxById)
 
-	router.GET("/tx/:txid/out/:index/spent", controller.GetTxOutputSpentStatusByTxIdAndIdx)
+	mainAPI.GET("/tx/:txid", controller.GetTxById)
+	mainAPI.GET("/tx/:txid/ins", controller.GetTxInputsByTxId)
+	mainAPI.GET("/tx/:txid/outs", controller.GetTxOutputsByTxId)
 
-	router.GET("/address/:address/utxo",
+	mainAPI.GET("/tx/:txid/in/:index", controller.GetTxInputByTxIdAndIdx)
+	mainAPI.GET("/tx/:txid/out/:index", controller.GetTxOutputByTxIdAndIdx)
+
+	mainAPI.GET("/tx/:txid/out/:index/spent", controller.GetTxOutputSpentStatusByTxIdAndIdx)
+
+	mainAPI.GET("/address/:address/utxo",
 		cache.CacheByRequestURI(store, 1*time.Second), controller.GetUtxoByAddress)
-	router.GET("/address/:address/utxo-data",
+	mainAPI.GET("/address/:address/utxo-data",
 		cache.CacheByRequestURI(store, 1*time.Second), controller.GetUtxoDataByAddress)
 
-	router.GET("/nft/sell/utxo", controller.GetNFTSellUtxo)
-	router.GET("/nft/sell/utxo-by-address/:address", controller.GetNFTSellUtxoByAddress)
-	router.GET("/nft/sell/utxo/:codehash/:genesis", controller.GetNFTSellUtxoByGenesis)
-	router.GET("/nft/sell/utxo-detail/:codehash/:genesis/:token_index", controller.GetNFTSellUtxoDetail)
+	mainAPI.GET("/nft/sell/utxo", controller.GetNFTSellUtxo)
+	mainAPI.GET("/nft/sell/utxo-by-address/:address", controller.GetNFTSellUtxoByAddress)
+	mainAPI.GET("/nft/sell/utxo/:codehash/:genesis", controller.GetNFTSellUtxoByGenesis)
+	mainAPI.GET("/nft/sell/utxo-detail/:codehash/:genesis/:token_index", controller.GetNFTSellUtxoDetail)
 
-	router.GET("/nft/auction/utxo-detail/:codehash/:nftid", controller.GetNFTAuctionUtxoDetail)
+	mainAPI.GET("/nft/auction/utxo-detail/:codehash/:nftid", controller.GetNFTAuctionUtxoDetail)
 
-	router.GET("/ft/utxo-data/:codehash/:genesis/:address", controller.GetFTUtxoData)
-	router.GET("/nft/utxo-data/:codehash/:genesis/:address", controller.GetNFTUtxoData)
+	mainAPI.GET("/ft/utxo-data/:codehash/:genesis/:address", controller.GetFTUtxoData)
+	mainAPI.GET("/nft/utxo-data/:codehash/:genesis/:address", controller.GetNFTUtxoData)
 
-	router.GET("/ft/utxo/:codehash/:genesis/:address", controller.GetFTUtxo)
-	router.GET("/nft/utxo/:codehash/:genesis/:address", controller.GetNFTUtxo)
-	router.GET("/nft/utxo-detail/:codehash/:genesis/:token_index", controller.GetNFTUtxoDetailByTokenIndex)
-	router.GET("/nft/utxo-list/:codehash/:genesis",
+	mainAPI.GET("/ft/utxo/:codehash/:genesis/:address", controller.GetFTUtxo)
+	mainAPI.GET("/nft/utxo/:codehash/:genesis/:address", controller.GetNFTUtxo)
+	mainAPI.GET("/nft/utxo-detail/:codehash/:genesis/:token_index", controller.GetNFTUtxoDetailByTokenIndex)
+	mainAPI.GET("/nft/utxo-list/:codehash/:genesis",
 		cache.CacheByRequestURI(store, 1*time.Second), controller.GetNFTUtxoList)
 
-	router.GET("/address/:address/balance", controller.GetBalanceByAddress)
+	mainAPI.GET("/address/:address/balance", controller.GetBalanceByAddress)
 
-	router.GET("/contract/swap-data/:codehash/:genesis",
+	mainAPI.GET("/contract/swap-data/:codehash/:genesis",
 		cache.CacheByRequestURI(store, 10*time.Second), controller.GetContractSwapDataInBlockRange)
-	router.GET("/contract/swap-aggregate/:codehash/:genesis",
+	mainAPI.GET("/contract/swap-aggregate/:codehash/:genesis",
 		cache.CacheByRequestURI(store, 60*time.Second), controller.GetContractSwapAggregateInBlockRange)
-	router.GET("/contract/swap-aggregate-amount/:codehash/:genesis",
+	mainAPI.GET("/contract/swap-aggregate-amount/:codehash/:genesis",
 		cache.CacheByRequestURI(store, 60*time.Second), controller.GetContractSwapAggregateAmountInBlockRange)
 
-	router.GET("/ft/info/all",
+	mainAPI.GET("/ft/info/all",
 		cache.CacheByRequestURI(store, 10*time.Second), controller.ListAllFTInfo)
-	router.GET("/ft/codehash/all",
+	mainAPI.GET("/ft/codehash/all",
 		cache.CacheByRequestURI(store, 10*time.Second), controller.ListAllFTCodeHash)
-	router.GET("/ft/codehash-info/:codehash",
+	mainAPI.GET("/ft/codehash-info/:codehash",
 		cache.CacheByRequestURI(store, 10*time.Second), controller.ListFTSummary)
-	router.GET("/ft/genesis-info/:codehash/:genesis",
+	mainAPI.GET("/ft/genesis-info/:codehash/:genesis",
 		cache.CacheByRequestURI(store, 10*time.Second), controller.ListFTInfoByGenesis)
 
-	router.GET("/ft/transfer-times/:codehash/:genesis",
+	mainAPI.GET("/ft/transfer-times/:codehash/:genesis",
 		cache.CacheByRequestURI(store, 10*time.Second), controller.GetFTTransferVolumeInBlockRange)
-	router.GET("/ft/owners/:codehash/:genesis",
+	mainAPI.GET("/ft/owners/:codehash/:genesis",
 		cache.CacheByRequestURI(store, 1*time.Second), controller.ListFTOwners)
-	router.GET("/ft/summary/:address",
+	mainAPI.GET("/ft/summary/:address",
 		cache.CacheByRequestURI(store, 2*time.Second), controller.ListAllFTSummaryByOwner)
 
-	router.GET("/ft/summary-data/:address",
+	mainAPI.GET("/ft/summary-data/:address",
 		cache.CacheByRequestURI(store, 2*time.Second), controller.ListAllFTSummaryDataByOwner)
 
-	router.GET("/ft/balance/:codehash/:genesis/:address", controller.GetFTBalanceByOwner) // without cache
+	mainAPI.GET("/ft/balance/:codehash/:genesis/:address", controller.GetFTBalanceByOwner) // without cache
 
-	router.GET("/ft/history/:codehash/:genesis/:address",
+	mainAPI.GET("/ft/history/:codehash/:genesis/:address",
 		cache.CacheByRequestURI(store, 10*time.Second), controller.GetFTHistoryByGenesis)
 
-	router.GET("/ft/income-history/:codehash/:genesis/:address",
+	mainAPI.GET("/ft/income-history/:codehash/:genesis/:address",
 		cache.CacheByRequestURI(store, 10*time.Second), controller.GetFTIncomeHistoryByGenesis)
 
-	router.GET("/nft/info/all",
+	mainAPI.GET("/nft/info/all",
 		cache.CacheByRequestURI(store, 10*time.Second), controller.ListAllNFTInfo)
-	router.GET("/nft/codehash/all",
+	mainAPI.GET("/nft/codehash/all",
 		cache.CacheByRequestURI(store, 10*time.Second), controller.ListAllNFTCodeHash)
-	router.GET("/nft/codehash-info/:codehash",
+	mainAPI.GET("/nft/codehash-info/:codehash",
 		cache.CacheByRequestURI(store, 10*time.Second), controller.ListNFTSummary)
-	router.GET("/nft/genesis-info/:codehash/:genesis",
+	mainAPI.GET("/nft/genesis-info/:codehash/:genesis",
 		cache.CacheByRequestURI(store, 10*time.Second), controller.ListNFTInfoByGenesis)
 
-	router.GET("/nft/transfer-times/:codehash/:genesis/:tokenid",
+	mainAPI.GET("/nft/transfer-times/:codehash/:genesis/:tokenid",
 		cache.CacheByRequestURI(store, 10*time.Second), controller.GetNFTTransferTimesInBlockRange)
-	router.GET("/nft/owners/:codehash/:genesis",
+	mainAPI.GET("/nft/owners/:codehash/:genesis",
 		cache.CacheByRequestURI(store, 2*time.Second), controller.ListNFTOwners)
-	router.GET("/nft/summary/:address",
+	mainAPI.GET("/nft/summary/:address",
 		cache.CacheByRequestURI(store, 2*time.Second), controller.ListAllNFTByOwner)
 
 	// without cache
-	router.GET("/nft/detail/:codehash/:genesis/:address", controller.ListNFTCountByOwner)
+	mainAPI.GET("/nft/detail/:codehash/:genesis/:address", controller.ListNFTCountByOwner)
 
-	router.GET("/nft/history/:codehash/:genesis/:address",
+	mainAPI.GET("/nft/history/:codehash/:genesis/:address",
 		cache.CacheByRequestURI(store, 10*time.Second), controller.GetNFTHistoryByGenesis)
 
-	router.GET("/address/:address/history",
+	mainAPI.GET("/address/:address/history",
 		cache.CacheByRequestURI(store, 10*time.Second), controller.GetHistoryByAddress)
 
-	router.GET("/address/:address/history/tx",
+	mainAPI.GET("/address/:address/history/tx",
 		cache.CacheByRequestURI(store, 10*time.Second), controller.GetTxsHistoryByAddress)
 
-	router.GET("/address/:address/contract-history",
+	mainAPI.GET("/address/:address/contract-history",
 		cache.CacheByRequestURI(store, 10*time.Second), controller.GetContractHistoryByAddress)
 
-	router.GET("/contract/history/:codehash/:genesis/:address",
+	mainAPI.GET("/contract/history/:codehash/:genesis/:address",
 		cache.CacheByRequestURI(store, 10*time.Second), controller.GetHistoryByGenesis)
 
-	router.GET("/contract/history/:codehash/:genesis",
+	mainAPI.GET("/contract/history/:codehash/:genesis",
 		cache.CacheByRequestURI(store, 10*time.Second), controller.GetAllHistoryByGenesis)
 
-	router.GET("/token/info",
+	mainAPI.GET("/token/info",
 		cache.CacheByRequestURI(store, 10*time.Second), controller.ListAllTokenInfo)
 
-	heightAPI := router.Group("/height/:height")
+	heightAPI := router.Group("/height/:height", midware.VerifySignatureForHttpGet())
 	{
 		heightAPI.GET("/block", controller.GetBlockByHeight)
 

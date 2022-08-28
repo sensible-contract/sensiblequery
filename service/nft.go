@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"sensiblequery/dao/clickhouse"
+	"sensiblequery/dao/rdb"
 	"sensiblequery/logger"
 	"sensiblequery/model"
 	"strconv"
@@ -25,7 +26,7 @@ func nftInfoResultSRF(rows *sql.Rows) (interface{}, error) {
 }
 
 func getNFTMetaInfo(nftsRsp []*model.NFTInfoResp) {
-	pipe := rdb.Pipeline()
+	pipe := rdb.BizClient.Pipeline()
 	nftinfoCmds := make([]*redis.StringStringMapCmd, 0)
 	for _, nft := range nftsRsp {
 		// nftinfo of each token

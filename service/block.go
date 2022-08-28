@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"sensiblequery/dao/clickhouse"
+	"sensiblequery/dao/rdb"
 	"sensiblequery/lib/blkparser"
 	"sensiblequery/logger"
 	"sensiblequery/model"
@@ -234,7 +235,7 @@ SELECT toUInt32(quantileExact(blocktime)) FROM (
 ////////////////
 func GetBestBlockHeight() (height int, err error) {
 	// get decimal from f info
-	height, err = rdb.HGet(ctx, "info", "blocks_total").Int()
+	height, err = rdb.BizClient.HGet(ctx, "info", "blocks_total").Int()
 	if err == redis.Nil {
 		height = 0
 		logger.Log.Info("GetBestBlockHeight, but info missing")

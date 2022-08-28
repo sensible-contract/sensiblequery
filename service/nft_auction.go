@@ -2,6 +2,7 @@ package service
 
 import (
 	"encoding/hex"
+	"sensiblequery/dao/rdb"
 	"sensiblequery/lib/blkparser"
 	"sensiblequery/lib/utils"
 	"sensiblequery/logger"
@@ -46,7 +47,7 @@ func GetNFTAuctionUtxoByNFTIDMerge(codeHash, nftId []byte, isReadyOnly bool) (nf
 }
 
 func GetNFTAuctionUtxoByKey(key string) (nftAuctionsRsp []*model.NFTAuctionResp, err error) {
-	utxoOutpoints, err := rdb.ZRevRange(ctx, key, 0, 16).Result()
+	utxoOutpoints, err := rdb.BizClient.ZRevRange(ctx, key, 0, 16).Result()
 	if err != nil {
 		logger.Log.Info("GetNFTAuctionUtxoByKey redis failed", zap.Error(err))
 		return
@@ -62,7 +63,7 @@ func GetNFTAuctionUtxoByKey(key string) (nftAuctionsRsp []*model.NFTAuctionResp,
 func getNFTAuctionUtxoFromRedis(utxoOutpoints []string) (nftAuctionsRsp []*model.NFTAuctionResp, err error) {
 	logger.Log.Info("getNFTAuctionUtxoFromRedis redis", zap.Int("nUTXO", len(utxoOutpoints)))
 	nftAuctionsRsp = make([]*model.NFTAuctionResp, 0)
-	pipe := pika.Pipeline()
+	pipe := rdb.PikaClient.Pipeline()
 
 	outpointsCmd := make([]*redis.StringCmd, 0)
 	for _, outpoint := range utxoOutpoints {

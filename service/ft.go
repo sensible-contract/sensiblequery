@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"sensiblequery/dao/clickhouse"
+	"sensiblequery/dao/rdb"
 	"sensiblequery/logger"
 	"sensiblequery/model"
 	"strconv"
@@ -28,7 +29,7 @@ func ftInfoResultSRF(rows *sql.Rows) (interface{}, error) {
 }
 
 func getFTDecimal(ftsRsp []*model.FTInfoResp) {
-	pipe := rdb.Pipeline()
+	pipe := rdb.BizClient.Pipeline()
 	ftinfoCmds := make([]*redis.StringStringMapCmd, 0)
 	for _, ft := range ftsRsp {
 		// ftinfo of each token

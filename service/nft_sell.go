@@ -2,6 +2,7 @@ package service
 
 import (
 	"encoding/hex"
+	"sensiblequery/dao/rdb"
 	"sensiblequery/lib/blkparser"
 	"sensiblequery/lib/utils"
 	"sensiblequery/logger"
@@ -15,7 +16,7 @@ import (
 
 func mergeUtxoByKeys(addressUtxoConfirmed, addressUtxoSpentUnconfirmed, oldUtxoKey, newUtxoKey, finalKey string) (err error) {
 	// 注意这里查询需要原子化，可使用pipeline
-	nDiff, err := rdb.ZDiffStore(ctx, oldUtxoKey, addressUtxoConfirmed, addressUtxoSpentUnconfirmed).Result()
+	nDiff, err := rdb.BizClient.ZDiffStore(ctx, oldUtxoKey, addressUtxoConfirmed, addressUtxoSpentUnconfirmed).Result()
 	if err != nil {
 		logger.Log.Info("ZDiffStore redis failed", zap.Error(err))
 		return
@@ -27,7 +28,7 @@ func mergeUtxoByKeys(addressUtxoConfirmed, addressUtxoSpentUnconfirmed, oldUtxoK
 			oldUtxoKey, newUtxoKey,
 		},
 	}
-	nUnion, err := rdb.ZUnionStore(ctx, finalKey, finalZs).Result()
+	nUnion, err := rdb.BizClient.ZUnionStore(ctx, finalKey, finalZs).Result()
 	if err != nil {
 		logger.Log.Info("ZUnionStore redis failed", zap.Error(err))
 		return
@@ -41,7 +42,7 @@ func mergeUtxoByKeys(addressUtxoConfirmed, addressUtxoSpentUnconfirmed, oldUtxoK
 func getNFTSellUtxoFromRedis(utxoOutpoints []string) (nftSellsRsp []*model.NFTSellResp, err error) {
 	logger.Log.Info("getNFTSellUtxoFromRedis redis", zap.Int("nUTXO", len(utxoOutpoints)))
 	nftSellsRsp = make([]*model.NFTSellResp, 0)
-	pipe := pika.Pipeline()
+	pipe := rdb.PikaClient.Pipeline()
 
 	outpointsCmd := make([]*redis.StringCmd, 0)
 	for _, outpoint := range utxoOutpoints {
@@ -97,7 +98,7 @@ func getNFTSellUtxoFromRedis(utxoOutpoints []string) (nftSellsRsp []*model.NFTSe
 }
 
 func getNFTMetaInfoForSell(nftSellsRsp []*model.NFTSellResp) {
-	pipe := rdb.Pipeline()
+	pipe := rdb.BizClient.Pipeline()
 	nftInfoCmds := make([]*redis.StringStringMapCmd, 0)
 	for _, nft := range nftSellsRsp {
 		// nftinfo of each token
@@ -137,7 +138,7 @@ func GetNFTSellUtxo(cursor, size int) (nftSellsRsp []*model.NFTSellResp, err err
 		return nil, err
 	}
 
-	utxoOutpoints, err := rdb.ZRevRange(ctx, finalKey, int64(cursor), int64(cursor+size-1)).Result()
+	utxoOutpoints, err := rdb.BizClient.ZRevRange(ctx, finalKey, int64(cursor), int64(cursor+size-1)).Result()
 	if err == redis.Nil {
 		utxoOutpoints = nil
 	} else if err != nil {
@@ -161,7 +162,7 @@ func GetNFTSellUtxoByAddress(cursor, size int, addressPkh []byte) (nftSellsRsp [
 		return nil, err
 	}
 
-	utxoOutpoints, err := rdb.ZRevRange(ctx, finalKey, int64(cursor), int64(cursor+size-1)).Result()
+	utxoOutpoints, err := rdb.BizClient.ZRevRange(ctx, finalKey, int64(cursor), int64(cursor+size-1)).Result()
 	if err == redis.Nil {
 		utxoOutpoints = nil
 	} else if err != nil {
@@ -185,7 +186,7 @@ func GetNFTSellUtxoByGenesis(cursor, size int, codeHash, genesisId []byte) (nftS
 		return nil, err
 	}
 
-	utxoOutpoints, err := rdb.ZRevRange(ctx, finalKey, int64(cursor), int64(cursor+size-1)).Result()
+	utxoOutpoints, err := rdb.BizClient.ZRevRange(ctx, finalKey, int64(cursor), int64(cursor+size-1)).Result()
 	if err == redis.Nil {
 		utxoOutpoints = nil
 	} else if err != nil {
@@ -235,7 +236,7 @@ func GetNFTSellUtxoByTokenIndex(key string, tokenIndex string) (nftSellsRsp []*m
 		Offset: 0,          // 类似sql的limit, 表示开始偏移量
 		Count:  64,         // 最多兼容64条同样的index
 	}
-	utxoOutpoints, err := rdb.ZRangeByScore(ctx, key, op).Result()
+	utxoOutpoints, err := rdb.BizClient.ZRangeByScore(ctx, key, op).Result()
 	if err != nil {
 		logger.Log.Info("GetUtxoByTokenIndex redis failed", zap.Error(err))
 		return

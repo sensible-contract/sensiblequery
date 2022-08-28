@@ -2,6 +2,7 @@ package service
 
 import (
 	"encoding/hex"
+	"sensiblequery/dao/rdb"
 	"sensiblequery/lib/blkparser"
 	"sensiblequery/lib/utils"
 	"sensiblequery/logger"
@@ -16,7 +17,7 @@ func GetBalanceByAddress(addressPkh []byte) (balanceRsp *model.BalanceResp, err 
 		Address: utils.EncodeAddress(addressPkh, utils.PubKeyHashAddrID),
 	}
 
-	balance, err := rdb.Get(ctx, "bl"+string(addressPkh)).Int()
+	balance, err := rdb.BizClient.Get(ctx, "bl"+string(addressPkh)).Int()
 	if err == redis.Nil {
 		balance = 0
 	} else if err != nil {
@@ -27,7 +28,7 @@ func GetBalanceByAddress(addressPkh []byte) (balanceRsp *model.BalanceResp, err 
 	balanceRsp.Satoshi = balance
 
 	// 待确认余额
-	mpBalance, err := rdb.Get(ctx, "mp:bl"+string(addressPkh)).Int()
+	mpBalance, err := rdb.BizClient.Get(ctx, "mp:bl"+string(addressPkh)).Int()
 	if err == redis.Nil {
 		mpBalance = 0
 	} else if err != nil {
@@ -65,21 +66,21 @@ func GetUtxoCountByAddress(codeHash, genesisId, addressPkh []byte, key string) (
 	addressUtxoSpentUnconfirmed := "mp:s:{" + key + addressKey
 
 	// unconfirmed count
-	newUtxoNum, err := rdb.ZCard(ctx, newUtxoKey).Result()
+	newUtxoNum, err := rdb.BizClient.ZCard(ctx, newUtxoKey).Result()
 	if err != nil {
 		logger.Log.Info("get newUtxoNum from redis failed", zap.Error(err))
 		return
 	}
 	logger.Log.Info("newUtxoNum", zap.Int64("n", newUtxoNum))
 	// confirmed count
-	addressUtxoConfirmedNum, err := rdb.ZCard(ctx, addressUtxoConfirmed).Result()
+	addressUtxoConfirmedNum, err := rdb.BizClient.ZCard(ctx, addressUtxoConfirmed).Result()
 	if err != nil {
 		logger.Log.Info("get addressUtxoConfirmedNum from redis failed", zap.Error(err))
 		return
 	}
 	logger.Log.Info("addressUtxoConfirmedNum", zap.Int64("n", addressUtxoConfirmedNum))
 	// confirmed spending count(spend still unconfirmed)
-	addressUtxoSpentUnconfirmedNum, err := rdb.ZCard(ctx, addressUtxoSpentUnconfirmed).Result()
+	addressUtxoSpentUnconfirmedNum, err := rdb.BizClient.ZCard(ctx, addressUtxoSpentUnconfirmed).Result()
 	if err != nil {
 		logger.Log.Info("get addressUtxoSpentUnconfirmedNum from redis failed", zap.Error(err))
 		return
@@ -120,7 +121,7 @@ func GetUtxoOutpointsByAddress(cursor, size int, codeHash, genesisId, addressPkh
 		return
 	}
 
-	newUtxoOutpoints, err := rdb.ZRevRange(ctx, newUtxoKey, int64(cursor), int64(cursor+size)-1).Result()
+	newUtxoOutpoints, err := rdb.BizClient.ZRevRange(ctx, newUtxoKey, int64(cursor), int64(cursor+size)-1).Result()
 	if err == redis.Nil {
 		newUtxoOutpoints = nil
 	} else if err != nil {
@@ -140,7 +141,7 @@ func GetUtxoOutpointsByAddress(cursor, size int, codeHash, genesisId, addressPkh
 		Rev:   true,
 	}
 	logger.Log.Info("ZRangeStore", zap.Any("zargs", zargs))
-	nRange, err := rdb.ZRangeStore(ctx, addressUtxoConfirmedRange, zargs).Result()
+	nRange, err := rdb.BizClient.ZRangeStore(ctx, addressUtxoConfirmedRange, zargs).Result()
 	if err != nil {
 		logger.Log.Info("ZRangeStore redis failed", zap.Error(err))
 		return
@@ -148,7 +149,7 @@ func GetUtxoOutpointsByAddress(cursor, size int, codeHash, genesisId, addressPkh
 	logger.Log.Info("ZRangeStore", zap.Int64("result", nRange))
 
 	// 再去掉已花费的utxo
-	nDiff, err := rdb.ZDiffStore(ctx, tmpUtxoKey, addressUtxoConfirmedRange, addressUtxoSpentUnconfirmed).Result()
+	nDiff, err := rdb.BizClient.ZDiffStore(ctx, tmpUtxoKey, addressUtxoConfirmedRange, addressUtxoSpentUnconfirmed).Result()
 	if err != nil {
 		logger.Log.Info("ZDiffStore redis failed", zap.Error(err))
 		return
@@ -156,7 +157,7 @@ func GetUtxoOutpointsByAddress(cursor, size int, codeHash, genesisId, addressPkh
 	logger.Log.Info("ZDiffStore", zap.Int64("n", nDiff))
 
 	// 再提取结果
-	utxoOutpoints, err := rdb.ZRevRange(ctx, tmpUtxoKey, int64(cursor), int64(cursor+size-totalUnconf)-1).Result()
+	utxoOutpoints, err := rdb.BizClient.ZRevRange(ctx, tmpUtxoKey, int64(cursor), int64(cursor+size-totalUnconf)-1).Result()
 	if err == redis.Nil {
 		utxoOutpoints = nil
 	} else if err != nil {
@@ -175,7 +176,7 @@ func GetUtxoOutpointsByAddress(cursor, size int, codeHash, genesisId, addressPkh
 func getNonTokenUtxoFromRedis(utxoOutpoints []string) (txOutsRsp []*model.TxStandardOutResp, err error) {
 	logger.Log.Info("getNonTokenUtxoFromRedis", zap.Int("nOutpoints", len(utxoOutpoints)))
 	txOutsRsp = make([]*model.TxStandardOutResp, 0)
-	pipe := pika.Pipeline()
+	pipe := rdb.PikaClient.Pipeline()
 
 	outpointsCmd := make([]*redis.StringCmd, 0)
 	for _, outpoint := range utxoOutpoints {

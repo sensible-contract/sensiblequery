@@ -3,6 +3,7 @@ package service
 import (
 	"encoding/hex"
 	"errors"
+	"sensiblequery/dao/rdb"
 	"sensiblequery/logger"
 	"sensiblequery/model"
 	"sort"
@@ -31,7 +32,7 @@ func getNFTUtxoByTokenIndex(key string, tokenIndex string) (txOutsRsp *model.TxO
 		Offset: 0,          // 类似sql的limit, 表示开始偏移量
 		Count:  1,          // 一次返回多少数据
 	}
-	utxoOutpoints, err := rdb.ZRangeByScore(ctx, key, op).Result()
+	utxoOutpoints, err := rdb.BizClient.ZRangeByScore(ctx, key, op).Result()
 	if err != nil {
 		logger.Log.Info("GetUtxoByTokenIndex redis failed", zap.Error(err))
 		return
@@ -50,7 +51,7 @@ func getNFTUtxoByTokenIndex(key string, tokenIndex string) (txOutsRsp *model.TxO
 func getUtxoFromRedis(utxoOutpoints []string) (txOutsRsp []*model.TxOutResp, err error) {
 	logger.Log.Info("getUtxoFromRedis redis", zap.Int("nUTXO", len(utxoOutpoints)))
 	txOutsRsp = make([]*model.TxOutResp, 0)
-	pipe := pika.Pipeline()
+	pipe := rdb.PikaClient.Pipeline()
 
 	outpointsCmd := make([]*redis.StringCmd, 0)
 	for _, outpoint := range utxoOutpoints {
@@ -113,7 +114,7 @@ func GetNFTUtxoByTokenIndexRange(cursor, size int, codeHash, genesisId []byte) (
 	newUtxoKey := "mp:nd" + string(codeHash) + string(genesisId)
 
 	// unconfirmed count
-	newUtxoNum, err := rdb.ZCard(ctx, newUtxoKey).Result()
+	newUtxoNum, err := rdb.BizClient.ZCard(ctx, newUtxoKey).Result()
 	if err != nil {
 		logger.Log.Info("get newUtxoNum from redis failed", zap.Error(err))
 		return
@@ -122,7 +123,7 @@ func GetNFTUtxoByTokenIndexRange(cursor, size int, codeHash, genesisId []byte) (
 
 	utxoKeyConfirmed := "nd" + string(codeHash) + string(genesisId)
 	// confirmed count
-	utxoConfirmedNum, err := rdb.ZCard(ctx, utxoKeyConfirmed).Result()
+	utxoConfirmedNum, err := rdb.BizClient.ZCard(ctx, utxoKeyConfirmed).Result()
 	if err != nil {
 		logger.Log.Info("get utxoConfirmedNum from redis failed", zap.Error(err))
 		return
@@ -140,13 +141,13 @@ func GetNFTUtxoByTokenIndexRange(cursor, size int, codeHash, genesisId []byte) (
 		// Offset: 0,                               // 类似sql的limit, 表示开始偏移量
 		// Count:  1,                               // 一次返回多少数据
 	}
-	utxoOutpointsUnconfirmed, err := rdb.ZRangeByScoreWithScores(ctx, newUtxoKey, op).Result()
+	utxoOutpointsUnconfirmed, err := rdb.BizClient.ZRangeByScoreWithScores(ctx, newUtxoKey, op).Result()
 	if err != nil {
 		logger.Log.Info("GetNFTUtxoByTokenIndexRange redis failed", zap.Error(err))
 		return
 	}
 
-	utxoOutpointsWithScore, err := rdb.ZRangeByScoreWithScores(ctx, utxoKeyConfirmed, op).Result()
+	utxoOutpointsWithScore, err := rdb.BizClient.ZRangeByScoreWithScores(ctx, utxoKeyConfirmed, op).Result()
 	if err != nil {
 		logger.Log.Info("GetNFTUtxoByTokenIndexRange redis failed", zap.Error(err))
 		return
