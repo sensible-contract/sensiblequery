@@ -49,7 +49,7 @@ func VerifySignatureForHttpGet() gin.HandlerFunc {
 		}
 
 		appid := params.Get("appid")
-		secretKey, err := rdb.UserClient.Get(ctx, "appid:"+appid).Result()
+		secretKey, err := rdb.UserClient.Get(ctx, "secretkey:"+appid).Result()
 		if err != nil {
 			c.JSON(http.StatusForbidden, &Response{Code: -1, Msg: "appid not valid"})
 			c.Abort()
@@ -67,6 +67,22 @@ func VerifySignatureForHttpGet() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
+
+		quota, err := rdb.UserClient.Get(ctx, "quota:"+appid).Int()
+		if err != nil {
+			c.JSON(http.StatusForbidden, &Response{Code: -1, Msg: "quota unavilable"})
+			c.Abort()
+			return
+		}
+
+		if quota <= 0 {
+			c.JSON(http.StatusForbidden, &Response{Code: -1, Msg: "quota exhausted"})
+			c.Abort()
+			return
+		}
+
+		rdb.UserClient.Decr(ctx, "quota:"+appid)
+		rdb.UserClient.Incr(ctx, "visit:"+appid)
 		c.Next()
 	}
 }
