@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net/http"
 	"sensiblequery/dao/rdb"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -20,15 +21,11 @@ func SignSha256(input, key string) string {
 }
 
 func VerifyTsWithTs(ts string, expired time.Duration) bool {
-	ats := []rune(ts)
-	if len(ats) < 14 {
+	timestamp, err := strconv.ParseInt(ts, 10, 64)
+	if err != nil {
 		return false
 	}
-
-	t, e := time.ParseInLocation("20060102150405.000", fmt.Sprint(string(ats[0:14])+"."+string(ats[14:])), time.UTC)
-	if e != nil {
-		return false
-	}
+	t := time.Unix(timestamp, 0)
 	now := time.Now().UTC()
 	if t.After(now.Add(expired)) || t.Before(now.Add(-expired)) {
 		return false
