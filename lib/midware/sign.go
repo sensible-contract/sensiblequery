@@ -83,3 +83,32 @@ func VerifySignatureForHttpGet() gin.HandlerFunc {
 		c.Next()
 	}
 }
+
+func VerifyToken() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		ctx := context.Background()
+		accesskey := c.GetHeader("accesskey")
+		if len(accesskey) > 64 || len(accesskey) == 0 {
+			c.JSON(http.StatusForbidden, &Response{Code: -1, Msg: "invalid accesskey"})
+			c.Abort()
+			return
+		}
+
+		quota, err := rdb.UserClient.Get(ctx, "quota:"+accesskey).Int()
+		if err != nil {
+			c.JSON(http.StatusForbidden, &Response{Code: -1, Msg: "auth unavilable"})
+			c.Abort()
+			return
+		}
+
+		if quota <= 0 {
+			c.JSON(http.StatusForbidden, &Response{Code: -1, Msg: "quota exhausted"})
+			c.Abort()
+			return
+		}
+
+		rdb.UserClient.Decr(ctx, "quota:"+accesskey)
+		rdb.UserClient.Incr(ctx, "visit:"+accesskey)
+		c.Next()
+	}
+}

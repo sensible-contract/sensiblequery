@@ -73,7 +73,7 @@ func main() {
 	router.POST("/pushtx", controller.PushTx)
 	router.POST("/pushtxs", controller.PushTxs)
 
-	mainAPI := router.Group("/", midware.VerifySignatureForHttpGet())
+	mainAPI := router.Group("/", midware.VerifyToken())
 
 	mainAPI.GET("/getrawmempool", controller.GetRawMempool)
 
@@ -195,7 +195,7 @@ func main() {
 	mainAPI.GET("/token/info",
 		cache.CacheByRequestURI(store, 10*time.Second), controller.ListAllTokenInfo)
 
-	heightAPI := router.Group("/height/:height", midware.VerifySignatureForHttpGet())
+	heightAPI := router.Group("/height/:height", midware.VerifyToken())
 	{
 		heightAPI.GET("/block", controller.GetBlockByHeight)
 

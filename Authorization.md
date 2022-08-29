@@ -1,5 +1,8 @@
-# 接口签名鉴权
+# 1. 接口Token鉴权
 
+在请求时HTTP请求头中添加授权accesskey即可。即 accesskey=9a48a35a8dadd8b54d3859865b292aa6e7624e34e83f073c62065212d7ef0f9b
+
+# 2. 接口签名鉴权
 
 ## 请求结构
 
