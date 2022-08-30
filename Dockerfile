@@ -5,8 +5,8 @@ WORKDIR /build/
 COPY . .
 
 # Build binary output
-RUN GOPROXY=https://goproxy.cn,direct GOOS=${GO_OS} GOARCH=${GO_ARCH} go get -u github.com/swaggo/swag/cmd/swag@v1.6.7
-RUN GOPROXY=https://goproxy.cn,direct GOOS=${GO_OS} GOARCH=${GO_ARCH} swag init
+# RUN GOPROXY=https://goproxy.cn,direct GOOS=${GO_OS} GOARCH=${GO_ARCH} go get -u github.com/swaggo/swag/cmd/swag@v1.6.7
+# RUN GOPROXY=https://goproxy.cn,direct GOOS=${GO_OS} GOARCH=${GO_ARCH} swag init
 RUN GOPROXY=https://goproxy.cn,direct GOOS=${GO_OS} GOARCH=${GO_ARCH} go build -o sensiblequery -ldflags '-s -w' main.go
 
 FROM alpine:latest
