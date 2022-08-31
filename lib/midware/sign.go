@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"sensiblequery/dao/rdb"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -87,16 +88,24 @@ func VerifySignatureForHttpGet() gin.HandlerFunc {
 func VerifyToken() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctx := context.Background()
-		accesskey := c.GetHeader("accesskey")
-		if len(accesskey) > 64 || len(accesskey) == 0 {
-			c.JSON(http.StatusForbidden, &Response{Code: -1, Msg: "invalid accesskey"})
+		auth := c.GetHeader("Authorization")
+		idTokenHeader := strings.Split(auth, "Bearer ")
+		if len(idTokenHeader) < 2 {
+			c.JSON(http.StatusUnauthorized, &Response{Code: -1, Msg: "Must provide Authorization header with format `Bearer {token}`"})
 			c.Abort()
 			return
 		}
 
-		quota, err := rdb.UserClient.Get(ctx, "quota:"+accesskey).Int()
+		authToken := idTokenHeader[1]
+		if len(authToken) > 64 || len(authToken) == 0 {
+			c.JSON(http.StatusForbidden, &Response{Code: -1, Msg: "invalid token"})
+			c.Abort()
+			return
+		}
+
+		quota, err := rdb.UserClient.Get(ctx, "quota:"+authToken).Int()
 		if err != nil {
-			c.JSON(http.StatusForbidden, &Response{Code: -1, Msg: "auth unavilable"})
+			c.JSON(http.StatusForbidden, &Response{Code: -1, Msg: "quota unavilable"})
 			c.Abort()
 			return
 		}
@@ -107,8 +116,8 @@ func VerifyToken() gin.HandlerFunc {
 			return
 		}
 
-		rdb.UserClient.Decr(ctx, "quota:"+accesskey)
-		rdb.UserClient.Incr(ctx, "visit:"+accesskey)
+		rdb.UserClient.Decr(ctx, "quota:"+authToken)
+		rdb.UserClient.Incr(ctx, "visit:"+authToken)
 		c.Next()
 	}
 }
