@@ -22,8 +22,8 @@ import (
 	"github.com/gin-contrib/gzip"
 	ginzap "github.com/gin-contrib/zap"
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-	"github.com/swaggo/gin-swagger/swaggerFiles"
 	"go.uber.org/zap"
 )
 
@@ -40,16 +40,26 @@ func KeepJsonContentType() gin.HandlerFunc {
 	}
 }
 
-// @title Sensible Browser
-// @version 1.0
-// @description Sensible 区块浏览器
+func SetSwagTitle(title string) func(*ginSwagger.Config) {
+	return func(c *ginSwagger.Config) {
+		c.Title = title
+	}
+}
+
+// @title Sensible Query Spec
+// @version 2.0
+// @description API definition for Sensiblequery  APIs
 
 // @contact.name sensiblequery
-// @contact.url https://github.com/sensing-contract/sensiblequery
+// @contact.url https://github.com/sensible-contract/sensiblequery
 // @contact.email jiedohh@gmail.com
 
 // @license.name MIT License
 // @license.url https://opensource.org/licenses/MIT
+
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
 func main() {
 	router := gin.New()
 	router.Use(ginzap.Ginzap(logger.Log, time.RFC3339, true))
@@ -59,12 +69,13 @@ func main() {
 	router.Use(gzip.Gzip(gzip.DefaultCompression, gzip.WithDecompressFn(gzip.DefaultDecompressHandle)))
 
 	// go get -u github.com/swaggo/swag/cmd/swag@v1.6.7
-	url := ginSwagger.URL(basePath + "/swagger/doc.json")
 
 	// store := persist.NewMemoryStore(time.Second)
 	store := persist.NewRedisStore(rdb.CacheClient)
 
-	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler,
+		ginSwagger.URL(basePath+"/swagger/doc.json"),
+		SetSwagTitle("Sensible")))
 
 	midware.CreateMetricsEndpoint(router)
 

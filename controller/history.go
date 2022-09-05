@@ -27,6 +27,7 @@ const MAX_HISTORY_BLOCK_RANGE = 100000
 // @Param size query int true "返回记录数量" default(16)
 // @Param address path string true "Address" default(17SkEw2md5avVNyYgj6RiXuQKNwkXaxFyQ)
 // @Success 200 {object} model.Response{data=[]model.TxInfoResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Security BearerAuth
 // @Router /address/{address}/history/tx [get]
 func GetTxsHistoryByAddress(ctx *gin.Context) {
 	logger.Log.Info("GetTxsHistoryByAddress enter")
@@ -43,6 +44,7 @@ func GetTxsHistoryByAddress(ctx *gin.Context) {
 // @Param size query int true "返回记录数量" default(16)
 // @Param address path string true "Address" default(17SkEw2md5avVNyYgj6RiXuQKNwkXaxFyQ)
 // @Success 200 {object} model.Response{data=[]model.TxInfoResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Security BearerAuth
 // @Router /address/{address}/contract-history/tx [get]
 func GetContractTxsHistoryByAddress(ctx *gin.Context) {
 	logger.Log.Info("GetContractTxsHistoryByAddress enter")
@@ -125,6 +127,7 @@ func GetTxsHistoryByAddressAndType(ctx *gin.Context, historyType model.HistoryTy
 // @Param size query int true "返回记录数量" default(16)
 // @Param address path string true "Address" default(17SkEw2md5avVNyYgj6RiXuQKNwkXaxFyQ)
 // @Success 200 {object} model.Response{data=[]model.TxOutHistoryResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Security BearerAuth
 // @Router /address/{address}/history [get]
 func GetHistoryByAddress(ctx *gin.Context) {
 	logger.Log.Info("GetHistoryByAddress enter")
@@ -141,6 +144,7 @@ func GetHistoryByAddress(ctx *gin.Context) {
 // @Param size query int true "返回记录数量" default(16)
 // @Param address path string true "Address" default(17SkEw2md5avVNyYgj6RiXuQKNwkXaxFyQ)
 // @Success 200 {object} model.Response{data=[]model.TxOutHistoryResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Security BearerAuth
 // @Router /address/{address}/contract-history [get]
 func GetContractHistoryByAddress(ctx *gin.Context) {
 	logger.Log.Info("GetContractHistoryByAddress enter")
@@ -223,6 +227,7 @@ func GetHistoryByAddressAndType(ctx *gin.Context, historyType model.HistoryType)
 // @Param genesis path string true "Genesis ID " default(74967a27ce3b46244e2e1fba60844c56bb99afc3)
 // @Param address path string true "Address" default(17SkEw2md5avVNyYgj6RiXuQKNwkXaxFyQ)
 // @Success 200 {object} model.Response{data=[]model.TxOutHistoryResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Security BearerAuth
 // @Router /contract/history/{codehash}/{genesis}/{address} [get]
 func GetHistoryByGenesis(ctx *gin.Context) {
 	logger.Log.Info("GetHistoryByGenesis enter")
@@ -317,6 +322,7 @@ func GetHistoryByGenesis(ctx *gin.Context) {
 // @Param genesis path string true "Genesis ID " default(74967a27ce3b46244e2e1fba60844c56bb99afc3)
 // @Param address path string true "Address" default(17SkEw2md5avVNyYgj6RiXuQKNwkXaxFyQ)
 // @Success 200 {object} model.Response{data=[]model.TxOutHistoryResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Security BearerAuth
 // @Router /ft/history/{codehash}/{genesis}/{address} [get]
 func GetFTHistoryByGenesis(ctx *gin.Context) {
 	logger.Log.Info("GetFTHistoryByGenesis enter")
@@ -335,6 +341,7 @@ func GetFTHistoryByGenesis(ctx *gin.Context) {
 // @Param genesis path string true "Genesis ID " default(74967a27ce3b46244e2e1fba60844c56bb99afc3)
 // @Param address path string true "Address" default(17SkEw2md5avVNyYgj6RiXuQKNwkXaxFyQ)
 // @Success 200 {object} model.Response{data=[]model.TxOutHistoryResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Security BearerAuth
 // @Router /nft/history/{codehash}/{genesis}/{address} [get]
 func GetNFTHistoryByGenesis(ctx *gin.Context) {
 	logger.Log.Info("GetNFTHistoryByGenesis enter")
@@ -353,6 +360,7 @@ func GetNFTHistoryByGenesis(ctx *gin.Context) {
 // @Param codehash path string true "Code Hash160" default(844c56bb99afc374967a27ce3b46244e2e1fba60)
 // @Param genesis path string true "Genesis ID " default(74967a27ce3b46244e2e1fba60844c56bb99afc3)
 // @Success 200 {object} model.Response{data=[]model.TxOutHistoryResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Security BearerAuth
 // @Router /contract/history/{codehash}/{genesis} [get]
 func GetAllHistoryByGenesis(ctx *gin.Context) {
 	logger.Log.Info("GetAllHistoryByGenesis enter")
@@ -441,6 +449,7 @@ func GetAllHistoryByGenesis(ctx *gin.Context) {
 // @Param genesis path string true "Genesis ID " default(74967a27ce3b46244e2e1fba60844c56bb99afc3)
 // @Param address path string true "Address" default(17SkEw2md5avVNyYgj6RiXuQKNwkXaxFyQ)
 // @Success 200 {object} model.Response{data=[]model.TxOutHistoryResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Security BearerAuth
 // @Router /ft/income-history/{codehash}/{genesis}/{address} [get]
 func GetFTIncomeHistoryByGenesis(ctx *gin.Context) {
 	logger.Log.Info("GetFTIncomeHistoryByGenesis enter")

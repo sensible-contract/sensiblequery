@@ -1,18 +1,18 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "Sensible 区块浏览器",
-        "title": "Sensible Browser",
+        "description": "Sensible",
+        "title": "Sensible Query Spec",
         "contact": {
             "name": "sensiblequery",
-            "url": "https://github.com/sensing-contract/sensiblequery",
+            "url": "https://github.com/sensible-contract/sensiblequery",
             "email": "jiedohh@gmail.com"
         },
         "license": {
             "name": "MIT License",
             "url": "https://opensource.org/licenses/MIT"
         },
-        "version": "1.0"
+        "version": "2.0"
     },
     "paths": {
         "/": {
@@ -45,6 +45,11 @@
         },
         "/address/{address}/balance": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -86,6 +91,11 @@
         },
         "/address/{address}/contract-history": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -162,6 +172,11 @@
         },
         "/address/{address}/contract-history/tx": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -238,6 +253,11 @@
         },
         "/address/{address}/history": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -314,6 +334,11 @@
         },
         "/address/{address}/history/tx": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -390,6 +415,11 @@
         },
         "/address/{address}/utxo": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -450,6 +480,11 @@
         },
         "/address/{address}/utxo-data": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -507,6 +542,11 @@
         },
         "/block/id/{blkid}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -548,6 +588,11 @@
         },
         "/block/txs/{blkid}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -608,6 +653,11 @@
         },
         "/blockchain/info": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -636,6 +686,11 @@
         },
         "/blocks": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -688,6 +743,11 @@
         },
         "/contract/history/{codehash}/{genesis}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -780,6 +840,11 @@
         },
         "/contract/history/{codehash}/{genesis}/{address}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -872,6 +937,11 @@
         },
         "/contract/swap-aggregate-amount/{codehash}/{genesis}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -948,6 +1018,11 @@
         },
         "/contract/swap-aggregate/{codehash}/{genesis}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -1024,6 +1099,11 @@
         },
         "/contract/swap-data/{codehash}/{genesis}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -1108,6 +1188,11 @@
         },
         "/ft/balance/{codehash}/{genesis}/{address}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -1165,6 +1250,11 @@
         },
         "/ft/codehash-info/{codehash}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -1209,6 +1299,11 @@
         },
         "/ft/codehash/all": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -1243,6 +1338,11 @@
         },
         "/ft/genesis-info/{codehash}/{genesis}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -1292,6 +1392,11 @@
         },
         "/ft/history/{codehash}/{genesis}/{address}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -1385,6 +1490,11 @@
         },
         "/ft/income-history/{codehash}/{genesis}/{address}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -1478,6 +1588,11 @@
         },
         "/ft/info/all": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -1512,6 +1627,11 @@
         },
         "/ft/owners/{codehash}/{genesis}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -1580,6 +1700,11 @@
         },
         "/ft/summary-data/{address}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -1637,6 +1762,11 @@
         },
         "/ft/summary/{address}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -1697,6 +1827,11 @@
         },
         "/ft/transfer-times/{codehash}/{genesis}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -1765,6 +1900,11 @@
         },
         "/ft/utxo-data/{codehash}/{genesis}/{address}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -1839,6 +1979,11 @@
         },
         "/ft/utxo/{codehash}/{genesis}/{address}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -1916,6 +2061,11 @@
         },
         "/getrawmempool": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -1947,6 +2097,11 @@
         },
         "/height/{height}/block": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -1988,6 +2143,11 @@
         },
         "/height/{height}/block/txs": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -2048,6 +2208,11 @@
         },
         "/height/{height}/rawtx/{txid}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -2097,6 +2262,11 @@
         },
         "/height/{height}/tx/{txid}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -2146,6 +2316,11 @@
         },
         "/height/{height}/tx/{txid}/in/{index}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -2203,6 +2378,11 @@
         },
         "/height/{height}/tx/{txid}/ins": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -2271,6 +2451,11 @@
         },
         "/height/{height}/tx/{txid}/out/{index}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -2328,6 +2513,11 @@
         },
         "/height/{height}/tx/{txid}/outs": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -2396,6 +2586,11 @@
         },
         "/mempool/info": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -2424,6 +2619,11 @@
         },
         "/nft/auction/utxo-detail/{codehash}/{nftid}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -2485,6 +2685,11 @@
         },
         "/nft/codehash-info/{codehash}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -2529,6 +2734,11 @@
         },
         "/nft/codehash/all": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -2563,6 +2773,11 @@
         },
         "/nft/detail/{codehash}/{genesis}/{address}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -2636,6 +2851,11 @@
         },
         "/nft/genesis-info/{codehash}/{genesis}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -2685,6 +2905,11 @@
         },
         "/nft/history/{codehash}/{genesis}/{address}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -2778,6 +3003,11 @@
         },
         "/nft/info/all": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -2812,6 +3042,11 @@
         },
         "/nft/owners/{codehash}/{genesis}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -2880,6 +3115,11 @@
         },
         "/nft/sell/utxo": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -2933,6 +3173,11 @@
         },
         "/nft/sell/utxo-by-address/{address}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -2994,6 +3239,11 @@
         },
         "/nft/sell/utxo-detail/{codehash}/{genesis}/{token_index}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -3063,6 +3313,11 @@
         },
         "/nft/sell/utxo/{codehash}/{genesis}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -3132,6 +3387,11 @@
         },
         "/nft/summary/{address}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -3192,6 +3452,11 @@
         },
         "/nft/transfer-times/{codehash}/{genesis}/{tokenid}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -3268,6 +3533,11 @@
         },
         "/nft/utxo-data/{codehash}/{genesis}/{address}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -3342,6 +3612,11 @@
         },
         "/nft/utxo-detail/{codehash}/{genesis}/{token_index}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -3400,6 +3675,11 @@
         },
         "/nft/utxo-list/{codehash}/{genesis}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -3466,6 +3746,11 @@
         },
         "/nft/utxo/{codehash}/{genesis}/{address}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -3543,6 +3828,11 @@
         },
         "/pushtx": {
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -3582,6 +3872,11 @@
         },
         "/pushtxs": {
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -3624,6 +3919,11 @@
         },
         "/rawtx/{txid}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -3665,6 +3965,11 @@
         },
         "/relay/{txid}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -3706,6 +4011,11 @@
         },
         "/token/info": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -3737,6 +4047,11 @@
         },
         "/tx/{txid}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -3778,6 +4093,11 @@
         },
         "/tx/{txid}/in/{index}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -3827,6 +4147,11 @@
         },
         "/tx/{txid}/ins": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -3887,6 +4212,11 @@
         },
         "/tx/{txid}/out/{index}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -3936,6 +4266,11 @@
         },
         "/tx/{txid}/out/{index}/spent": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -3985,6 +4320,11 @@
         },
         "/tx/{txid}/outs": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -5420,6 +5760,13 @@
                     "type": "string"
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }

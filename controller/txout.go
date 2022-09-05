@@ -21,6 +21,7 @@ import (
 // @Param size query int true "返回记录数量" default(16)
 // @Param txid path string true "TxId" default(f4184fc596403b9d638783cf57adfe4c75c605f6356fbc91338530e9831e9e16)
 // @Success 200 {object} model.Response{data=[]model.TxOutStatusResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Security BearerAuth
 // @Router /tx/{txid}/outs [get]
 func GetTxOutputsByTxId(ctx *gin.Context) {
 	logger.Log.Info("GetTxOutputsByTxId enter")
@@ -74,6 +75,7 @@ func GetTxOutputsByTxId(ctx *gin.Context) {
 // @Param height path int true "Block Height" default(170)
 // @Param txid path string true "TxId" default(f4184fc596403b9d638783cf57adfe4c75c605f6356fbc91338530e9831e9e16)
 // @Success 200 {object} model.Response{data=[]model.TxOutStatusResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Security BearerAuth
 // @Router /height/{height}/tx/{txid}/outs [get]
 func GetTxOutputsByTxIdInsideHeight(ctx *gin.Context) {
 	logger.Log.Info("GetTxOutputsByTxId enter")
@@ -133,6 +135,7 @@ func GetTxOutputsByTxIdInsideHeight(ctx *gin.Context) {
 // @Param txid path string true "TxId" default(f4184fc596403b9d638783cf57adfe4c75c605f6356fbc91338530e9831e9e16)
 // @Param index path int true "output index" default(0)
 // @Success 200 {object} model.Response{data=model.TxOutStatusResp} "{"code": 0, "data": {}, "msg": "ok"}"
+// @Security BearerAuth
 // @Router /tx/{txid}/out/{index} [get]
 func GetTxOutputByTxIdAndIdx(ctx *gin.Context) {
 	logger.Log.Info("GetTxOutputByTxIdAndIdx enter")
@@ -178,6 +181,7 @@ func GetTxOutputByTxIdAndIdx(ctx *gin.Context) {
 // @Param txid path string true "TxId" default(f4184fc596403b9d638783cf57adfe4c75c605f6356fbc91338530e9831e9e16)
 // @Param index path int true "output index" default(0)
 // @Success 200 {object} model.Response{data=model.TxOutStatusResp} "{"code": 0, "data": {}, "msg": "ok"}"
+// @Security BearerAuth
 // @Router /height/{height}/tx/{txid}/out/{index} [get]
 func GetTxOutputByTxIdAndIdxInsideHeight(ctx *gin.Context) {
 	logger.Log.Info("GetTxOutputByTxIdAndIdxInsideHeight enter")
@@ -230,6 +234,7 @@ func GetTxOutputByTxIdAndIdxInsideHeight(ctx *gin.Context) {
 // @Param txid path string true "TxId" default(f4184fc596403b9d638783cf57adfe4c75c605f6356fbc91338530e9831e9e16)
 // @Param index path int true "output index" default(0)
 // @Success 200 {object} model.Response{data=model.TxInSpentResp} "{"code": 0, "data": {}, "msg": "ok"}"
+// @Security BearerAuth
 // @Router /tx/{txid}/out/{index}/spent [get]
 func GetTxOutputSpentStatusByTxIdAndIdx(ctx *gin.Context) {
 	logger.Log.Info("GetTxOutputSpentStatusByTxIdAndIdx enter")

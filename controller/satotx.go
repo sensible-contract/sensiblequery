@@ -33,6 +33,7 @@ func Satotx(ctx *gin.Context) {
 // @Summary 获取最新区块位置、同步状态等信息
 // @Produce  json
 // @Success 200 {object} model.Response{data=model.BlockchainInfoResp} "{"code": 0, "data": {}, "msg": "ok"}"
+// @Security BearerAuth
 // @Router /blockchain/info [get]
 func GetBlockchainInfo(ctx *gin.Context) {
 	logger.Log.Info("GetBlockchainInfo enter")
@@ -70,6 +71,7 @@ func GetBlockchainInfo(ctx *gin.Context) {
 // @Summary 获取mempool信息
 // @Produce  json
 // @Success 200 {object} model.Response{data=model.MempoolInfoResp} "{"code": 0, "data": {}, "msg": "ok"}"
+// @Security BearerAuth
 // @Router /mempool/info [get]
 func GetMempoolInfo(ctx *gin.Context) {
 	logger.Log.Info("GetMempoolInfo enter")

@@ -15,6 +15,7 @@ import (
 // @Tags token
 // @Produce  json
 // @Success 200 {object} model.Response{data=model.TokenInfoResp} "{"code": 0, "data": {}, "msg": "ok"}"
+// @Security BearerAuth
 // @Router /token/info [get]
 func ListAllTokenInfo(ctx *gin.Context) {
 	logger.Log.Info("ListAllTokenInfo enter")

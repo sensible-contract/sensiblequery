@@ -19,6 +19,7 @@ import (
 // @Tags token NFT
 // @Produce  json
 // @Success 200 {object} model.Response{data=[]model.TokenCodeHashResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Security BearerAuth
 // @Router /nft/codehash/all [get]
 func ListAllNFTCodeHash(ctx *gin.Context) {
 	logger.Log.Info("ListAllNFTCodeHash enter")
@@ -42,6 +43,7 @@ func ListAllNFTCodeHash(ctx *gin.Context) {
 // @Tags token NFT
 // @Produce  json
 // @Success 200 {object} model.Response{data=[]model.NFTInfoResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Security BearerAuth
 // @Router /nft/info/all [get]
 func ListAllNFTInfo(ctx *gin.Context) {
 	logger.Log.Info("ListNFTInfo enter")
@@ -66,6 +68,7 @@ func ListAllNFTInfo(ctx *gin.Context) {
 // @Produce  json
 // @Param codehash path string true "Code Hash160" default(844c56bb99afc374967a27ce3b46244e2e1fba60)
 // @Success 200 {object} model.Response{data=[]model.NFTInfoResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Security BearerAuth
 // @Router /nft/codehash-info/{codehash} [get]
 func ListNFTSummary(ctx *gin.Context) {
 	logger.Log.Info("ListNFTSummary enter")
@@ -100,6 +103,7 @@ func ListNFTSummary(ctx *gin.Context) {
 // @Param codehash path string true "Code Hash160" default(844c56bb99afc374967a27ce3b46244e2e1fba60)
 // @Param genesis path string true "Genesis ID" default(74967a27ce3b46244e2e1fba60844c56bb99afc3)
 // @Success 200 {object} model.Response{data=model.NFTInfoResp} "{"code": 0, "data": {}, "msg": "ok"}"
+// @Security BearerAuth
 // @Router /nft/genesis-info/{codehash}/{genesis} [get]
 func ListNFTInfoByGenesis(ctx *gin.Context) {
 	logger.Log.Info("ListNFTInfoByGenesis enter")
@@ -146,6 +150,7 @@ func ListNFTInfoByGenesis(ctx *gin.Context) {
 // @Param genesis path string true "Genesis ID" default(74967a27ce3b46244e2e1fba60844c56bb99afc3)
 // @Param tokenid path int true "Token ID " default(3)
 // @Success 200 {object} model.Response{data=[]model.BlockTokenVolumeResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Security BearerAuth
 // @Router /nft/transfer-times/{codehash}/{genesis}/{tokenid} [get]
 func GetNFTTransferTimesInBlockRange(ctx *gin.Context) {
 	logger.Log.Info("GetNFTTransferTimesInBlockRange enter")
@@ -222,6 +227,7 @@ func GetNFTTransferTimesInBlockRange(ctx *gin.Context) {
 // @Param codehash path string true "Code Hash160" default(844c56bb99afc374967a27ce3b46244e2e1fba60)
 // @Param genesis path string true "Genesis ID" default(74967a27ce3b46244e2e1fba60844c56bb99afc3)
 // @Success 200 {object} model.Response{data=[]model.NFTOwnerResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Security BearerAuth
 // @Router /nft/owners/{codehash}/{genesis} [get]
 func ListNFTOwners(ctx *gin.Context) {
 	logger.Log.Info("ListNFTOwners enter")
@@ -283,6 +289,7 @@ func ListNFTOwners(ctx *gin.Context) {
 // @Param size query int true "返回记录数量" default(10)
 // @Param address path string true "Address" default(17SkEw2md5avVNyYgj6RiXuQKNwkXaxFyQ)
 // @Success 200 {object} model.Response{data=[]model.NFTSummaryByAddressResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Security BearerAuth
 // @Router /nft/summary/{address} [get]
 func ListAllNFTByOwner(ctx *gin.Context) {
 	logger.Log.Info("ListAllNFTOwners enter")
@@ -336,6 +343,7 @@ func ListAllNFTByOwner(ctx *gin.Context) {
 // @Param genesis path string true "Genesis ID" default(74967a27ce3b46244e2e1fba60844c56bb99afc3)
 // @Param address path string true "Address" default(17SkEw2md5avVNyYgj6RiXuQKNwkXaxFyQ)
 // @Success 200 {object} model.Response{data=model.NFTOwnerResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Security BearerAuth
 // @Router /nft/detail/{codehash}/{genesis}/{address} [get]
 func ListNFTCountByOwner(ctx *gin.Context) {
 	logger.Log.Info("ListNFTCountByOwner enter")

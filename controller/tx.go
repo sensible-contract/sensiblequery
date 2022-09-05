@@ -29,6 +29,7 @@ var (
 // @Param size query int true "返回记录数量" default(16)
 // @Param height path int true "Block Height" default(3)
 // @Success 200 {object} model.Response{data=[]model.TxInfoResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Security BearerAuth
 // @Router /height/{height}/block/txs [get]
 func GetBlockTxsByBlockHeight(ctx *gin.Context) {
 	logger.Log.Info("GetBlockTxsByBlockHeight enter")
@@ -80,6 +81,7 @@ func GetBlockTxsByBlockHeight(ctx *gin.Context) {
 // @Param size query int true "返回记录数量" default(16)
 // @Param blkid path string true "Block ID" default(0000000082b5015589a3fdf2d4baff403e6f0be035a5d9742c1cae6295464449)
 // @Success 200 {object} model.Response{data=[]model.TxInfoResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Security BearerAuth
 // @Router /block/txs/{blkid} [get]
 func GetBlockTxsByBlockId(ctx *gin.Context) {
 	logger.Log.Info("GetBlockTxsByBlockId enter")
@@ -130,6 +132,7 @@ func GetBlockTxsByBlockId(ctx *gin.Context) {
 // @Produce  json
 // @Param txid path string true "TxId" default(999e1c837c76a1b7fbb7e57baf87b309960f5ffefbf2a9b95dd890602272f644)
 // @Success 200 {object} model.Response{data=model.TxInfoResp} "{"code": 0, "data": {}, "msg": "ok"}"
+// @Security BearerAuth
 // @Router /tx/{txid} [get]
 func GetTxById(ctx *gin.Context) {
 	logger.Log.Info("GetTxById enter")
@@ -165,6 +168,7 @@ func GetTxById(ctx *gin.Context) {
 // @Param height path int true "Block Height" default(3)
 // @Param txid path string true "TxId" default(999e1c837c76a1b7fbb7e57baf87b309960f5ffefbf2a9b95dd890602272f644)
 // @Success 200 {object} model.Response{data=model.TxInfoResp} "{"code": 0, "data": {}, "msg": "ok"}"
+// @Security BearerAuth
 // @Router /height/{height}/tx/{txid} [get]
 func GetTxByIdInsideHeight(ctx *gin.Context) {
 	logger.Log.Info("GetTxByIdInsideHeight enter")
@@ -208,6 +212,7 @@ func GetTxByIdInsideHeight(ctx *gin.Context) {
 // @Produce  json
 // @Param txid path string true "TxId" default(999e1c837c76a1b7fbb7e57baf87b309960f5ffefbf2a9b95dd890602272f644)
 // @Success 200 {object} model.Response{data=string} "{"code": 0, "data": "00...", "msg": "ok"}"
+// @Security BearerAuth
 // @Router /rawtx/{txid} [get]
 func GetRawTxById(ctx *gin.Context) {
 	logger.Log.Info("GetRawTxById enter")
@@ -243,6 +248,7 @@ func GetRawTxById(ctx *gin.Context) {
 // @Produce  json
 // @Param txid path string true "TxId" default(999e1c837c76a1b7fbb7e57baf87b309960f5ffefbf2a9b95dd890602272f644)
 // @Success 200 {object} model.Response{data=string} "{"code": 0, "data": "00...", "msg": "ok"}"
+// @Security BearerAuth
 // @Router /relay/{txid} [get]
 func RelayTxById(ctx *gin.Context) {
 	logger.Log.Info("RelayTxById enter")
@@ -293,6 +299,7 @@ func RelayTxById(ctx *gin.Context) {
 // @Param height path int true "Block Height" default(3)
 // @Param txid path string true "TxId" default(999e1c837c76a1b7fbb7e57baf87b309960f5ffefbf2a9b95dd890602272f644)
 // @Success 200 {object} model.Response{data=string} "{"code": 0, "data": "00...", "msg": "ok"}"
+// @Security BearerAuth
 // @Router /height/{height}/rawtx/{txid} [get]
 func GetRawTxByIdInsideHeight(ctx *gin.Context) {
 	logger.Log.Info("GetRawTxByIdInsideHeight enter")

@@ -20,6 +20,7 @@ import (
 // @Param start query int true "Start Block Height" default(0)
 // @Param end query int true "End Block Height" default(0)
 // @Success 200 {object} model.Response{data=[]model.BlockInfoResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Security BearerAuth
 // @Router /blocks [get]
 func GetBlocksByHeightRange(ctx *gin.Context) {
 	logger.Log.Info("GetBlocksByHeightRange enter")
@@ -66,6 +67,7 @@ func GetBlocksByHeightRange(ctx *gin.Context) {
 // @Produce  json
 // @Param height path int true "Block Height" default(0)
 // @Success 200 {object} model.Response{data=model.BlockInfoResp} "{"code": 0, "data": {}, "msg": "ok"}"
+// @Security BearerAuth
 // @Router /height/{height}/block [get]
 func GetBlockByHeight(ctx *gin.Context) {
 	logger.Log.Info("GetBlockByHeight enter")
@@ -99,6 +101,7 @@ func GetBlockByHeight(ctx *gin.Context) {
 // @Produce  json
 // @Param blkid path string true "BlockId" default(0000000082b5015589a3fdf2d4baff403e6f0be035a5d9742c1cae6295464449)
 // @Success 200 {object} model.Response{data=model.BlockInfoResp} "{"code": 0, "data": {}, "msg": "ok"}"
+// @Security BearerAuth
 // @Router /block/id/{blkid} [get]
 func GetBlockById(ctx *gin.Context) {
 	logger.Log.Info("GetBlockById enter")

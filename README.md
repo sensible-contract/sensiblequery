@@ -1,9 +1,11 @@
 
 # Bitcoin SV blockchain API service
 
-We deployed a browser Demo [BSV Browser](https://sensiblequery.com/#/blocks) ，The blockchain data can be tested and viewed。
+For self-deployment please use [sensiblequery-deploy](https://github.com/sensible-contract/sensiblequery-deploy)。
 
-Api Endpoint: `https://api.sensiblequery.com`
+Api Endpoint: `https://api.sensiblequery.com` for public.
+
+Api V2 Endpoint: `https://api-v2.sensiblequery.com` with authorization.
 
 See the supported API：`https://api.sensiblequery.com/swagger/index.html`
 
@@ -17,7 +19,7 @@ Block data service includes 2 components，Use Clickhouse as a data computing st
 
 Sensibled synchronizes block data by accessing the block folder of the full node (default in`~/.bitcoin/blocks/`)，The synchronized data is saved in Clickhouse，UTXO information is kept at Redis in order to support confirmed block data query。
 
-At the same time, through the listening node zmq, real-time synchronization are done to get tx content and update to redis and clickhouse to support real-time queries of tx, balance and UTXO data. 
+At the same time, through the listening node zmq, real-time synchronization are done to get tx content and update to redis and clickhouse to support real-time queries of tx, balance and UTXO data.
 
 ### 2. Data API server：sensiblequery
 
@@ -37,7 +39,7 @@ There are multiple profiles in the conf directory that are required for the prog
 Clickhouse database configuration, including adses, databases, etc.
 
 * chain.yaml
-* 
+*
 Node configuration, rpc address.
 
 * redis.yaml
@@ -72,9 +74,10 @@ The richquery service can be restarted at any time without any eventual data pro
 | deploy               | DISK(minimum) | DISK(recommended) | MEM(minimum) | MEM(recommended) |
 |----------------------|---------------|-------------------|--------------|------------------|
 | sensiblequery        | 10 GB         | 20 GB             | 1 GB         | 4 GB             |
-| bsv-node + sensibled | 512 GB        | 1000 GB           | 8 GB         | 16 GB            |
-| clickhouse           | 512 GB        | 1000 GB           | 16 GB        | 32 GB            |
-| redis x 1            | 30GB          | 50GB              | 24GB         | 32GB             |
-| redis-cluster x 6    | 20GB          | 50GB              | 8GB          | 16GB             |
+| bsv-node + sensibled | 512 GB        | 1000 GB           | 16 GB        | 32 GB            |
+| clickhouse           | 1000 GB       | 1500 GB           | 16 GB        | 32 GB            |
+| redis x 1            | 20 GB         | 50 GB             | 16 GB        | 32 GB            |
+| pika x 1             | 20 GB         | 50 GB             | 4 GB         | 8 GB             |
+| cache x 1            | 10 GB         | 20 GB             | 1 GB         | 2 GB             |
 
 Where sensible is used to provide API services to the outside world, multiple instances can be deployed. the mindd is a single-instance run. Redis can deploy single nodes or clusters.

@@ -20,6 +20,7 @@ import (
 // @Param cursor query int true "起始游标" default(0)
 // @Param size query int true "返回记录数量" default(10)
 // @Success 200 {object} model.Response{data=[]model.NFTSellResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Security BearerAuth
 // @Router /nft/sell/utxo [get]
 func GetNFTSellUtxo(ctx *gin.Context) {
 	logger.Log.Info("GetNFTSellUtxo enter")
@@ -62,6 +63,7 @@ func GetNFTSellUtxo(ctx *gin.Context) {
 // @Param size query int true "返回记录数量" default(10)
 // @Param address path string true "Address" default(17SkEw2md5avVNyYgj6RiXuQKNwkXaxFyQ)
 // @Success 200 {object} model.Response{data=[]model.NFTSellResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Security BearerAuth
 // @Router /nft/sell/utxo-by-address/{address} [get]
 func GetNFTSellUtxoByAddress(ctx *gin.Context) {
 	logger.Log.Info("GetNFTSellUtxoByAddress enter")
@@ -115,6 +117,7 @@ func GetNFTSellUtxoByAddress(ctx *gin.Context) {
 // @Param codehash path string true "Code Hash160" default(844c56bb99afc374967a27ce3b46244e2e1fba60)
 // @Param genesis path string true "Genesis ID" default(74967a27ce3b46244e2e1fba60844c56bb99afc3)
 // @Success 200 {object} model.Response{data=[]model.NFTSellResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Security BearerAuth
 // @Router /nft/sell/utxo/{codehash}/{genesis} [get]
 func GetNFTSellUtxoByGenesis(ctx *gin.Context) {
 	logger.Log.Info("GetNFTSellUtxoByGenesis enter")
@@ -177,6 +180,7 @@ func GetNFTSellUtxoByGenesis(ctx *gin.Context) {
 // @Param token_index path int true "Token Index" default(3)
 // @Param ready query boolean true "仅返回ready状态的记录" default(true)
 // @Success 200 {object} model.Response{data=[]model.NFTSellResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Security BearerAuth
 // @Router /nft/sell/utxo-detail/{codehash}/{genesis}/{token_index} [get]
 func GetNFTSellUtxoDetail(ctx *gin.Context) {
 	logger.Log.Info("GetNFTSellUtxoDetail enter")
@@ -230,6 +234,7 @@ func GetNFTSellUtxoDetail(ctx *gin.Context) {
 // @Param nftid path string true "NFT ID" default(74967a27ce3b46244e2e1fba60844c56bb99afc3)
 // @Param ready query boolean true "仅返回ready状态的记录" default(true)
 // @Success 200 {object} model.Response{data=[]model.NFTAuctionResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Security BearerAuth
 // @Router /nft/auction/utxo-detail/{codehash}/{nftid} [get]
 func GetNFTAuctionUtxoDetail(ctx *gin.Context) {
 	logger.Log.Info("GetNFTAuctionUtxoDetail enter")

@@ -20,7 +20,7 @@ var doc = `{
         "title": "{{.Title}}",
         "contact": {
             "name": "sensiblequery",
-            "url": "https://github.com/sensing-contract/sensiblequery",
+            "url": "https://github.com/sensible-contract/sensiblequery",
             "email": "jiedohh@gmail.com"
         },
         "license": {
@@ -62,6 +62,11 @@ var doc = `{
         },
         "/address/{address}/balance": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -103,6 +108,11 @@ var doc = `{
         },
         "/address/{address}/contract-history": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -179,6 +189,11 @@ var doc = `{
         },
         "/address/{address}/contract-history/tx": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -255,6 +270,11 @@ var doc = `{
         },
         "/address/{address}/history": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -331,6 +351,11 @@ var doc = `{
         },
         "/address/{address}/history/tx": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -407,6 +432,11 @@ var doc = `{
         },
         "/address/{address}/utxo": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -467,6 +497,11 @@ var doc = `{
         },
         "/address/{address}/utxo-data": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -524,6 +559,11 @@ var doc = `{
         },
         "/block/id/{blkid}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -565,6 +605,11 @@ var doc = `{
         },
         "/block/txs/{blkid}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -625,6 +670,11 @@ var doc = `{
         },
         "/blockchain/info": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -653,6 +703,11 @@ var doc = `{
         },
         "/blocks": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -705,6 +760,11 @@ var doc = `{
         },
         "/contract/history/{codehash}/{genesis}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -797,6 +857,11 @@ var doc = `{
         },
         "/contract/history/{codehash}/{genesis}/{address}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -889,6 +954,11 @@ var doc = `{
         },
         "/contract/swap-aggregate-amount/{codehash}/{genesis}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -965,6 +1035,11 @@ var doc = `{
         },
         "/contract/swap-aggregate/{codehash}/{genesis}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -1041,6 +1116,11 @@ var doc = `{
         },
         "/contract/swap-data/{codehash}/{genesis}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -1125,6 +1205,11 @@ var doc = `{
         },
         "/ft/balance/{codehash}/{genesis}/{address}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -1182,6 +1267,11 @@ var doc = `{
         },
         "/ft/codehash-info/{codehash}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -1226,6 +1316,11 @@ var doc = `{
         },
         "/ft/codehash/all": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -1260,6 +1355,11 @@ var doc = `{
         },
         "/ft/genesis-info/{codehash}/{genesis}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -1309,6 +1409,11 @@ var doc = `{
         },
         "/ft/history/{codehash}/{genesis}/{address}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -1402,6 +1507,11 @@ var doc = `{
         },
         "/ft/income-history/{codehash}/{genesis}/{address}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -1495,6 +1605,11 @@ var doc = `{
         },
         "/ft/info/all": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -1529,6 +1644,11 @@ var doc = `{
         },
         "/ft/owners/{codehash}/{genesis}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -1597,6 +1717,11 @@ var doc = `{
         },
         "/ft/summary-data/{address}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -1654,6 +1779,11 @@ var doc = `{
         },
         "/ft/summary/{address}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -1714,6 +1844,11 @@ var doc = `{
         },
         "/ft/transfer-times/{codehash}/{genesis}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -1782,6 +1917,11 @@ var doc = `{
         },
         "/ft/utxo-data/{codehash}/{genesis}/{address}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -1856,6 +1996,11 @@ var doc = `{
         },
         "/ft/utxo/{codehash}/{genesis}/{address}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -1933,6 +2078,11 @@ var doc = `{
         },
         "/getrawmempool": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -1964,6 +2114,11 @@ var doc = `{
         },
         "/height/{height}/block": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -2005,6 +2160,11 @@ var doc = `{
         },
         "/height/{height}/block/txs": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -2065,6 +2225,11 @@ var doc = `{
         },
         "/height/{height}/rawtx/{txid}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -2114,6 +2279,11 @@ var doc = `{
         },
         "/height/{height}/tx/{txid}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -2163,6 +2333,11 @@ var doc = `{
         },
         "/height/{height}/tx/{txid}/in/{index}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -2220,6 +2395,11 @@ var doc = `{
         },
         "/height/{height}/tx/{txid}/ins": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -2288,6 +2468,11 @@ var doc = `{
         },
         "/height/{height}/tx/{txid}/out/{index}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -2345,6 +2530,11 @@ var doc = `{
         },
         "/height/{height}/tx/{txid}/outs": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -2413,6 +2603,11 @@ var doc = `{
         },
         "/mempool/info": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -2441,6 +2636,11 @@ var doc = `{
         },
         "/nft/auction/utxo-detail/{codehash}/{nftid}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -2502,6 +2702,11 @@ var doc = `{
         },
         "/nft/codehash-info/{codehash}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -2546,6 +2751,11 @@ var doc = `{
         },
         "/nft/codehash/all": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -2580,6 +2790,11 @@ var doc = `{
         },
         "/nft/detail/{codehash}/{genesis}/{address}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -2653,6 +2868,11 @@ var doc = `{
         },
         "/nft/genesis-info/{codehash}/{genesis}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -2702,6 +2922,11 @@ var doc = `{
         },
         "/nft/history/{codehash}/{genesis}/{address}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -2795,6 +3020,11 @@ var doc = `{
         },
         "/nft/info/all": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -2829,6 +3059,11 @@ var doc = `{
         },
         "/nft/owners/{codehash}/{genesis}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -2897,6 +3132,11 @@ var doc = `{
         },
         "/nft/sell/utxo": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -2950,6 +3190,11 @@ var doc = `{
         },
         "/nft/sell/utxo-by-address/{address}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -3011,6 +3256,11 @@ var doc = `{
         },
         "/nft/sell/utxo-detail/{codehash}/{genesis}/{token_index}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -3080,6 +3330,11 @@ var doc = `{
         },
         "/nft/sell/utxo/{codehash}/{genesis}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -3149,6 +3404,11 @@ var doc = `{
         },
         "/nft/summary/{address}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -3209,6 +3469,11 @@ var doc = `{
         },
         "/nft/transfer-times/{codehash}/{genesis}/{tokenid}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -3285,6 +3550,11 @@ var doc = `{
         },
         "/nft/utxo-data/{codehash}/{genesis}/{address}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -3359,6 +3629,11 @@ var doc = `{
         },
         "/nft/utxo-detail/{codehash}/{genesis}/{token_index}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -3417,6 +3692,11 @@ var doc = `{
         },
         "/nft/utxo-list/{codehash}/{genesis}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -3483,6 +3763,11 @@ var doc = `{
         },
         "/nft/utxo/{codehash}/{genesis}/{address}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -3560,6 +3845,11 @@ var doc = `{
         },
         "/pushtx": {
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -3599,6 +3889,11 @@ var doc = `{
         },
         "/pushtxs": {
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -3641,6 +3936,11 @@ var doc = `{
         },
         "/rawtx/{txid}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -3682,6 +3982,11 @@ var doc = `{
         },
         "/relay/{txid}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -3723,6 +4028,11 @@ var doc = `{
         },
         "/token/info": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -3754,6 +4064,11 @@ var doc = `{
         },
         "/tx/{txid}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -3795,6 +4110,11 @@ var doc = `{
         },
         "/tx/{txid}/in/{index}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -3844,6 +4164,11 @@ var doc = `{
         },
         "/tx/{txid}/ins": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -3904,6 +4229,11 @@ var doc = `{
         },
         "/tx/{txid}/out/{index}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -3953,6 +4283,11 @@ var doc = `{
         },
         "/tx/{txid}/out/{index}/spent": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -4002,6 +4337,11 @@ var doc = `{
         },
         "/tx/{txid}/outs": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -5438,6 +5778,13 @@ var doc = `{
                 }
             }
         }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
     }
 }`
 
@@ -5452,12 +5799,12 @@ type swaggerInfo struct {
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = swaggerInfo{
-	Version:     "1.0",
+	Version:     "2.0",
 	Host:        "",
 	BasePath:    "",
 	Schemes:     []string{},
-	Title:       "Sensible Browser",
-	Description: "Sensible 区块浏览器",
+	Title:       "Sensible Query Spec",
+	Description: "Sensible",
 }
 
 type s struct{}

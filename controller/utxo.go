@@ -21,6 +21,7 @@ const MAX_UTXO_LIMIT = 5120
 // @Produce  json
 // @Param address path string true "Address" default(17SkEw2md5avVNyYgj6RiXuQKNwkXaxFyQ)
 // @Success 200 {object} model.Response{data=model.BalanceResp} "{"code": 0, "data": {}, "msg": "ok"}"
+// @Security BearerAuth
 // @Router /address/{address}/balance [get]
 func GetBalanceByAddress(ctx *gin.Context) {
 	logger.Log.Info("GetBalanceByAddress enter")
@@ -56,6 +57,7 @@ func GetBalanceByAddress(ctx *gin.Context) {
 // @Param size query int true "返回记录数量" default(16)
 // @Param address path string true "Address" default(17SkEw2md5avVNyYgj6RiXuQKNwkXaxFyQ)
 // @Success 200 {object} model.Response{data=model.AddressUTXOResp} "{"code": 0, "data": {}, "msg": "ok"}"
+// @Security BearerAuth
 // @Router /address/{address}/utxo-data [get]
 func GetUtxoDataByAddress(ctx *gin.Context) {
 	logger.Log.Info("GetUtxoDataByAddress enter")
@@ -70,6 +72,7 @@ func GetUtxoDataByAddress(ctx *gin.Context) {
 // @Param size query int true "返回记录数量" default(16)
 // @Param address path string true "Address" default(17SkEw2md5avVNyYgj6RiXuQKNwkXaxFyQ)
 // @Success 200 {object} model.Response{data=[]model.TxStandardOutResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Security BearerAuth
 // @Router /address/{address}/utxo [get]
 func GetUtxoByAddress(ctx *gin.Context) {
 	logger.Log.Info("GetUtxoByAddress enter")
@@ -143,6 +146,7 @@ func GetUtxoDataByAddressCommon(ctx *gin.Context, detail bool) {
 // @Param codehash path string true "Code Hash160" default(844c56bb99afc374967a27ce3b46244e2e1fba60)
 // @Param genesis path string true "Genesis ID" default(74967a27ce3b46244e2e1fba60844c56bb99afc3)
 // @Success 200 {object} model.Response{data=model.AddressTokenUTXOResp} "{"code": 0, "data": {}, "msg": "ok"}"
+// @Security BearerAuth
 // @Router /nft/utxo-list/{codehash}/{genesis} [get]
 func GetNFTUtxoList(ctx *gin.Context) {
 	logger.Log.Info("GetNFTUtxoList enter")
@@ -210,6 +214,7 @@ func GetNFTUtxoList(ctx *gin.Context) {
 // @Param genesis path string true "Genesis ID" default(74967a27ce3b46244e2e1fba60844c56bb99afc3)
 // @Param token_index path int true "Token Index" default(3)
 // @Success 200 {object} model.Response{data=model.TxOutResp} "{"code": 0, "data": {}, "msg": "ok"}"
+// @Security BearerAuth
 // @Router /nft/utxo-detail/{codehash}/{genesis}/{token_index} [get]
 func GetNFTUtxoDetailByTokenIndex(ctx *gin.Context) {
 	logger.Log.Info("GetNFTUtxoDetailByTokenIndex enter")
@@ -264,6 +269,7 @@ func GetNFTUtxoDetailByTokenIndex(ctx *gin.Context) {
 // @Param genesis path string true "Genesis ID" default(74967a27ce3b46244e2e1fba60844c56bb99afc3)
 // @Param address path string true "Address" default(17SkEw2md5avVNyYgj6RiXuQKNwkXaxFyQ)
 // @Success 200 {object} model.Response{data=model.AddressTokenUTXOResp} "{"code": 0, "data": {}, "msg": "ok"}"
+// @Security BearerAuth
 // @Router /ft/utxo-data/{codehash}/{genesis}/{address} [get]
 func GetFTUtxoData(ctx *gin.Context) {
 	logger.Log.Info("GetFTUtxoData enter")
@@ -280,6 +286,7 @@ func GetFTUtxoData(ctx *gin.Context) {
 // @Param genesis path string true "Genesis ID" default(74967a27ce3b46244e2e1fba60844c56bb99afc3)
 // @Param address path string true "Address" default(17SkEw2md5avVNyYgj6RiXuQKNwkXaxFyQ)
 // @Success 200 {object} model.Response{data=model.AddressTokenUTXOResp} "{"code": 0, "data": {}, "msg": "ok"}"
+// @Security BearerAuth
 // @Router /nft/utxo-data/{codehash}/{genesis}/{address} [get]
 func GetNFTUtxoData(ctx *gin.Context) {
 	logger.Log.Info("GetNFTUtxoData enter")
@@ -296,6 +303,7 @@ func GetNFTUtxoData(ctx *gin.Context) {
 // @Param genesis path string true "Genesis ID" default(74967a27ce3b46244e2e1fba60844c56bb99afc3)
 // @Param address path string true "Address" default(17SkEw2md5avVNyYgj6RiXuQKNwkXaxFyQ)
 // @Success 200 {object} model.Response{data=[]model.TxOutResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Security BearerAuth
 // @Router /ft/utxo/{codehash}/{genesis}/{address} [get]
 func GetFTUtxo(ctx *gin.Context) {
 	logger.Log.Info("GetFTUtxo enter")
@@ -312,6 +320,7 @@ func GetFTUtxo(ctx *gin.Context) {
 // @Param genesis path string true "Genesis ID" default(74967a27ce3b46244e2e1fba60844c56bb99afc3)
 // @Param address path string true "Address" default(17SkEw2md5avVNyYgj6RiXuQKNwkXaxFyQ)
 // @Success 200 {object} model.Response{data=[]model.TxOutResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Security BearerAuth
 // @Router /nft/utxo/{codehash}/{genesis}/{address} [get]
 func GetNFTUtxo(ctx *gin.Context) {
 	logger.Log.Info("GetNFTUtxo enter")

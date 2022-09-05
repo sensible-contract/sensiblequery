@@ -1,9 +1,11 @@
 
 # 区块数据服务 Bitcoin SV blockchain API service
 
-我们部署了一个浏览器Demo [BSV Browser](https://sensiblequery.com/#/blocks) ，可测试查看Blockchain的数据。
+自行部署请使用 [sensiblequery-deploy](https://github.com/sensible-contract/sensiblequery-deploy)。
 
 Api Endpoint: `https://api.sensiblequery.com`
+
+Api V2 Endpoint: `https://api-v2.sensiblequery.com`
 
 支持的API见：`https://api.sensiblequery.com/swagger/index.html`
 
@@ -40,6 +42,10 @@ clickhouse数据库配置，主要包括address、database等。
 
 节点配置，rpc地址。
 
+* pika.yaml
+
+pika配置，主要包括utxo原始数据。
+
 * redis.yaml
 
 redis配置，主要包括addrs、database等。
@@ -73,9 +79,10 @@ sensiblequery服务可以随时重启，除了会中断用户访问，不会造�
 | 部署                 | DISK(最低) | DISK(推荐) | MEM(最低) | MEM(推荐) |
 |----------------------|------------|------------|-----------|-----------|
 | sensiblequery        | 10 GB      | 20 GB      | 1 GB      | 4 GB      |
-| bsv-node + sensibled | 512 GB     | 1000 GB    | 8 GB      | 16 GB     |
-| clickhouse           | 512 GB     | 1000 GB    | 16 GB     | 32 GB     |
-| redis x 1            | 30GB       | 50GB       | 24GB      | 32GB      |
-| redis-cluster x 6    | 20GB       | 50GB       | 8GB       | 16GB      |
+| bsv-node + sensibled | 512 GB     | 1000 GB    | 16 GB     | 32 GB     |
+| clickhouse           | 1000 GB    | 1500 GB    | 16 GB     | 32 GB     |
+| redis x 1            | 20 GB      | 50 GB      | 16 GB     | 32 GB     |
+| pika x 1             | 20 GB      | 50 GB      | 4 GB      | 8 GB      |
+| cache x 1            | 10 GB      | 20 GB      | 1 GB      | 2 GB      |
 
 其中sensiblequery用来对外提供API服务，可以部署多实例。sensibled是单实例运行。redis可以部署单节点或集群。

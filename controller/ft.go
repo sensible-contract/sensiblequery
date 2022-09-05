@@ -19,6 +19,7 @@ import (
 // @Tags token FT
 // @Produce  json
 // @Success 200 {object} model.Response{data=[]model.TokenCodeHashResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Security BearerAuth
 // @Router /ft/codehash/all [get]
 func ListAllFTCodeHash(ctx *gin.Context) {
 	logger.Log.Info("ListAllFTCodeHash enter")
@@ -42,6 +43,7 @@ func ListAllFTCodeHash(ctx *gin.Context) {
 // @Tags token FT
 // @Produce  json
 // @Success 200 {object} model.Response{data=[]model.FTInfoResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Security BearerAuth
 // @Router /ft/info/all [get]
 func ListAllFTInfo(ctx *gin.Context) {
 	logger.Log.Info("ListFTInfo enter")
@@ -66,6 +68,7 @@ func ListAllFTInfo(ctx *gin.Context) {
 // @Produce  json
 // @Param codehash path string true "Code Hash160" default(844c56bb99afc374967a27ce3b46244e2e1fba60)
 // @Success 200 {object} model.Response{data=[]model.FTInfoResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Security BearerAuth
 // @Router /ft/codehash-info/{codehash} [get]
 func ListFTSummary(ctx *gin.Context) {
 	logger.Log.Info("ListFTSummary enter")
@@ -100,6 +103,7 @@ func ListFTSummary(ctx *gin.Context) {
 // @Param codehash path string true "Code Hash160" default(844c56bb99afc374967a27ce3b46244e2e1fba60)
 // @Param genesis path string true "Genesis ID" default(74967a27ce3b46244e2e1fba60844c56bb99afc3)
 // @Success 200 {object} model.Response{data=model.FTInfoResp} "{"code": 0, "data": {}, "msg": "ok"}"
+// @Security BearerAuth
 // @Router /ft/genesis-info/{codehash}/{genesis} [get]
 func ListFTInfoByGenesis(ctx *gin.Context) {
 	logger.Log.Info("ListFTInfoByGenesis enter")
@@ -145,6 +149,7 @@ func ListFTInfoByGenesis(ctx *gin.Context) {
 // @Param codehash path string true "Code Hash160" default(844c56bb99afc374967a27ce3b46244e2e1fba60)
 // @Param genesis path string true "Genesis ID" default(74967a27ce3b46244e2e1fba60844c56bb99afc3)
 // @Success 200 {object} model.Response{data=[]model.BlockTokenVolumeResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Security BearerAuth
 // @Router /ft/transfer-times/{codehash}/{genesis} [get]
 func GetFTTransferVolumeInBlockRange(ctx *gin.Context) {
 	logger.Log.Info("GetFTTransferVolumeInBlockRange enter")
@@ -212,6 +217,7 @@ func GetFTTransferVolumeInBlockRange(ctx *gin.Context) {
 // @Param codehash path string true "Code Hash160" default(844c56bb99afc374967a27ce3b46244e2e1fba60)
 // @Param genesis path string true "Genesis ID" default(74967a27ce3b46244e2e1fba60844c56bb99afc3)
 // @Success 200 {object} model.Response{data=[]model.FTOwnerBalanceResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Security BearerAuth
 // @Router /ft/owners/{codehash}/{genesis} [get]
 func ListFTOwners(ctx *gin.Context) {
 	logger.Log.Info("ListFTOwners enter")
@@ -272,6 +278,7 @@ func ListFTOwners(ctx *gin.Context) {
 // @Param size query int true "返回记录数量" default(10)
 // @Param address path string true "Address" default(17SkEw2md5avVNyYgj6RiXuQKNwkXaxFyQ)
 // @Success 200 {object} model.Response{data=model.FTSummaryDataByAddressResp} "{"code": 0, "data": {}, "msg": "ok"}"
+// @Security BearerAuth
 // @Router /ft/summary-data/{address} [get]
 func ListAllFTSummaryDataByOwner(ctx *gin.Context) {
 	logger.Log.Info("ListAllFTOwners enter")
@@ -287,6 +294,7 @@ func ListAllFTSummaryDataByOwner(ctx *gin.Context) {
 // @Param size query int true "返回记录数量" default(10)
 // @Param address path string true "Address" default(17SkEw2md5avVNyYgj6RiXuQKNwkXaxFyQ)
 // @Success 200 {object} model.Response{data=[]model.FTSummaryByAddressResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Security BearerAuth
 // @Router /ft/summary/{address} [get]
 func ListAllFTSummaryByOwner(ctx *gin.Context) {
 	logger.Log.Info("ListAllFTOwners enter")
@@ -356,6 +364,7 @@ func ListAllFTSummaryByOwnerCommon(ctx *gin.Context, page bool) {
 // @Param genesis path string true "Genesis ID" default(74967a27ce3b46244e2e1fba60844c56bb99afc3)
 // @Param address path string true "Address" default(17SkEw2md5avVNyYgj6RiXuQKNwkXaxFyQ)
 // @Success 200 {object} model.Response{data=model.FTOwnerBalanceWithUtxoCountResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Security BearerAuth
 // @Router /ft/balance/{codehash}/{genesis}/{address} [get]
 func GetFTBalanceByOwner(ctx *gin.Context) {
 	logger.Log.Info("GetFTBalanceByOwner enter")

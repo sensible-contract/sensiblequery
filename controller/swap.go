@@ -24,6 +24,7 @@ import (
 // @Param codehash path string true "Code Hash160" default(844c56bb99afc374967a27ce3b46244e2e1fba60)
 // @Param genesis path string true "Genesis ID" default(74967a27ce3b46244e2e1fba60844c56bb99afc3)
 // @Success 200 {object} model.Response{data=[]model.ContractSwapDataResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Security BearerAuth
 // @Router /contract/swap-data/{codehash}/{genesis} [get]
 func GetContractSwapDataInBlockRange(ctx *gin.Context) {
 	logger.Log.Info("GetContractSwapDataInBlockRange enter")
@@ -108,6 +109,7 @@ func GetContractSwapDataInBlockRange(ctx *gin.Context) {
 // @Param codehash path string true "Code Hash160" default(844c56bb99afc374967a27ce3b46244e2e1fba60)
 // @Param genesis path string true "Genesis ID" default(74967a27ce3b46244e2e1fba60844c56bb99afc3)
 // @Success 200 {object} model.Response{data=[]model.ContractSwapAggregateResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Security BearerAuth
 // @Router /contract/swap-aggregate/{codehash}/{genesis} [get]
 func GetContractSwapAggregateInBlockRange(ctx *gin.Context) {
 	logger.Log.Info("GetContractSwapAggregateInBlockRange enter")
@@ -184,6 +186,7 @@ func GetContractSwapAggregateInBlockRange(ctx *gin.Context) {
 // @Param codehash path string true "Code Hash160" default(844c56bb99afc374967a27ce3b46244e2e1fba60)
 // @Param genesis path string true "Genesis ID" default(74967a27ce3b46244e2e1fba60844c56bb99afc3)
 // @Success 200 {object} model.Response{data=[]model.ContractSwapAggregateAmountResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Security BearerAuth
 // @Router /contract/swap-aggregate-amount/{codehash}/{genesis} [get]
 func GetContractSwapAggregateAmountInBlockRange(ctx *gin.Context) {
 	logger.Log.Info("GetContractSwapAggregateAmountInBlockRange enter")

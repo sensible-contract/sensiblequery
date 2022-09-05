@@ -21,6 +21,7 @@ import (
 // @Param size query int true "返回记录数量" default(16)
 // @Param txid path string true "TxId" default(f4184fc596403b9d638783cf57adfe4c75c605f6356fbc91338530e9831e9e16)
 // @Success 200 {object} model.Response{data=[]model.TxInResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Security BearerAuth
 // @Router /tx/{txid}/ins [get]
 func GetTxInputsByTxId(ctx *gin.Context) {
 	logger.Log.Info("GetTxInputsByTxId enter")
@@ -74,6 +75,7 @@ func GetTxInputsByTxId(ctx *gin.Context) {
 // @Param height path int true "Block Height" default(170)
 // @Param txid path string true "TxId" default(f4184fc596403b9d638783cf57adfe4c75c605f6356fbc91338530e9831e9e16)
 // @Success 200 {object} model.Response{data=[]model.TxInResp} "{"code": 0, "data": [{}], "msg": "ok"}"
+// @Security BearerAuth
 // @Router /height/{height}/tx/{txid}/ins [get]
 func GetTxInputsByTxIdInsideHeight(ctx *gin.Context) {
 	logger.Log.Info("GetTxInputsByTxIdInsideHeight enter")
@@ -133,6 +135,7 @@ func GetTxInputsByTxIdInsideHeight(ctx *gin.Context) {
 // @Param txid path string true "TxId" default(f4184fc596403b9d638783cf57adfe4c75c605f6356fbc91338530e9831e9e16)
 // @Param index path int true "input index" default(0)
 // @Success 200 {object} model.Response{data=model.TxInResp} "{"code": 0, "data": {}, "msg": "ok"}"
+// @Security BearerAuth
 // @Router /tx/{txid}/in/{index} [get]
 func GetTxInputByTxIdAndIdx(ctx *gin.Context) {
 	logger.Log.Info("GetTxInputByTxIdAndIdx enter")
@@ -178,6 +181,7 @@ func GetTxInputByTxIdAndIdx(ctx *gin.Context) {
 // @Param txid path string true "TxId" default(f4184fc596403b9d638783cf57adfe4c75c605f6356fbc91338530e9831e9e16)
 // @Param index path int true "input index" default(0)
 // @Success 200 {object} model.Response{data=model.TxInResp} "{"code": 0, "data": {}, "msg": "ok"}"
+// @Security BearerAuth
 // @Router /height/{height}/tx/{txid}/in/{index} [get]
 func GetTxInputByTxIdAndIdxInsideHeight(ctx *gin.Context) {
 	logger.Log.Info("GetTxInputByTxIdAndIdxInsideHeight enter")

@@ -1002,13 +1002,13 @@ info:
   contact:
     email: jiedohh@gmail.com
     name: sensiblequery
-    url: https://github.com/sensing-contract/sensiblequery
-  description: Sensible 区块浏览器
+    url: https://github.com/sensible-contract/sensiblequery
+  description: Sensible
   license:
     name: MIT License
     url: https://opensource.org/licenses/MIT
-  title: Sensible Browser
-  version: "1.0"
+  title: Sensible Query Spec
+  version: "2.0"
 paths:
   /:
     get:
@@ -1046,6 +1046,8 @@ paths:
                 data:
                   $ref: '#/definitions/model.BalanceResp'
               type: object
+      security:
+      - BearerAuth: []
       summary: 通过地址address获取balance
       tags:
       - UTXO
@@ -1096,6 +1098,8 @@ paths:
                     $ref: '#/definitions/model.TxOutHistoryResp'
                   type: array
               type: object
+      security:
+      - BearerAuth: []
       summary: 通过地址address获取合约相关tx历史列表，返回详细输入/输出
       tags:
       - History
@@ -1146,6 +1150,8 @@ paths:
                     $ref: '#/definitions/model.TxInfoResp'
                   type: array
               type: object
+      security:
+      - BearerAuth: []
       summary: 通过地址address获取合约相关tx历史列表，返回tx概要
       tags:
       - History
@@ -1196,6 +1202,8 @@ paths:
                     $ref: '#/definitions/model.TxOutHistoryResp'
                   type: array
               type: object
+      security:
+      - BearerAuth: []
       summary: 通过地址address获取相关tx历史列表，返回详细输入/输出
       tags:
       - History
@@ -1246,6 +1254,8 @@ paths:
                     $ref: '#/definitions/model.TxInfoResp'
                   type: array
               type: object
+      security:
+      - BearerAuth: []
       summary: 通过地址address获取相关tx历史列表，返回tx概要
       tags:
       - History
@@ -1284,6 +1294,8 @@ paths:
                     $ref: '#/definitions/model.TxStandardOutResp'
                   type: array
               type: object
+      security:
+      - BearerAuth: []
       summary: 通过地址address获取相关常规utxo列表
       tags:
       - UTXO
@@ -1320,6 +1332,8 @@ paths:
                 data:
                   $ref: '#/definitions/model.AddressUTXOResp'
               type: object
+      security:
+      - BearerAuth: []
       summary: 通过地址address获取相关常规utxo列表，和数量信息
       tags:
       - UTXO
@@ -1344,6 +1358,8 @@ paths:
                 data:
                   $ref: '#/definitions/model.BlockInfoResp'
               type: object
+      security:
+      - BearerAuth: []
       summary: 通过区块blkid获取区块概述
       tags:
       - Block
@@ -1382,6 +1398,8 @@ paths:
                     $ref: '#/definitions/model.TxInfoResp'
                   type: array
               type: object
+      security:
+      - BearerAuth: []
       summary: 通过区块blkid获取区块包含的Tx概述列表
       tags:
       - Tx
@@ -1399,6 +1417,8 @@ paths:
                 data:
                   $ref: '#/definitions/model.BlockchainInfoResp'
               type: object
+      security:
+      - BearerAuth: []
       summary: 获取最新区块位置、同步状态等信息
   /blocks:
     get:
@@ -1429,6 +1449,8 @@ paths:
                     $ref: '#/definitions/model.BlockInfoResp'
                   type: array
               type: object
+      security:
+      - BearerAuth: []
       summary: 获取指定高度范围内的区块概述列表
       tags:
       - Block
@@ -1491,6 +1513,8 @@ paths:
                     $ref: '#/definitions/model.TxOutHistoryResp'
                   type: array
               type: object
+      security:
+      - BearerAuth: []
       summary: 通过溯源genesis获取任何地址相关tx历史列表，返回详细输入/输出
       tags:
       - History
@@ -1553,6 +1577,8 @@ paths:
                     $ref: '#/definitions/model.TxOutHistoryResp'
                   type: array
               type: object
+      security:
+      - BearerAuth: []
       summary: 通过溯源genesis获取某地址相关tx历史列表，返回详细输入/输出
       tags:
       - History
@@ -1603,6 +1629,8 @@ paths:
                     $ref: '#/definitions/model.ContractSwapAggregateAmountResp'
                   type: array
               type: object
+      security:
+      - BearerAuth: []
       summary: 查询Swap合约在区块中的聚合Amount数据，以合约CodeHash+GenesisID来确认一种Swap
       tags:
       - Unique
@@ -1653,6 +1681,8 @@ paths:
                     $ref: '#/definitions/model.ContractSwapAggregateResp'
                   type: array
               type: object
+      security:
+      - BearerAuth: []
       summary: 查询Swap合约在区块中的聚合价格数据，以合约CodeHash+GenesisID来确认一种Swap
       tags:
       - Unique
@@ -1709,6 +1739,8 @@ paths:
                     $ref: '#/definitions/model.ContractSwapDataResp'
                   type: array
               type: object
+      security:
+      - BearerAuth: []
       summary: 查询Swap合约在区块中的每次交易数据，以合约CodeHash+GenesisID来确认一种Swap
       tags:
       - Unique
@@ -1745,6 +1777,8 @@ paths:
                 data:
                   $ref: '#/definitions/model.FTOwnerBalanceWithUtxoCountResp'
               type: object
+      security:
+      - BearerAuth: []
       summary: 查询某人持有的某FT Token的余额，同时返回UTXO数量
       tags:
       - token FT
@@ -1771,6 +1805,8 @@ paths:
                     $ref: '#/definitions/model.FTInfoResp'
                   type: array
               type: object
+      security:
+      - BearerAuth: []
       summary: 查询使用某codehash的FT Token简述
       tags:
       - token FT
@@ -1790,6 +1826,8 @@ paths:
                     $ref: '#/definitions/model.TokenCodeHashResp'
                   type: array
               type: object
+      security:
+      - BearerAuth: []
       summary: 查询所有FT codehash简述
       tags:
       - token FT
@@ -1820,6 +1858,8 @@ paths:
                 data:
                   $ref: '#/definitions/model.FTInfoResp'
               type: object
+      security:
+      - BearerAuth: []
       summary: 查询使用某codehash+genesis的FT Token简述
       tags:
       - token FT
@@ -1882,6 +1922,8 @@ paths:
                     $ref: '#/definitions/model.TxOutHistoryResp'
                   type: array
               type: object
+      security:
+      - BearerAuth: []
       summary: 通过FT合约CodeHash+溯源genesis获取地址相关tx历史列表，返回详细输入/输出
       tags:
       - History
@@ -1945,6 +1987,8 @@ paths:
                     $ref: '#/definitions/model.TxOutHistoryResp'
                   type: array
               type: object
+      security:
+      - BearerAuth: []
       summary: 通过FT合约CodeHash+溯源genesis获取地址相关tx历史列表，返回详细输出历史，并附带输入来源
       tags:
       - History
@@ -1965,6 +2009,8 @@ paths:
                     $ref: '#/definitions/model.FTInfoResp'
                   type: array
               type: object
+      security:
+      - BearerAuth: []
       summary: 查询所有FT Token简述
       tags:
       - token FT
@@ -2009,6 +2055,8 @@ paths:
                     $ref: '#/definitions/model.FTOwnerBalanceResp'
                   type: array
               type: object
+      security:
+      - BearerAuth: []
       summary: 查询FT Token的持有人。获得每个地址的token余额
       tags:
       - token FT
@@ -2045,6 +2093,8 @@ paths:
                 data:
                   $ref: '#/definitions/model.FTSummaryDataByAddressResp'
               type: object
+      security:
+      - BearerAuth: []
       summary: 查询某人持有的FT Token列表。获得每个token的余额。并返回token总量
       tags:
       - token FT
@@ -2083,6 +2133,8 @@ paths:
                     $ref: '#/definitions/model.FTSummaryByAddressResp'
                   type: array
               type: object
+      security:
+      - BearerAuth: []
       summary: 查询某人持有的FT Token列表。获得每个token的余额
       tags:
       - token FT
@@ -2127,6 +2179,8 @@ paths:
                     $ref: '#/definitions/model.BlockTokenVolumeResp'
                   type: array
               type: object
+      security:
+      - BearerAuth: []
       summary: 查询FT Token在区块中的转移数量，以合约CodeHash+GenesisID来确认一种FT
       tags:
       - token FT
@@ -2175,6 +2229,8 @@ paths:
                 data:
                   $ref: '#/definitions/model.AddressTokenUTXOResp'
               type: object
+      security:
+      - BearerAuth: []
       summary: 通过FT合约CodeHash+溯源genesis获取某地址的utxo列表，和数量信息
       tags:
       - UTXO
@@ -2226,6 +2282,8 @@ paths:
                     $ref: '#/definitions/model.TxOutResp'
                   type: array
               type: object
+      security:
+      - BearerAuth: []
       summary: 通过FT合约CodeHash+溯源genesis获取某地址的utxo列表
       tags:
       - UTXO
@@ -2246,6 +2304,8 @@ paths:
                     type: string
                   type: array
               type: object
+      security:
+      - BearerAuth: []
       summary: GetRawMempool, get txid list in mempool
   /height/{height}/block:
     get:
@@ -2268,6 +2328,8 @@ paths:
                 data:
                   $ref: '#/definitions/model.BlockInfoResp'
               type: object
+      security:
+      - BearerAuth: []
       summary: 通过区块height获取区块概述
       tags:
       - Block
@@ -2306,6 +2368,8 @@ paths:
                     $ref: '#/definitions/model.TxInfoResp'
                   type: array
               type: object
+      security:
+      - BearerAuth: []
       summary: 通过区块height获取区块包含的Tx概述列表
       tags:
       - Tx
@@ -2336,6 +2400,8 @@ paths:
                 data:
                   type: string
               type: object
+      security:
+      - BearerAuth: []
       summary: 通过交易txid和交易被打包的区块高度height获取交易原数据rawtx
       tags:
       - Tx
@@ -2366,6 +2432,8 @@ paths:
                 data:
                   $ref: '#/definitions/model.TxInfoResp'
               type: object
+      security:
+      - BearerAuth: []
       summary: 通过交易txid和交易被打包的区块高度height获取交易概述
       tags:
       - Tx
@@ -2402,6 +2470,8 @@ paths:
                 data:
                   $ref: '#/definitions/model.TxInResp'
               type: object
+      security:
+      - BearerAuth: []
       summary: 通过交易txid和index和交易被打包的区块高度height获取指定交易输入信息
       tags:
       - Txin
@@ -2446,6 +2516,8 @@ paths:
                     $ref: '#/definitions/model.TxInResp'
                   type: array
               type: object
+      security:
+      - BearerAuth: []
       summary: 通过交易txid和交易被打包的区块高度height获取交易所有输入信息列表
       tags:
       - Txin
@@ -2482,6 +2554,8 @@ paths:
                 data:
                   $ref: '#/definitions/model.TxOutStatusResp'
               type: object
+      security:
+      - BearerAuth: []
       summary: 通过交易txid和index和交易被打包的区块高度height获取指定交易输出信息
       tags:
       - Txout
@@ -2526,6 +2600,8 @@ paths:
                     $ref: '#/definitions/model.TxOutStatusResp'
                   type: array
               type: object
+      security:
+      - BearerAuth: []
       summary: 通过交易txid和交易被打包的区块高度height获取交易所有输出信息列表
       tags:
       - Txout
@@ -2543,6 +2619,8 @@ paths:
                 data:
                   $ref: '#/definitions/model.MempoolInfoResp'
               type: object
+      security:
+      - BearerAuth: []
       summary: 获取mempool信息
   /nft/auction/utxo-detail/{codehash}/{nftid}:
     get:
@@ -2579,6 +2657,8 @@ paths:
                     $ref: '#/definitions/model.NFTAuctionResp'
                   type: array
               type: object
+      security:
+      - BearerAuth: []
       summary: 通过拍卖的CodeHash和NFT ID获取具体NFTAuction合约utxo
       tags:
       - UTXO
@@ -2606,6 +2686,8 @@ paths:
                     $ref: '#/definitions/model.NFTInfoResp'
                   type: array
               type: object
+      security:
+      - BearerAuth: []
       summary: 查询使用某codehash的NFT Token简述
       tags:
       - token NFT
@@ -2625,6 +2707,8 @@ paths:
                     $ref: '#/definitions/model.TokenCodeHashResp'
                   type: array
               type: object
+      security:
+      - BearerAuth: []
       summary: 查询所有NFT CodeHash简述
       tags:
       - token NFT
@@ -2673,6 +2757,8 @@ paths:
                 data:
                   $ref: '#/definitions/model.NFTOwnerResp'
               type: object
+      security:
+      - BearerAuth: []
       summary: 查询某人持有的某NFT Token的所持有的NFT数量
       tags:
       - token NFT
@@ -2703,6 +2789,8 @@ paths:
                 data:
                   $ref: '#/definitions/model.NFTInfoResp'
               type: object
+      security:
+      - BearerAuth: []
       summary: 查询使用某codehash+genesis的NFT Token简述
       tags:
       - token NFT
@@ -2765,6 +2853,8 @@ paths:
                     $ref: '#/definitions/model.TxOutHistoryResp'
                   type: array
               type: object
+      security:
+      - BearerAuth: []
       summary: 通过NFT合约CodeHash+溯源genesis获取地址相关tx历史列表，返回详细输入/输出
       tags:
       - History
@@ -2785,6 +2875,8 @@ paths:
                     $ref: '#/definitions/model.NFTInfoResp'
                   type: array
               type: object
+      security:
+      - BearerAuth: []
       summary: 查询所有NFT Token简述
       tags:
       - token NFT
@@ -2829,6 +2921,8 @@ paths:
                     $ref: '#/definitions/model.NFTOwnerResp'
                   type: array
               type: object
+      security:
+      - BearerAuth: []
       summary: 查询NFT Token的持有人。获得每个人持有的NFT数量
       tags:
       - token NFT
@@ -2861,6 +2955,8 @@ paths:
                     $ref: '#/definitions/model.NFTSellResp'
                   type: array
               type: object
+      security:
+      - BearerAuth: []
       summary: 获取NFTSell合约的utxo列表
       tags:
       - UTXO
@@ -2900,6 +2996,8 @@ paths:
                     $ref: '#/definitions/model.NFTSellResp'
                   type: array
               type: object
+      security:
+      - BearerAuth: []
       summary: 通过出售人地址获取NFTSell合约utxo列表
       tags:
       - UTXO
@@ -2945,6 +3043,8 @@ paths:
                     $ref: '#/definitions/model.NFTSellResp'
                   type: array
               type: object
+      security:
+      - BearerAuth: []
       summary: 通过NFT的CodeHash+溯源genesis和NFT Token Index获取具体NFTSell合约utxo
       tags:
       - UTXO
@@ -2990,6 +3090,8 @@ paths:
                     $ref: '#/definitions/model.NFTSellResp'
                   type: array
               type: object
+      security:
+      - BearerAuth: []
       summary: 通过NFT的CodeHash+溯源genesis获取NFTSell合约utxo列表
       tags:
       - UTXO
@@ -3029,6 +3131,8 @@ paths:
                     $ref: '#/definitions/model.NFTSummaryByAddressResp'
                   type: array
               type: object
+      security:
+      - BearerAuth: []
       summary: 查询某人持有的所有NFT Token列表。获得持有的nft数量计数
       tags:
       - token NFT
@@ -3079,6 +3183,8 @@ paths:
                     $ref: '#/definitions/model.BlockTokenVolumeResp'
                   type: array
               type: object
+      security:
+      - BearerAuth: []
       summary: 查询NFT Token在区块中的转移次数，以合约CodeHash+GenesisID，和tokenId来确认一种NFT。
       tags:
       - token NFT
@@ -3127,6 +3233,8 @@ paths:
                 data:
                   $ref: '#/definitions/model.AddressTokenUTXOResp'
               type: object
+      security:
+      - BearerAuth: []
       summary: 通过NFT合约CodeHash+溯源genesis获取某地址的utxo列表，和数量信息
       tags:
       - UTXO
@@ -3164,6 +3272,8 @@ paths:
                 data:
                   $ref: '#/definitions/model.TxOutResp'
               type: object
+      security:
+      - BearerAuth: []
       summary: 通过NFT合约CodeHash+溯源genesis获取某tokenId的utxo
       tags:
       - UTXO
@@ -3207,6 +3317,8 @@ paths:
                 data:
                   $ref: '#/definitions/model.AddressTokenUTXOResp'
               type: object
+      security:
+      - BearerAuth: []
       summary: 通过NFT合约CodeHash+溯源genesis按tokenIndex顺序获取所有的utxo列表，附带总量信息
       tags:
       - UTXO
@@ -3258,6 +3370,8 @@ paths:
                     $ref: '#/definitions/model.TxOutResp'
                   type: array
               type: object
+      security:
+      - BearerAuth: []
       summary: 通过NFT合约CodeHash+溯源genesis获取某地址的utxo列表
       tags:
       - UTXO
@@ -3283,6 +3397,8 @@ paths:
                 data:
                   type: string
               type: object
+      security:
+      - BearerAuth: []
       summary: Push Tx
   /pushtxs:
     post:
@@ -3307,6 +3423,8 @@ paths:
                     type: string
                   type: array
               type: object
+      security:
+      - BearerAuth: []
       summary: Push Tx list
   /rawtx/{txid}:
     get:
@@ -3329,6 +3447,8 @@ paths:
                 data:
                   type: string
               type: object
+      security:
+      - BearerAuth: []
       summary: 通过交易txid获取交易原数据rawtx
       tags:
       - Tx
@@ -3353,6 +3473,8 @@ paths:
                 data:
                   type: string
               type: object
+      security:
+      - BearerAuth: []
       summary: 将交易txid重新发送到woc
       tags:
       - Tx
@@ -3370,6 +3492,8 @@ paths:
                 data:
                   $ref: '#/definitions/model.TokenInfoResp'
               type: object
+      security:
+      - BearerAuth: []
       summary: 查询Token简述
       tags:
       - token
@@ -3394,6 +3518,8 @@ paths:
                 data:
                   $ref: '#/definitions/model.TxInfoResp'
               type: object
+      security:
+      - BearerAuth: []
       summary: 通过交易txid获取交易概述
       tags:
       - Tx
@@ -3424,6 +3550,8 @@ paths:
                 data:
                   $ref: '#/definitions/model.TxInResp'
               type: object
+      security:
+      - BearerAuth: []
       summary: 通过交易txid和index获取指定交易输入信息
       tags:
       - Txin
@@ -3462,6 +3590,8 @@ paths:
                     $ref: '#/definitions/model.TxInResp'
                   type: array
               type: object
+      security:
+      - BearerAuth: []
       summary: 通过交易txid获取交易所有输入信息列表
       tags:
       - Txin
@@ -3492,6 +3622,8 @@ paths:
                 data:
                   $ref: '#/definitions/model.TxOutStatusResp'
               type: object
+      security:
+      - BearerAuth: []
       summary: 通过交易txid和index获取指定交易输出信息
       tags:
       - Txout
@@ -3522,6 +3654,8 @@ paths:
                 data:
                   $ref: '#/definitions/model.TxInSpentResp'
               type: object
+      security:
+      - BearerAuth: []
       summary: 通过交易txid和index获取指定交易输出是否被花费状态
       tags:
       - Txout
@@ -3560,7 +3694,14 @@ paths:
                     $ref: '#/definitions/model.TxOutStatusResp'
                   type: array
               type: object
+      security:
+      - BearerAuth: []
       summary: 通过交易txid获取交易所有输出信息列表
       tags:
       - Txout
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

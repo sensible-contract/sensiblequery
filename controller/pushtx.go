@@ -45,6 +45,7 @@ type TxRequest struct {
 // @Produce json
 // @Param body body TxRequest true "txHex"
 // @Success 200 {object} model.Response{data=string} "{"code": 0, "data": "<txid>", "msg": "ok"}"
+// @Security BearerAuth
 // @Router /pushtx [post]
 func PushTx(ctx *gin.Context) {
 	logger.Log.Info("PushTx enter")
@@ -98,6 +99,7 @@ type TxsRequest struct {
 // @Produce json
 // @Param body body TxsRequest true "txsHex"
 // @Success 200 {object} model.Response{data=[]string} "{"code": 0, "data": ["<txid>", "<txid>"...], "msg": "ok"}"
+// @Security BearerAuth
 // @Router /pushtxs [post]
 func PushTxs(ctx *gin.Context) {
 	logger.Log.Info("PushTxs enter")
@@ -161,6 +163,7 @@ func PushTxs(ctx *gin.Context) {
 // @Summary GetRawMempool, get txid list in mempool
 // @Produce json
 // @Success 200 {object} model.Response{data=[]string} "{"code": 0, "data": "[<txid>]", "msg": "ok"}"
+// @Security BearerAuth
 // @Router /getrawmempool [get]
 func GetRawMempool(ctx *gin.Context) {
 	logger.Log.Info("GetRawMempool enter")
