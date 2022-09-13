@@ -1,9 +1,11 @@
 package controller
 
 import (
+	"bytes"
 	"encoding/base64"
 	"encoding/hex"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"sensiblequery/logger"
 	"sensiblequery/model"
@@ -40,15 +42,15 @@ type TxRequest struct {
 	TxHex string `json:"txHex"`
 }
 
-// Pushtx
-// @Summary Push Tx
+// LocalPushTx
+// @Summary Push Tx to local bitcoind
 // @Produce json
 // @Param body body TxRequest true "txHex"
 // @Success 200 {object} model.Response{data=string} "{"code": 0, "data": "<txid>", "msg": "ok"}"
 // @Security BearerAuth
-// @Router /pushtx [post]
-func PushTx(ctx *gin.Context) {
-	logger.Log.Info("PushTx enter")
+// @Router /local_pushtx [post]
+func LocalPushTx(ctx *gin.Context) {
+	logger.Log.Info("LocalPushTx enter")
 
 	// check body
 	req := TxRequest{}
@@ -90,19 +92,77 @@ func PushTx(ctx *gin.Context) {
 
 }
 
+// WocPushTx
+// @Summary Push Tx to woc
+// @Produce json
+// @Param body body TxRequest true "txHex"
+// @Success 200 {object} model.Response{data=string} "{"code": 0, "data": "<txid>", "msg": "ok"}"
+// @Security BearerAuth
+// @Router /pushtx [post]
+func WocPushTx(ctx *gin.Context) {
+	logger.Log.Info("WocPushTx enter")
+
+	// check body
+	req := TxRequest{}
+	if err := ctx.BindJSON(&req); err != nil {
+		logger.Log.Info("Bind json failed", zap.Error(err))
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "json error"})
+		return
+	}
+
+	_, err := hex.DecodeString(req.TxHex)
+	if err != nil {
+		logger.Log.Info("txRaw invalid", zap.Error(err))
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "tx invalid"})
+		return
+	}
+
+	logger.Log.Info("send", zap.String("rawtx", req.TxHex))
+
+	woc := "https://api.whatsonchain.com/v1/bsv/main/tx/raw"
+	if is_testnet != "" {
+		woc = "https://api.whatsonchain.com/v1/bsv/test/tx/raw"
+	}
+	jsonData := fmt.Sprintf(`{"txhex": "%s"}`, req.TxHex)
+	resp, err := http.Post(woc, "application/json", bytes.NewBufferString(jsonData))
+	if err != nil {
+		logger.Log.Info("push tx failed", zap.Error(err))
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "push tx failed"})
+		return
+	}
+	defer resp.Body.Close()
+
+	body, _ := ioutil.ReadAll(resp.Body)
+	logger.Log.Info("Receive remote return", zap.String("response", string(body)))
+
+	if _, err := hex.DecodeString(string(body)); err != nil {
+		ctx.JSON(http.StatusOK, model.Response{
+			Code: -1,
+			Msg:  string(body),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, model.Response{
+		Code: 0,
+		Msg:  "ok",
+		Data: string(body),
+	})
+}
+
 type TxsRequest struct {
 	TxsHex []string `json:"txsHex"`
 }
 
-// Pushtxs
-// @Summary Push Tx list
+// LocalPushTxs
+// @Summary Push Tx list to local bitcoind
 // @Produce json
 // @Param body body TxsRequest true "txsHex"
 // @Success 200 {object} model.Response{data=[]string} "{"code": 0, "data": ["<txid>", "<txid>"...], "msg": "ok"}"
 // @Security BearerAuth
-// @Router /pushtxs [post]
-func PushTxs(ctx *gin.Context) {
-	logger.Log.Info("PushTxs enter")
+// @Router /local_pushtxs [post]
+func LocalPushTxs(ctx *gin.Context) {
+	logger.Log.Info("LocalPushTxs enter")
 
 	// check body
 	req := TxsRequest{}
@@ -157,6 +217,77 @@ func PushTxs(ctx *gin.Context) {
 		Data: txIdResponse,
 	})
 
+}
+
+// WocPushTxs
+// @Summary Push Tx list to woc
+// @Produce json
+// @Param body body TxsRequest true "txsHex"
+// @Success 200 {object} model.Response{data=[]string} "{"code": 0, "data": ["<txid>", "<txid>"...], "msg": "ok"}"
+// @Security BearerAuth
+// @Router /pushtxs [post]
+func WocPushTxs(ctx *gin.Context) {
+	logger.Log.Info("WocPushTxs enter")
+
+	// check body
+	req := TxsRequest{}
+	if err := ctx.BindJSON(&req); err != nil {
+		logger.Log.Info("Bind json failed", zap.Error(err))
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "json error"})
+		return
+	}
+
+	for idx, txHex := range req.TxsHex {
+		if len(txHex) == 0 {
+			continue
+		}
+		_, err := hex.DecodeString(txHex)
+		if err != nil {
+			logger.Log.Info("txRaw invalid", zap.Error(err))
+			ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: fmt.Sprintf("tx[%d] invalid", idx)})
+			return
+		}
+	}
+
+	txIdResponse := []interface{}{}
+	for _, txHex := range req.TxsHex {
+		if len(txHex) == 0 {
+			continue
+		}
+
+		logger.Log.Info("send", zap.String("rawtx", txHex))
+
+		woc := "https://api.whatsonchain.com/v1/bsv/main/tx/raw"
+		if is_testnet != "" {
+			woc = "https://api.whatsonchain.com/v1/bsv/test/tx/raw"
+		}
+		jsonData := fmt.Sprintf(`{"txhex": "%s"}`, txHex)
+		resp, err := http.Post(woc, "application/json", bytes.NewBufferString(jsonData))
+		if err != nil {
+			logger.Log.Info("push tx failed", zap.Error(err))
+			ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "push tx failed"})
+			return
+		}
+		defer resp.Body.Close()
+
+		body, _ := ioutil.ReadAll(resp.Body)
+		logger.Log.Info("Receive remote return", zap.String("response", string(body)))
+
+		if _, err := hex.DecodeString(string(body)); err != nil {
+			ctx.JSON(http.StatusOK, model.Response{
+				Code: -1,
+				Msg:  string(body),
+				Data: txIdResponse,
+			})
+			return
+		}
+		txIdResponse = append(txIdResponse, string(body))
+	}
+	ctx.JSON(http.StatusOK, model.Response{
+		Code: 0,
+		Msg:  "ok",
+		Data: txIdResponse,
+	})
 }
 
 // GetRawMempool

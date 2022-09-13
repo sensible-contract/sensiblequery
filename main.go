@@ -81,8 +81,11 @@ func main() {
 
 	router.GET("/", controller.Satotx)
 
-	router.POST("/pushtx", controller.PushTx)
-	router.POST("/pushtxs", controller.PushTxs)
+	router.POST("/local_pushtx", controller.LocalPushTx)
+	router.POST("/local_pushtxs", controller.LocalPushTxs)
+
+	router.POST("/pushtx", controller.WocPushTx)
+	router.POST("/pushtxs", controller.WocPushTxs)
 
 	mainAPI := router.Group("/", midware.VerifyToken())
 
