@@ -2601,6 +2601,97 @@ var doc = `{
                 }
             }
         },
+        "/local_pushtx": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Push Tx to local bitcoind",
+                "parameters": [
+                    {
+                        "description": "txHex",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controller.TxRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\": 0, \"data\": \"\u003ctxid\u003e\", \"msg\": \"ok\"}",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/model.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/local_pushtxs": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Push Tx list to local bitcoind",
+                "parameters": [
+                    {
+                        "description": "txsHex",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controller.TxsRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\": 0, \"data\": [\"\u003ctxid\u003e\", \"\u003ctxid\u003e\"...], \"msg\": \"ok\"}",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/model.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
         "/mempool/info": {
             "get": {
                 "security": [
@@ -3853,7 +3944,7 @@ var doc = `{
                 "produces": [
                     "application/json"
                 ],
-                "summary": "Push Tx",
+                "summary": "Push Tx to woc",
                 "parameters": [
                     {
                         "description": "txHex",
@@ -3897,7 +3988,7 @@ var doc = `{
                 "produces": [
                     "application/json"
                 ],
-                "summary": "Push Tx list",
+                "summary": "Push Tx list to woc",
                 "parameters": [
                     {
                         "description": "txsHex",
@@ -5804,7 +5895,7 @@ var SwaggerInfo = swaggerInfo{
 	BasePath:    "",
 	Schemes:     []string{},
 	Title:       "Sensible Query Spec",
-	Description: "Sensible",
+	Description: "API definition for Sensiblequery  APIs",
 }
 
 type s struct{}

@@ -1003,7 +1003,7 @@ info:
     email: jiedohh@gmail.com
     name: sensiblequery
     url: https://github.com/sensible-contract/sensiblequery
-  description: Sensible
+  description: API definition for Sensiblequery  APIs
   license:
     name: MIT License
     url: https://opensource.org/licenses/MIT
@@ -2605,6 +2605,56 @@ paths:
       summary: 通过交易txid和交易被打包的区块高度height获取交易所有输出信息列表
       tags:
       - Txout
+  /local_pushtx:
+    post:
+      parameters:
+      - description: txHex
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/controller.TxRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 0, "data": "<txid>", "msg": "ok"}'
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      security:
+      - BearerAuth: []
+      summary: Push Tx to local bitcoind
+  /local_pushtxs:
+    post:
+      parameters:
+      - description: txsHex
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/controller.TxsRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 0, "data": ["<txid>", "<txid>"...], "msg": "ok"}'
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  items:
+                    type: string
+                  type: array
+              type: object
+      security:
+      - BearerAuth: []
+      summary: Push Tx list to local bitcoind
   /mempool/info:
     get:
       produces:
@@ -3399,7 +3449,7 @@ paths:
               type: object
       security:
       - BearerAuth: []
-      summary: Push Tx
+      summary: Push Tx to woc
   /pushtxs:
     post:
       parameters:
@@ -3425,7 +3475,7 @@ paths:
               type: object
       security:
       - BearerAuth: []
-      summary: Push Tx list
+      summary: Push Tx list to woc
   /rawtx/{txid}:
     get:
       parameters:
