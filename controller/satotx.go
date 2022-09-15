@@ -51,12 +51,15 @@ func GetBlockchainInfo(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get block mtp failed"})
 		return
 	}
-
+	chain := "main"
+	if is_testnet != "" {
+		chain = "test"
+	}
 	ctx.JSON(http.StatusOK, model.Response{
 		Code: 0,
 		Msg:  "ok",
 		Data: &model.BlockchainInfoResp{
-			Chain:         "main",
+			Chain:         chain,
 			Blocks:        blk.Height + 1,
 			Headers:       blk.Height + 1,
 			BestBlockHash: blk.BlockIdHex,
