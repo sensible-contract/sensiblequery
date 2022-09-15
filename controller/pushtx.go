@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"sensiblequery/logger"
 	"sensiblequery/model"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
@@ -133,12 +134,13 @@ func WocPushTx(ctx *gin.Context) {
 	defer resp.Body.Close()
 
 	body, _ := ioutil.ReadAll(resp.Body)
-	logger.Log.Info("Receive remote return", zap.String("response", string(body)))
+	result := strings.Trim(string(body), "\"\n")
+	logger.Log.Info("Receive remote return", zap.String("response", result))
 
-	if _, err := hex.DecodeString(string(body)); err != nil {
+	if _, err := hex.DecodeString(result); err != nil {
 		ctx.JSON(http.StatusOK, model.Response{
 			Code: -1,
-			Msg:  string(body),
+			Msg:  result,
 		})
 		return
 	}
@@ -146,8 +148,16 @@ func WocPushTx(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, model.Response{
 		Code: 0,
 		Msg:  "ok",
-		Data: string(body),
+		Data: result,
 	})
+
+	// then call LocalPushTx
+	response, err := rpcClient.Call("sendrawtransaction", []string{req.TxHex})
+	if err != nil {
+		logger.Log.Info("local call failed", zap.Error(err))
+		return
+	}
+	logger.Log.Info("Receive local rpc return", zap.Any("response", response))
 }
 
 type TxsRequest struct {
@@ -271,17 +281,25 @@ func WocPushTxs(ctx *gin.Context) {
 		defer resp.Body.Close()
 
 		body, _ := ioutil.ReadAll(resp.Body)
-		logger.Log.Info("Receive remote return", zap.String("response", string(body)))
+		result := strings.Trim(string(body), "\"\n")
+		logger.Log.Info("Receive remote return", zap.String("response", result))
 
-		if _, err := hex.DecodeString(string(body)); err != nil {
+		if _, err := hex.DecodeString(result); err != nil {
 			ctx.JSON(http.StatusOK, model.Response{
 				Code: -1,
-				Msg:  string(body),
+				Msg:  result,
 				Data: txIdResponse,
 			})
 			return
 		}
-		txIdResponse = append(txIdResponse, string(body))
+		txIdResponse = append(txIdResponse, result)
+
+		// then call localpush
+		response, err := rpcClient.Call("sendrawtransaction", []string{txHex})
+		if err != nil {
+			logger.Log.Info("call failed", zap.Error(err))
+		}
+		logger.Log.Info("Receive local rpc return", zap.Any("response", response))
 	}
 	ctx.JSON(http.StatusOK, model.Response{
 		Code: 0,

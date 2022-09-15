@@ -81,13 +81,13 @@ func main() {
 
 	router.GET("/", controller.Satotx)
 
-	router.POST("/local_pushtx", controller.LocalPushTx)
-	router.POST("/local_pushtxs", controller.LocalPushTxs)
-
-	router.POST("/pushtx", controller.WocPushTx)
-	router.POST("/pushtxs", controller.WocPushTxs)
-
 	mainAPI := router.Group("/", midware.VerifyToken())
+
+	mainAPI.POST("/local_pushtx", controller.LocalPushTx)
+	mainAPI.POST("/local_pushtxs", controller.LocalPushTxs)
+
+	mainAPI.POST("/pushtx", controller.WocPushTx)
+	mainAPI.POST("/pushtxs", controller.WocPushTxs)
 
 	mainAPI.GET("/getrawmempool", controller.GetRawMempool)
 
