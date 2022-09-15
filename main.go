@@ -29,8 +29,9 @@ import (
 
 var (
 	// 0.0.0.0:8000
-	listen_address = os.Getenv("LISTEN")
-	basePath       = os.Getenv("BASE_PATH")
+	listen_address     = os.Getenv("LISTEN")
+	basePath           = os.Getenv("BASE_PATH")
+	disableVerifyToken = os.Getenv("DISABLE_VERIFY_TOKEN")
 )
 
 func KeepJsonContentType() gin.HandlerFunc {
@@ -82,6 +83,9 @@ func main() {
 	router.GET("/", controller.Satotx)
 
 	mainAPI := router.Group("/", midware.VerifyToken())
+	if disableVerifyToken != "" {
+		mainAPI = router.Group("/")
+	}
 
 	mainAPI.POST("/local_pushtx", controller.LocalPushTx)
 	mainAPI.POST("/local_pushtxs", controller.LocalPushTxs)
@@ -210,6 +214,9 @@ func main() {
 		cache.CacheByRequestURI(store, 10*time.Second), controller.ListAllTokenInfo)
 
 	heightAPI := router.Group("/height/:height", midware.VerifyToken())
+	if disableVerifyToken != "" {
+		heightAPI = router.Group("/height/:height")
+	}
 	{
 		heightAPI.GET("/block", controller.GetBlockByHeight)
 
