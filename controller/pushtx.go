@@ -18,6 +18,7 @@ import (
 )
 
 var rpcClient jsonrpc.RPCClient
+var wocKey string
 
 func init() {
 	viper.SetConfigFile("conf/chain.yaml")
@@ -29,6 +30,7 @@ func init() {
 		}
 	}
 
+	wocKey = viper.GetString("woc_key")
 	rpcAddress := viper.GetString("rpc")
 	rpcAuth := viper.GetString("rpc_auth")
 	rpcClient = jsonrpc.NewClientWithOpts(rpcAddress, &jsonrpc.RPCClientOpts{
@@ -120,12 +122,21 @@ func WocPushTx(ctx *gin.Context) {
 
 	logger.Log.Info("send", zap.String("rawtx", req.TxHex))
 
-	woc := "https://api.whatsonchain.com/v1/bsv/main/tx/raw"
+	wocUrl := "https://api.whatsonchain.com/v1/bsv/main/tx/raw"
 	if is_testnet != "" {
-		woc = "https://api.whatsonchain.com/v1/bsv/test/tx/raw"
+		wocUrl = "https://api.whatsonchain.com/v1/bsv/test/tx/raw"
 	}
 	jsonData := fmt.Sprintf(`{"txhex": "%s"}`, req.TxHex)
-	resp, err := http.Post(woc, "application/json", bytes.NewBufferString(jsonData))
+
+	wocReq, err := http.NewRequest("POST", wocUrl, bytes.NewBufferString(jsonData))
+	if err != nil {
+		logger.Log.Info("push tx failed", zap.Error(err))
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "push tx failed"})
+		return
+	}
+	wocReq.Header.Set("Content-Type", "application/json")
+	wocReq.Header.Set("woc-api-key", wocKey)
+	resp, err := http.DefaultClient.Do(wocReq)
 	if err != nil {
 		logger.Log.Info("push tx failed", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "push tx failed"})
@@ -267,12 +278,20 @@ func WocPushTxs(ctx *gin.Context) {
 
 		logger.Log.Info("send", zap.String("rawtx", txHex))
 
-		woc := "https://api.whatsonchain.com/v1/bsv/main/tx/raw"
+		wocUrl := "https://api.whatsonchain.com/v1/bsv/main/tx/raw"
 		if is_testnet != "" {
-			woc = "https://api.whatsonchain.com/v1/bsv/test/tx/raw"
+			wocUrl = "https://api.whatsonchain.com/v1/bsv/test/tx/raw"
 		}
 		jsonData := fmt.Sprintf(`{"txhex": "%s"}`, txHex)
-		resp, err := http.Post(woc, "application/json", bytes.NewBufferString(jsonData))
+		req, err := http.NewRequest("POST", wocUrl, bytes.NewBufferString(jsonData))
+		if err != nil {
+			logger.Log.Info("push tx failed", zap.Error(err))
+			ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "push tx failed"})
+			return
+		}
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("woc-api-key", wocKey)
+		resp, err := http.DefaultClient.Do(req)
 		if err != nil {
 			logger.Log.Info("push tx failed", zap.Error(err))
 			ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "push tx failed"})
