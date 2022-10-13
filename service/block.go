@@ -154,8 +154,8 @@ LIMIT 1`, SQL_FIELEDS_BLOCK, blkidHex, blkidHex)
 	return GetBlockBySql(psql)
 }
 
-func GetBestBlock() (blk *model.BlockInfoResp, err error) {
-	psql := fmt.Sprintf("SELECT %s FROM blk_height ORDER BY height DESC LIMIT 1", SQL_FIELEDS_BEST_BLOCK)
+func GetBestBlockByHeight(blkHeight int) (blk *model.BlockInfoResp, err error) {
+	psql := fmt.Sprintf("SELECT %s FROM blk_height WHERE height = %d LIMIT 1", SQL_FIELEDS_BEST_BLOCK, blkHeight)
 	return GetBlockBySql(psql)
 }
 

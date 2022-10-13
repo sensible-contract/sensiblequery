@@ -38,14 +38,19 @@ func Satotx(ctx *gin.Context) {
 func GetBlockchainInfo(ctx *gin.Context) {
 	logger.Log.Info("GetBlockchainInfo enter")
 
-	blk, err := service.GetBestBlock()
+	bestHeight, err := service.GetBestBlockHeight()
+	if err != nil {
+		logger.Log.Info("best block failed", zap.Error(err))
+	}
+
+	blk, err := service.GetBestBlockByHeight(bestHeight)
 	if err != nil {
 		logger.Log.Info("best block failed", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get best block failed"})
 		return
 	}
 
-	mtp, err := service.GetBlockMedianTimePast(blk.Height)
+	mtp, err := service.GetBlockMedianTimePast(bestHeight)
 	if err != nil {
 		logger.Log.Info("block mtp failed", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get block mtp failed"})
@@ -60,8 +65,8 @@ func GetBlockchainInfo(ctx *gin.Context) {
 		Msg:  "ok",
 		Data: &model.BlockchainInfoResp{
 			Chain:         chain,
-			Blocks:        blk.Height + 1,
-			Headers:       blk.Height + 1,
+			Blocks:        bestHeight + 1,
+			Headers:       bestHeight + 1,
 			BestBlockHash: blk.BlockIdHex,
 			Difficulty:    "",
 			MedianTime:    mtp,
