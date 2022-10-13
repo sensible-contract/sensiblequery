@@ -162,13 +162,15 @@ func WocPushTx(ctx *gin.Context) {
 		Data: result,
 	})
 
-	// then call LocalPushTx
-	response, err := rpcClient.Call("sendrawtransaction", []string{req.TxHex})
-	if err != nil {
-		logger.Log.Info("local call failed", zap.Error(err))
-		return
-	}
-	logger.Log.Info("Receive local rpc return", zap.Any("response", response))
+	go func() {
+		// then call LocalPushTx
+		response, err := rpcClient.Call("sendrawtransaction", []string{req.TxHex})
+		if err != nil {
+			logger.Log.Info("woc ok, but local call failed", zap.String("txid", result), zap.Error(err))
+			return
+		}
+		logger.Log.Info("Receive local rpc return", zap.String("txid", result), zap.Any("response", response))
+	}()
 }
 
 type TxsRequest struct {
@@ -313,12 +315,14 @@ func WocPushTxs(ctx *gin.Context) {
 		}
 		txIdResponse = append(txIdResponse, result)
 
-		// then call localpush
-		response, err := rpcClient.Call("sendrawtransaction", []string{txHex})
-		if err != nil {
-			logger.Log.Info("call failed", zap.Error(err))
-		}
-		logger.Log.Info("Receive local rpc return", zap.Any("response", response))
+		go func(txid, txHex string) {
+			// then call localpush
+			response, err := rpcClient.Call("sendrawtransaction", []string{txHex})
+			if err != nil {
+				logger.Log.Info("call failed", zap.String("txid", txid), zap.Error(err))
+			}
+			logger.Log.Info("Receive local rpc return", zap.String("txid", txid), zap.Any("response", response))
+		}(result, txHex)
 	}
 	ctx.JSON(http.StatusOK, model.Response{
 		Code: 0,
