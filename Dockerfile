@@ -1,4 +1,4 @@
-FROM golang:1.19-alpine AS build
+FROM golang:1.19.2-alpine AS build
 ARG GO_OS="linux"
 ARG GO_ARCH="amd64"
 WORKDIR /build/

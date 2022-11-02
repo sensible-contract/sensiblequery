@@ -93,33 +93,30 @@ func main() {
 	mainAPI.POST("/pushtx", controller.WocPushTx)
 	mainAPI.POST("/pushtxs", controller.WocPushTxs)
 
+	// sensible irrelevant
 	mainAPI.GET("/getrawmempool", controller.GetRawMempool)
-
 	mainAPI.GET("/blockchain/info", controller.GetBlockchainInfo)
-
 	mainAPI.GET("/mempool/info", controller.GetMempoolInfo)
-
 	mainAPI.GET("/blocks", controller.GetBlocksByHeightRange)
-
 	mainAPI.GET("/block/id/:blkid", controller.GetBlockById)
 	mainAPI.GET("/block/txs/:blkid", controller.GetBlockTxsByBlockId)
-
 	mainAPI.GET("/rawtx/:txid", controller.GetRawTxById)
 	mainAPI.GET("/relay/:txid", controller.RelayTxById)
-
 	mainAPI.GET("/tx/:txid", controller.GetTxById)
-	mainAPI.GET("/tx/:txid/ins", controller.GetTxInputsByTxId)
-	mainAPI.GET("/tx/:txid/outs", controller.GetTxOutputsByTxId)
-
-	mainAPI.GET("/tx/:txid/in/:index", controller.GetTxInputByTxIdAndIdx)
-	mainAPI.GET("/tx/:txid/out/:index", controller.GetTxOutputByTxIdAndIdx)
-
 	mainAPI.GET("/tx/:txid/out/:index/spent", controller.GetTxOutputSpentStatusByTxIdAndIdx)
 
 	mainAPI.GET("/address/:address/utxo",
 		cache.CacheByRequestURI(store, 1*time.Second), controller.GetUtxoByAddress)
 	mainAPI.GET("/address/:address/utxo-data",
 		cache.CacheByRequestURI(store, 1*time.Second), controller.GetUtxoDataByAddress)
+
+	mainAPI.GET("/address/:address/balance", controller.GetBalanceByAddress)
+
+	// sensible relevant
+	mainAPI.GET("/tx/:txid/ins", controller.GetTxInputsByTxId)
+	mainAPI.GET("/tx/:txid/outs", controller.GetTxOutputsByTxId)
+	mainAPI.GET("/tx/:txid/in/:index", controller.GetTxInputByTxIdAndIdx)
+	mainAPI.GET("/tx/:txid/out/:index", controller.GetTxOutputByTxIdAndIdx)
 
 	mainAPI.GET("/nft/sell/utxo", controller.GetNFTSellUtxo)
 	mainAPI.GET("/nft/sell/utxo-by-address/:address", controller.GetNFTSellUtxoByAddress)
@@ -136,8 +133,6 @@ func main() {
 	mainAPI.GET("/nft/utxo-detail/:codehash/:genesis/:token_index", controller.GetNFTUtxoDetailByTokenIndex)
 	mainAPI.GET("/nft/utxo-list/:codehash/:genesis",
 		cache.CacheByRequestURI(store, 1*time.Second), controller.GetNFTUtxoList)
-
-	mainAPI.GET("/address/:address/balance", controller.GetBalanceByAddress)
 
 	mainAPI.GET("/contract/swap-data/:codehash/:genesis",
 		cache.CacheByRequestURI(store, 10*time.Second), controller.GetContractSwapDataInBlockRange)
@@ -189,20 +184,19 @@ func main() {
 	mainAPI.GET("/nft/summary/:address",
 		cache.CacheByRequestURI(store, 2*time.Second), controller.ListAllNFTByOwner)
 
-	// without cache
-	mainAPI.GET("/nft/detail/:codehash/:genesis/:address", controller.ListNFTCountByOwner)
+	mainAPI.GET("/nft/detail/:codehash/:genesis/:address", controller.ListNFTCountByOwner) // without cache
 
 	mainAPI.GET("/nft/history/:codehash/:genesis/:address",
 		cache.CacheByRequestURI(store, 10*time.Second), controller.GetNFTHistoryByGenesis)
 
 	mainAPI.GET("/address/:address/history",
-		cache.CacheByRequestURI(store, 10*time.Second), controller.GetHistoryByAddress)
+		cache.CacheByRequestURI(store, 10*time.Second), controller.GetHistoryByAddress) // include sensible tx, with input/output detail
 
 	mainAPI.GET("/address/:address/history/tx",
-		cache.CacheByRequestURI(store, 10*time.Second), controller.GetTxsHistoryByAddress)
+		cache.CacheByRequestURI(store, 10*time.Second), controller.GetTxsHistoryByAddress) // include sensible tx, with brief tx info
 
 	mainAPI.GET("/address/:address/contract-history",
-		cache.CacheByRequestURI(store, 10*time.Second), controller.GetContractHistoryByAddress)
+		cache.CacheByRequestURI(store, 10*time.Second), controller.GetContractHistoryByAddress) // include sensible tx only, with input/output detail
 
 	mainAPI.GET("/contract/history/:codehash/:genesis/:address",
 		cache.CacheByRequestURI(store, 10*time.Second), controller.GetHistoryByGenesis)
@@ -218,16 +212,15 @@ func main() {
 		heightAPI = router.Group("/height/:height")
 	}
 	{
+		// sensible irrelevant
 		heightAPI.GET("/block", controller.GetBlockByHeight)
-
 		heightAPI.GET("/block/txs", controller.GetBlockTxsByBlockHeight)
-
 		heightAPI.GET("/rawtx/:txid", controller.GetRawTxByIdInsideHeight)
-
 		heightAPI.GET("/tx/:txid", controller.GetTxByIdInsideHeight)
+
+		// sensible relevant
 		heightAPI.GET("/tx/:txid/ins", controller.GetTxInputsByTxIdInsideHeight)
 		heightAPI.GET("/tx/:txid/outs", controller.GetTxOutputsByTxIdInsideHeight)
-
 		heightAPI.GET("/tx/:txid/in/:index", controller.GetTxInputByTxIdAndIdxInsideHeight)
 		heightAPI.GET("/tx/:txid/out/:index", controller.GetTxOutputByTxIdAndIdxInsideHeight)
 	}
