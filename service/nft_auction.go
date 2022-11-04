@@ -63,7 +63,7 @@ func GetNFTAuctionUtxoByKey(key string) (nftAuctionsRsp []*model.NFTAuctionResp,
 func getNFTAuctionUtxoFromRedis(utxoOutpoints []string) (nftAuctionsRsp []*model.NFTAuctionResp, err error) {
 	logger.Log.Info("getNFTAuctionUtxoFromRedis redis", zap.Int("nUTXO", len(utxoOutpoints)))
 	nftAuctionsRsp = make([]*model.NFTAuctionResp, 0)
-	pipe := rdb.PikaClient.Pipeline()
+	pipe := rdb.RdbUtxoClient.Pipeline()
 
 	outpointsCmd := make([]*redis.StringCmd, 0)
 	for _, outpoint := range utxoOutpoints {

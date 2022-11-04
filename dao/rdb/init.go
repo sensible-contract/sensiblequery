@@ -9,10 +9,11 @@ import (
 )
 
 var (
-	CacheClient *redis.Client
-	UserClient  redis.UniversalClient
-	BizClient   redis.UniversalClient
-	PikaClient  redis.UniversalClient
+	CacheClient      *redis.Client
+	UserClient       redis.UniversalClient
+	BizClient        redis.UniversalClient
+	RdbUtxoClient    redis.UniversalClient
+	RdbAddressClient redis.UniversalClient
 
 	ctx = context.Background()
 )
@@ -21,7 +22,8 @@ func init() {
 	CacheClient = InitClient("conf/cache.yaml")
 
 	BizClient = Init("conf/redis.yaml")
-	PikaClient = Init("conf/pika.yaml")
+	RdbUtxoClient = Init("conf/rdb_utxo.yaml")
+	RdbAddressClient = Init("conf/rdb_address.yaml")
 	UserClient = Init("conf/user.yaml")
 }
 
@@ -41,15 +43,19 @@ func InitClient(filename string) (rds *redis.Client) {
 	dialTimeout := viper.GetDuration("dialTimeout")
 	readTimeout := viper.GetDuration("readTimeout")
 	writeTimeout := viper.GetDuration("writeTimeout")
+	idleTimeout := viper.GetDuration("idleTimeout")
+	idleCheckFrequency := viper.GetDuration("idleCheckFrequency")
 	poolSize := viper.GetInt("poolSize")
 	rds = redis.NewClient(&redis.Options{
-		Addr:         addr,
-		Password:     password,
-		DB:           database,
-		DialTimeout:  dialTimeout,
-		ReadTimeout:  readTimeout,
-		WriteTimeout: writeTimeout,
-		PoolSize:     poolSize,
+		Addr:               addr,
+		Password:           password,
+		DB:                 database,
+		DialTimeout:        dialTimeout,
+		ReadTimeout:        readTimeout,
+		WriteTimeout:       writeTimeout,
+		PoolSize:           poolSize,
+		IdleTimeout:        idleTimeout,
+		IdleCheckFrequency: idleCheckFrequency,
 	})
 	return rds
 }
@@ -70,15 +76,19 @@ func Init(filename string) (rds redis.UniversalClient) {
 	dialTimeout := viper.GetDuration("dialTimeout")
 	readTimeout := viper.GetDuration("readTimeout")
 	writeTimeout := viper.GetDuration("writeTimeout")
+	idleTimeout := viper.GetDuration("idleTimeout")
+	idleCheckFrequency := viper.GetDuration("idleCheckFrequency")
 	poolSize := viper.GetInt("poolSize")
 	rds = redis.NewUniversalClient(&redis.UniversalOptions{
-		Addrs:        addrs,
-		Password:     password,
-		DB:           database,
-		DialTimeout:  dialTimeout,
-		ReadTimeout:  readTimeout,
-		WriteTimeout: writeTimeout,
-		PoolSize:     poolSize,
+		Addrs:              addrs,
+		Password:           password,
+		DB:                 database,
+		DialTimeout:        dialTimeout,
+		ReadTimeout:        readTimeout,
+		WriteTimeout:       writeTimeout,
+		PoolSize:           poolSize,
+		IdleTimeout:        idleTimeout,
+		IdleCheckFrequency: idleCheckFrequency,
 	})
 	return rds
 }
