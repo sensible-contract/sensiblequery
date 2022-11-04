@@ -189,14 +189,8 @@ func main() {
 	mainAPI.GET("/nft/history/:codehash/:genesis/:address",
 		cache.CacheByRequestURI(store, 10*time.Second), controller.GetNFTHistoryByGenesis)
 
-	mainAPI.GET("/address/:address/history",
-		cache.CacheByRequestURI(store, 10*time.Second), controller.GetHistoryByAddress) // include sensible tx, with input/output detail
-
 	mainAPI.GET("/address/:address/history/tx",
 		cache.CacheByRequestURI(store, 10*time.Second), controller.GetTxsHistoryByAddress) // include sensible tx, with brief tx info
-
-	mainAPI.GET("/address/:address/contract-history",
-		cache.CacheByRequestURI(store, 10*time.Second), controller.GetContractHistoryByAddress) // include sensible tx only, with input/output detail
 
 	mainAPI.GET("/contract/history/:codehash/:genesis/:address",
 		cache.CacheByRequestURI(store, 10*time.Second), controller.GetHistoryByGenesis)
