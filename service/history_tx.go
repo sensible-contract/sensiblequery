@@ -14,6 +14,20 @@ import (
 )
 
 ////////////////
+func GetTxsHistoryInfoByAddress(addressPkh []byte) (addrRsp *model.AddressHistoryInfoResp, err error) {
+	historyNum, err := rdb.RdbAddressClient.ZCard(ctx, "{ah"+string(addressPkh)+"}").Result()
+	if err != nil {
+		logger.Log.Info("get historyNum from redis failed", zap.Error(err))
+		return
+	}
+	logger.Log.Info("historyNum", zap.Int64("n", historyNum))
+
+	addrRsp = &model.AddressHistoryInfoResp{
+		Total: int(historyNum),
+	}
+	return addrRsp, nil
+}
+
 func GetTxsHistoryByAddressAndTypeByHeightRangeFromPika(cursor, size int, addressPkh []byte) (txsRsp []*model.TxInfoResp, err error) {
 	addrTxWithHeightHistory, err := rdb.RdbAddressClient.ZRevRange(ctx, "{ah"+string(addressPkh)+"}", int64(cursor), int64(cursor+size)-1).Result()
 	if err == redis.Nil {

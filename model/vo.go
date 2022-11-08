@@ -51,6 +51,10 @@ type BlockInfoResp struct {
 	BlockSize      int    `json:"size"` // 区块字节数
 }
 
+type AddressHistoryInfoResp struct {
+	Total int `json:"total"` // 和地址相关的Tx总条数
+}
+
 type TxInfoResp struct {
 	TxIdHex       string `json:"txid"`
 	InCount       int    `json:"nIn"`           // Tx包括的输入条数

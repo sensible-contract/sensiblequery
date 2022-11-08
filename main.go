@@ -192,6 +192,9 @@ func main() {
 	mainAPI.GET("/address/:address/history/tx",
 		cache.CacheByRequestURI(store, 10*time.Second), controller.GetTxsHistoryByAddress) // include sensible tx, with brief tx info
 
+	mainAPI.GET("/address/:address/history/info",
+		cache.CacheByRequestURI(store, 5*time.Second), controller.GetTxsHistoryByAddress)
+
 	mainAPI.GET("/contract/history/:codehash/:genesis/:address",
 		cache.CacheByRequestURI(store, 10*time.Second), controller.GetHistoryByGenesis)
 

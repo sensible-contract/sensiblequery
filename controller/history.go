@@ -17,6 +17,40 @@ const MAX_HISTORY_SIZE = 2048
 const MAX_HISTORY_LIMIT = 102400
 const MAX_HISTORY_BLOCK_RANGE = 100000
 
+// GetTxsHistoryInfoByAddress
+// @Summary 通过地址address获取相关tx历史记录信息，包括记录条数等
+// @Tags History
+// @Produce  json
+// @Param address path string true "Address" default(17SkEw2md5avVNyYgj6RiXuQKNwkXaxFyQ)
+// @Success 200 {object} model.Response{data=model.AddressHistoryInfoResp} "{"code": 0, "data": {}, "msg": "ok"}"
+// @Security BearerAuth
+// @Router /address/{address}/history/info [get]
+func GetTxsHistoryInfoByAddress(ctx *gin.Context) {
+	logger.Log.Info("GetTxsHistoryInfoByAddress enter")
+
+	address := ctx.Param("address")
+	// check
+	addressPkh, err := utils.DecodeAddress(address)
+	if err != nil {
+		logger.Log.Info("address invalid", zap.Error(err))
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "address invalid"})
+		return
+	}
+
+	result, err := service.GetTxsHistoryInfoByAddress(addressPkh)
+	if err != nil {
+		logger.Log.Info("get txs history info failed", zap.Error(err))
+		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get txs history info failed"})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, model.Response{
+		Code: 0,
+		Msg:  "ok",
+		Data: result,
+	})
+}
+
 // GetTxsHistoryByAddress
 // @Summary 通过地址address获取相关tx历史列表，返回tx概要
 // @Tags History
