@@ -1,30 +1,62 @@
 package service
 
 import (
+	"encoding/hex"
 	"fmt"
+	"sensiblequery/dao/rdb"
 	"sensiblequery/logger"
 	"sensiblequery/model"
+	"strconv"
+	"strings"
 
+	"github.com/go-redis/redis/v8"
 	"go.uber.org/zap"
 )
 
+////////////////
+func GetTxsHistoryByAddressAndTypeByHeightRangeFromPika(cursor, size int, addressPkh []byte) (txsRsp []*model.TxInfoResp, err error) {
+	addrTxWithHeightHistory, err := rdb.RdbAddressClient.ZRevRange(ctx, "{ah"+string(addressPkh)+"}", int64(cursor), int64(cursor+size)-1).Result()
+	if err == redis.Nil {
+		addrTxWithHeightHistory = nil
+	} else if err != nil {
+		logger.Log.Info("GetTxsHistoryByAddressAndTypeByHeightRangeFromPika failed", zap.Error(err))
+		return
+	}
+
+	for _, historyPosition := range addrTxWithHeightHistory {
+		sep := strings.Index(historyPosition, ":")
+		height, _ := strconv.Atoi(historyPosition[:sep])
+		txidx, _ := strconv.Atoi(historyPosition[sep+1:])
+		txsRsp = append(txsRsp, &model.TxInfoResp{
+			Height: height,
+			Idx:    txidx,
+		})
+	}
+
+	return txsRsp, nil
+}
+
 //////////////// address
-func GetTxsHistoryByAddressAndTypeByHeightRange(cursor, size, blkStartHeight, blkEndHeight int, addressHex string, historyType model.HistoryType) (txsRsp []*model.TxInfoResp, err error) {
+func GetTxsHistoryByAddressAndTypeByHeightRange(cursor, size, blkStartHeight, blkEndHeight int, addressPkh []byte, historyType model.HistoryType) (txsRsp []*model.TxInfoResp, err error) {
 	logger.Log.Info("query txinfo history for",
 		zap.Int("cursor", cursor),
 		zap.Int("size", size),
 		zap.Int("blkStart", blkStartHeight),
 		zap.Int("blkEnd", blkEndHeight),
-		zap.String("address", addressHex))
-	maxOffset := cursor + size
+		zap.String("address", hex.EncodeToString(addressPkh)))
+
+	txsRsp, err = GetTxsHistoryByAddressAndTypeByHeightRangeFromPika(cursor, size, addressPkh)
+	if err != nil || len(txsRsp) == 0 {
+		return
+	}
+
+	strHeightTxidList := make([]string, len(txsRsp))
+	for idx, tx := range txsRsp {
+		strHeightTxidList[idx] = fmt.Sprintf("(%d,%d)", tx.Height, tx.Idx)
+	}
 
 	if blkEndHeight == 0 {
 		blkEndHeight = 4294967295 + 1 // enable mempool
-	}
-
-	codehashMatch := ""
-	if historyType == model.HISTORY_CONTRACT_ONLY {
-		codehashMatch = "AND codehash != '' AND codehash != unhex('00')"
 	}
 
 	psql := fmt.Sprintf(`
@@ -34,58 +66,13 @@ LEFT JOIN  (
     WHERE height >= %d AND height < %d
 ) AS blk
 USING height
-WHERE (height, txidx, substring(txid, 1, 12)) in (
-    SELECT height, txidx, txid FROM
-    (
-        SELECT utxid AS txid, height, utxidx AS txidx FROM txout_address_height
-        WHERE height >= %d AND height < %d AND address = unhex('%s') %s
-        GROUP BY txid, height, txidx
-        ORDER BY height DESC, txidx DESC
-        LIMIT %d
-
-      UNION ALL
-
-        SELECT substring(utxid, 1, 12) AS txid, height, utxidx AS txidx FROM txout
-        WHERE height >= 4294967295 AND height < %d AND address = unhex('%s') %s
-        GROUP BY txid, height, txidx
-        ORDER BY height DESC, txidx DESC
-        LIMIT %d
-
-      UNION ALL
-
-        SELECT txid, height, txidx FROM txin_address_height
-        WHERE height >= %d AND height < %d AND address = unhex('%s') %s
-        GROUP BY txid, height, txidx
-        ORDER BY height DESC, txidx DESC
-        LIMIT %d
-
-      UNION ALL
-
-        SELECT substring(txid, 1, 12), height, txidx FROM txin
-        WHERE height >= 4294967295 AND height < %d AND address = unhex('%s') %s
-        GROUP BY txid, height, txidx
-        ORDER BY height DESC, txidx DESC
-        LIMIT %d
-    ) AS txlist
-    ORDER BY height DESC, txidx DESC
-)
+WHERE (height, txidx) in (%s)
 ORDER BY height DESC, txidx DESC
-LIMIT %d, %d
 `,
 		SQL_FIELEDS_TX_TIMESTAMP,
 		blkStartHeight, blkEndHeight,
 
-		blkStartHeight, blkEndHeight,
-		addressHex, codehashMatch, maxOffset,
-		blkEndHeight,
-		addressHex, codehashMatch, maxOffset,
-
-		blkStartHeight, blkEndHeight,
-		addressHex, codehashMatch, maxOffset,
-		blkEndHeight,
-		addressHex, codehashMatch, maxOffset,
-
-		cursor, size)
+		strings.Join(strHeightTxidList, ","))
 
 	return GetBlockTxsBySql(psql, true)
 }

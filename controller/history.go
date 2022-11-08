@@ -101,7 +101,7 @@ func GetTxsHistoryByAddressAndType(ctx *gin.Context, historyType model.HistoryTy
 		return
 	}
 
-	result, err := service.GetTxsHistoryByAddressAndTypeByHeightRange(cursor, size, blkStartHeight, blkEndHeight, hex.EncodeToString(addressPkh), historyType)
+	result, err := service.GetTxsHistoryByAddressAndTypeByHeightRange(cursor, size, blkStartHeight, blkEndHeight, addressPkh, historyType)
 	if err != nil {
 		logger.Log.Info("get txs history failed", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get txs history failed"})
