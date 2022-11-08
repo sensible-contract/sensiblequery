@@ -94,7 +94,7 @@ func GetTxsHistoryByAddressAndType(ctx *gin.Context, historyType model.HistoryTy
 	}
 	sizeString := ctx.DefaultQuery("size", "16")
 	size, err := strconv.Atoi(sizeString)
-	if err != nil || size <= 0 || size > MAX_HISTORY_SIZE || cursor+size > MAX_HISTORY_LIMIT {
+	if err != nil || size <= 0 || size > MAX_HISTORY_SIZE {
 		logger.Log.Info("size invalid", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "size invalid"})
 		return
