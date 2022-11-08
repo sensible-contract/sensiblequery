@@ -55,8 +55,6 @@ func GetTxsHistoryInfoByAddress(ctx *gin.Context) {
 // @Summary 通过地址address获取相关tx历史列表，返回tx概要
 // @Tags History
 // @Produce  json
-// @Param start query int true "Start Block Height" default(666666)
-// @Param end query int true "End Block Height, (0 to get mempool data)" default(0)
 // @Param cursor query int true "起始游标" default(0)
 // @Param size query int true "返回记录数量" default(16)
 // @Param address path string true "Address" default(17SkEw2md5avVNyYgj6RiXuQKNwkXaxFyQ)
@@ -72,8 +70,6 @@ func GetTxsHistoryByAddress(ctx *gin.Context) {
 // @Summary 通过地址address获取合约相关tx历史列表，返回tx概要
 // @Tags History
 // @Produce  json
-// @Param start query int true "Start Block Height" default(666666)
-// @Param end query int true "End Block Height, (0 to get mempool data)" default(0)
 // @Param cursor query int true "起始游标" default(0)
 // @Param size query int true "返回记录数量" default(16)
 // @Param address path string true "Address" default(17SkEw2md5avVNyYgj6RiXuQKNwkXaxFyQ)
@@ -87,28 +83,6 @@ func GetContractTxsHistoryByAddress(ctx *gin.Context) {
 
 func GetTxsHistoryByAddressAndType(ctx *gin.Context, historyType model.HistoryType) {
 	logger.Log.Info("GetTxsHistoryByAddressAndType enter")
-
-	// check height
-	blkStartHeightString := ctx.DefaultQuery("start", "666666")
-	blkStartHeight, err := strconv.Atoi(blkStartHeightString)
-	if err != nil || blkStartHeight < 0 {
-		logger.Log.Info("blk start height invalid", zap.Error(err))
-		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "blk start height invalid"})
-		return
-	}
-	blkEndHeightString := ctx.DefaultQuery("end", "0")
-	blkEndHeight, err := strconv.Atoi(blkEndHeightString)
-	if err != nil || blkEndHeight < 0 {
-		logger.Log.Info("blk end height invalid", zap.Error(err))
-		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "blk end height invalid"})
-		return
-	}
-
-	if blkEndHeight > 0 && (blkEndHeight <= blkStartHeight || (blkEndHeight-blkStartHeight > MAX_HISTORY_BLOCK_RANGE)) {
-		logger.Log.Info("blk end height invalid", zap.Error(err))
-		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "blk end height invalid"})
-		return
-	}
 
 	// get cursor/size
 	cursorString := ctx.DefaultQuery("cursor", "0")
@@ -135,7 +109,7 @@ func GetTxsHistoryByAddressAndType(ctx *gin.Context, historyType model.HistoryTy
 		return
 	}
 
-	result, err := service.GetTxsHistoryByAddressAndTypeByHeightRange(cursor, size, blkStartHeight, blkEndHeight, addressPkh, historyType)
+	result, err := service.GetTxsHistoryByAddressAndTypeByHeightRange(cursor, size, addressPkh, historyType)
 	if err != nil {
 		logger.Log.Info("get txs history failed", zap.Error(err))
 		ctx.JSON(http.StatusOK, model.Response{Code: -1, Msg: "get txs history failed"})

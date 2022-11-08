@@ -51,12 +51,10 @@ func GetTxsHistoryByAddressAndTypeByHeightRangeFromPika(cursor, size int, addres
 }
 
 //////////////// address
-func GetTxsHistoryByAddressAndTypeByHeightRange(cursor, size, blkStartHeight, blkEndHeight int, addressPkh []byte, historyType model.HistoryType) (txsRsp []*model.TxInfoResp, err error) {
+func GetTxsHistoryByAddressAndTypeByHeightRange(cursor, size int, addressPkh []byte, historyType model.HistoryType) (txsRsp []*model.TxInfoResp, err error) {
 	logger.Log.Info("query txinfo history for",
 		zap.Int("cursor", cursor),
 		zap.Int("size", size),
-		zap.Int("blkStart", blkStartHeight),
-		zap.Int("blkEnd", blkEndHeight),
 		zap.String("address", hex.EncodeToString(addressPkh)))
 
 	txsRsp, err = GetTxsHistoryByAddressAndTypeByHeightRangeFromPika(cursor, size, addressPkh)
@@ -64,20 +62,24 @@ func GetTxsHistoryByAddressAndTypeByHeightRange(cursor, size, blkStartHeight, bl
 		return
 	}
 
+	blkStartHeight := 4294967295
+	blkEndHeight := 0
 	strHeightTxidList := make([]string, len(txsRsp))
 	for idx, tx := range txsRsp {
+		if blkStartHeight > tx.Height {
+			blkStartHeight = tx.Height
+		}
+		if blkEndHeight < tx.Height {
+			blkEndHeight = tx.Height
+		}
 		strHeightTxidList[idx] = fmt.Sprintf("(%d,%d)", tx.Height, tx.Idx)
-	}
-
-	if blkEndHeight == 0 {
-		blkEndHeight = 4294967295 + 1 // enable mempool
 	}
 
 	psql := fmt.Sprintf(`
 SELECT %s FROM blktx_height
 LEFT JOIN  (
     SELECT height, blkid, blocktime FROM blk_height
-    WHERE height >= %d AND height < %d
+    WHERE height >= %d AND height <= %d
 ) AS blk
 USING height
 WHERE (height, txidx) in (%s)
