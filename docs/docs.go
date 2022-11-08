@@ -123,22 +123,6 @@ var doc = `{
                 "parameters": [
                     {
                         "type": "integer",
-                        "default": 666666,
-                        "description": "Start Block Height",
-                        "name": "start",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "default": 0,
-                        "description": "End Block Height, (0 to get mempool data)",
-                        "name": "end",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
                         "default": 0,
                         "description": "起始游标",
                         "name": "cursor",
@@ -187,6 +171,52 @@ var doc = `{
                 }
             }
         },
+        "/address/{address}/history/info": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "History"
+                ],
+                "summary": "通过地址address获取相关tx历史记录信息，包括记录条数等",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "17SkEw2md5avVNyYgj6RiXuQKNwkXaxFyQ",
+                        "description": "Address",
+                        "name": "address",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\": 0, \"data\": {}, \"msg\": \"ok\"}",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/model.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/model.AddressHistoryInfoResp"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
         "/address/{address}/history/tx": {
             "get": {
                 "security": [
@@ -202,22 +232,6 @@ var doc = `{
                 ],
                 "summary": "通过地址address获取相关tx历史列表，返回tx概要",
                 "parameters": [
-                    {
-                        "type": "integer",
-                        "default": 666666,
-                        "description": "Start Block Height",
-                        "name": "start",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "default": 0,
-                        "description": "End Block Height, (0 to get mempool data)",
-                        "name": "end",
-                        "in": "query",
-                        "required": true
-                    },
                     {
                         "type": "integer",
                         "default": 0,
@@ -4347,6 +4361,15 @@ var doc = `{
                     "items": {
                         "type": "string"
                     }
+                }
+            }
+        },
+        "model.AddressHistoryInfoResp": {
+            "type": "object",
+            "properties": {
+                "total": {
+                    "description": "和地址相关的Tx总条数",
+                    "type": "integer"
                 }
             }
         },

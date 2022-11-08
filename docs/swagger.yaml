@@ -11,6 +11,12 @@ definitions:
           type: string
         type: array
     type: object
+  model.AddressHistoryInfoResp:
+    properties:
+      total:
+        description: 和地址相关的Tx总条数
+        type: integer
+    type: object
   model.AddressTokenUTXOResp:
     properties:
       cursor:
@@ -1054,18 +1060,6 @@ paths:
   /address/{address}/contract-history/tx:
     get:
       parameters:
-      - default: 666666
-        description: Start Block Height
-        in: query
-        name: start
-        required: true
-        type: integer
-      - default: 0
-        description: End Block Height, (0 to get mempool data)
-        in: query
-        name: end
-        required: true
-        type: integer
       - default: 0
         description: 起始游标
         in: query
@@ -1103,21 +1097,35 @@ paths:
       summary: 通过地址address获取合约相关tx历史列表，返回tx概要
       tags:
       - History
+  /address/{address}/history/info:
+    get:
+      parameters:
+      - default: 17SkEw2md5avVNyYgj6RiXuQKNwkXaxFyQ
+        description: Address
+        in: path
+        name: address
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 0, "data": {}, "msg": "ok"}'
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.AddressHistoryInfoResp'
+              type: object
+      security:
+      - BearerAuth: []
+      summary: 通过地址address获取相关tx历史记录信息，包括记录条数等
+      tags:
+      - History
   /address/{address}/history/tx:
     get:
       parameters:
-      - default: 666666
-        description: Start Block Height
-        in: query
-        name: start
-        required: true
-        type: integer
-      - default: 0
-        description: End Block Height, (0 to get mempool data)
-        in: query
-        name: end
-        required: true
-        type: integer
       - default: 0
         description: 起始游标
         in: query
